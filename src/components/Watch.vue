@@ -16,10 +16,6 @@
                   <strong>Tx:</strong>
                   <a :href="'https://eostracker.io/transactions/' + txid">{{ txid }}</a>
               </p>
-              <p v-if="ipfsHash">
-                  <strong>IPFS Hash:</strong>
-                  {{ ipfsHash }}
-              </p>
               <p>
                 <strong>Source:</strong>
                   <a :href="videoUrl">{{ videoUrl }}</a>
@@ -36,7 +32,7 @@
 </template>
 
 <script>
-import { Eos, ScatterConfig, ScatterEosOptions } from '../eos'
+import { GetEOS, ScatterConfig, ScatterEosOptions } from '../eos'
 
 var watchData = {
     txid: '',
@@ -52,7 +48,7 @@ export default {
       async function load(scatter, txid) {
             watchData.txid = txid;
 
-            const eos = scatter.eos(ScatterConfig, Eos, ScatterEosOptions, 'https');
+            const eos = GetEOS(scatter);
             var tx = await eos.getTransaction(txid);
             var actions = tx.trx.trx.actions;
             if (actions && actions.length >= 1) {
@@ -78,14 +74,15 @@ export default {
        }
 
       var txid = this.$route.params.id;
-      if (window.scatter) {
+      load(null, txid);
+      /*if (window.scatter) {
           load(window.scatter, txid);
       }
       else {
           document.addEventListener('scatterLoaded', scatterExtension => {
                 load(window.scatter, txid);
           });
-      }
+      }*/
   },
   methods: {
   },

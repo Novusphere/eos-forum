@@ -12,9 +12,22 @@ const ScatterEosOptions = {
         sign: true,
         chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906" // Or null to fetch automatically ( takes longer )
     };
+    
+function GetEOS(scatter) {
+    var eos;
+    
+    if (scatter) {
+        eos = scatter.eos(ScatterConfig, Eos, ScatterEosOptions, 'https');
+    }
+    else {
+        eos = Eos({
+            httpEndpoint: 'https://' + ScatterConfig.host,
+            chainId: ScatterConfig.chainId, 
+            keyProvider: []
+        });
+    }
 
-function GetTransactionData() {
-    // https://api.eostracker.io/transactions/459b1f5f2517abfdde719d72d9c287e32e37ea79fccfb45881a0dc38944e2ef0/actions
+    return eos;
 }
 
-export { Eos, ScatterConfig, ScatterEosOptions, EosTransactionData };
+export { GetEOS, ScatterConfig, ScatterEosOptions };
