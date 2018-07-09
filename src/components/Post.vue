@@ -22,7 +22,10 @@
             </div>
 
             <div v-if="showContent">
-                <div class="row" v-if="p.data.json_metadata.attachment && p.data.json_metadata.attachment.value">
+                <div
+                    :id="'content-' + p.data.post_uuid" 
+                    :class="p.depth > 0 ? 'row collapse' : 'row'" 
+                    v-if="p.data.json_metadata.attachment && p.data.json_metadata.attachment.value">
                     <div class="col-md-12">
                         <div v-if="p.data.json_metadata.attachment.display == 'iframe'">
                             <iframe style="width: 100%" :src="p.data.json_metadata.attachment.value" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
@@ -51,6 +54,13 @@
                     <ul class="list-inline">
                         <li class="list-inline-item" v-if="showContent">
                             <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="reply()">reply</button>
+                        </li>
+                        <li class="list-inline-item" v-if="p.depth > 0 && p.data.json_metadata.attachment && p.data.json_metadata.attachment.value">
+                            <button 
+                                data-toggle="collapse" :data-target="'#content-' + p.data.post_uuid"
+                                type="button" class="btn btn-sm btn-outline-primary">
+                                show attachment
+                            </button>
                         </li>
                     </ul>
                 </div>
