@@ -2,13 +2,17 @@
   <div class="container">
      <div class="row">
       <div class="col-md-8">
-        <div class="row"  v-for="p in posts" :key="p.id">
+        <div class="row mb-2" style="border:1px solid black;" v-for="p in posts" :key="p.id">
           <div class="col-md-12">
               <span style="font-weight: bold; font-size: 20px">
-                <router-link :to="'/e/novusphere/' + p.transaction">{{ p.data.title }}</router-link>
+                <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.data.title }}</router-link>
+                <router-link style="font-size: x-small" :to="'/e/' + p.data.json_metadata.sub">(self.{{p.data.json_metadata.sub}})</router-link>  
               </span>
               <div style="font-size: 13px">
                 <ul class="list-inline">
+                  <li class="list-inline-item">
+                    <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.total_replies+1 }} comments</router-link>
+                  </li>
                   <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
                   <li class="list-inline-item">by <a :href="'https://eostracker.io/accounts/' + p.data.account">{{ p.data.account }}</a></li>
                   <li class="list-inline-item"><a :href="'https://eostracker.io/transactions/' + p.transaction">view on chain</a></li>
@@ -112,23 +116,53 @@
 import { GetNovusphere } from "../novusphere"
 import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos"
 import { v4 as uuidv4 } from "uuid"
-import JQuery from "jquery"
+import jQuery from "jquery"
 
 export default {
   name: "Index",
   mounted: async function() {
     var novusphere = GetNovusphere();
-    var apiResult = await novusphere.api({
-      'find': novusphere.config.collection,
-      'maxTimeMS': 1000,
-      'filter': {
-        'data.json_metadata.sub': 'novusphere',
-        'data.reply_to_post_uuid': '' // only top level posts
-      },
-      'sort': {
-        'createdAt': -1
-      }
-    });
+    var apiResult = await novusphere.api(
+      {
+        'aggregate': novusphere.config.collection,
+        'maxTimeMS': 1000,
+        'cursor': {},
+        'pipeline': [
+          { 
+              "$match": 
+              { 
+                'data.json_metadata.sub': 'novusphere', 
+                'data.reply_to_post_uuid': '' 
+              } 
+          },
+          { 
+              "$lookup": {
+                  "from": "novusphere",
+                  "localField": "data.post_uuid",
+                  "foreignField": "data.reply_to_post_uuid",
+                  "as": "replies"
+              }
+          },
+          { 
+              "$project": {
+                  "transaction": "$transaction",
+                  "createdAt": "$createdAt",
+                  "data": "$data",
+                  "total_replies": { "$size": "$replies" }
+              } 
+          },
+          {
+              "$sort": {
+                "createdAt": -1
+              }
+          },
+          {
+              "$skip": 0
+          },
+          {
+              "$limit": 25
+          }]
+      });
 
     var payload = apiResult.cursor.firstBatch;
     this.$data.posts = payload;
@@ -190,7 +224,7 @@ export default {
      var novusphere = GetNovusphere();
      await novusphere.waitTx(eostx.transaction_id, 500, 1000);
 
-     JQuery('#submitPost').modal('hide');
+     jQuery('#submitPost').modal('hide');
      this.$router.push('/e/novusphere/' + eostx.transaction_id);
    }
   },
