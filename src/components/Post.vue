@@ -43,8 +43,8 @@
                     </div>
                 </div>
                 
-                <p style="">
-                    {{ p.data.content }}
+                <p v-html="md(p.data.content) ">
+                
                 </p>
 
                 <div style="font-size: x-small">
@@ -62,6 +62,7 @@
 
 <script>
 import jQuery from 'jquery'
+import { markdown } from '../markdown'
 
 export default {
   name: "Post",
@@ -79,6 +80,9 @@ export default {
   async mounted() {
   },
   methods: {
+      md: function(text) {
+          return markdown(text);
+      },
       reply: function () {
         // set the parent uuid that we're replying to
         var $submitPost = jQuery('#submitPost');
