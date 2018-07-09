@@ -1,5 +1,13 @@
 <template>
   <div>
+    <div class="text-center">
+      <ul class="list-inline">
+        <li class="list-inline-item"><router-link to='/e/novusphere'>/e/novusphere</router-link></li>
+        <li class="list-inline-item"><router-link to='/e/eos'>/e/eos</router-link></li>
+        <li class="list-inline-item"><router-link to='/e/general'>/e/general</router-link></li>
+        <li class="list-inline-item"><router-link to='/e/test'>/e/test</router-link></li>
+      </ul>
+    </div>
     <div class="ml-3">
       <h1><router-link :to="'/e/' + sub">/e/{{ sub }}</router-link></h1>
     </div>
@@ -62,7 +70,7 @@
           </div>
         </div>
       </div>
-      <SubmitPostModal :postContentCallback="postContent"></SubmitPostModal>
+      <SubmitPostModal :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
     </div>
   </div>
 </template>
@@ -84,6 +92,9 @@ export default {
   },
   watch: {
     '$route.query.page': function (id) {
+      this.load();
+    },
+    '$route.params.sub': function() {
       this.load();
     }
   },

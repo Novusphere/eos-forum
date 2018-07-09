@@ -10,7 +10,7 @@
         <Post :post="mainPost" :showContent="true" v-bind="mainPost"></post>
       </div>
      </div>
-     <SubmitPostModal :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.account"></SubmitPostModal>
+     <SubmitPostModal :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.account"></SubmitPostModal>
     </div>
   </div>
 </template>

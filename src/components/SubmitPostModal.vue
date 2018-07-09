@@ -112,6 +112,11 @@ export default {
           required: false,
           default: ''       
       },
+      sub: {
+          type: String,
+          required: true,
+          default: '',
+      },
       postContentCallback: {
           type: Function,
           required: false,
@@ -157,10 +162,10 @@ export default {
                     content: post.content,
                     post_uuid: uuidv4(),
                     json_metadata: JSON.stringify({
-                        'sub': 'novusphere',
+                        'sub': this.sub,
                         'parent_uuid': parent_uuid, 
                         'attachment': {
-                            'value': post.attachment.value,
+                            'value': post.attachment.value.trim(),
                             'type': post.attachment.type,
                             'display': (post.attachment.value) ? post.attachment.display : ''
                         }}),
