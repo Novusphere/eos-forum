@@ -13,7 +13,7 @@
             <div style="font-size: x-small">
                 <ul class="list-inline">
                   <li class="list-inline-item" v-if="!showContent">
-                    <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.total_replies+1 }} comments</router-link>
+                    <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
                   <li class="list-inline-item">by <a :href="'https://eostracker.io/accounts/' + p.data.account">{{ p.data.account }}</a></li>
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 
-                <p v-html="md(p.data.content) ">
+                <p style="word-wrap:break-word;" v-html="md(p.data.content) ">
                 
                 </p>
 
@@ -103,7 +103,7 @@ export default {
       getHost: function(href) {
           if (href.indexOf('magnet:') == 0)
             return 'magnet link';
-            
+
           var parser = document.createElement('a');
           parser.href = href;
           return parser.host;

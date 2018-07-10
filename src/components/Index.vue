@@ -65,6 +65,9 @@
                   using the <a href="https://github.com/eoscanada/eosio.forum">eosio.forum</a> contract deployed by EOSCanada.
                   You can follow development on our <a href="https://discord.gg/PtXzUVr">Discord</a>.
                   You need the <a href="https://get-scatter.com/">Scatter</a> browser plugin to post.
+                  This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub pages</a>.
+                  Developers of eos-forum take no responsibility for the content of the forum.
+                  To file a DMCA compliant, please contact dmca[at]novusphere.io.
                 </p>
               </div>
             </div>
