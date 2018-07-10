@@ -162,6 +162,7 @@ export default {
                     content: post.content,
                     post_uuid: uuidv4(),
                     json_metadata: JSON.stringify({
+                        'protocol': 'novusphere-forum',
                         'sub': this.sub,
                         'parent_uuid': parent_uuid, 
                         'attachment': {

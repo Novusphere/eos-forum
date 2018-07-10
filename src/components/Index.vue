@@ -5,6 +5,7 @@
         <li class="list-inline-item"><router-link to='/e/novusphere'>/e/novusphere</router-link></li>
         <li class="list-inline-item"><router-link to='/e/eos'>/e/eos</router-link></li>
         <li class="list-inline-item"><router-link to='/e/general'>/e/general</router-link></li>
+        <li class="list-inline-item"><router-link to='/e/movies'>/e/movies</router-link></li>
         <li class="list-inline-item"><router-link to='/e/test'>/e/test</router-link></li>
       </ul>
     </div>
@@ -163,7 +164,17 @@ export default {
       var payload = apiResult.cursor.firstBatch;
       
       for (var i = 0; i < payload.length; i++) {
-        payload[i].depth = 0; // these are all top-level
+        var p = payload[i];
+        p.children = [];
+        p.depth = 0;
+
+        var attachment = p.data.json_metadata.attachment;
+
+        // transform ipfs --> url
+        if (attachment && attachment.value && attachment.type == 'ipfs') {
+            attachment.type = 'url';
+            attachment.value = 'https://ipfs.io/ipfs/' + attachment.value;
+        }
       }
 
       this.$data.posts = payload;
