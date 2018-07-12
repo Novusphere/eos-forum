@@ -86,6 +86,7 @@
 
 <script>
 import { GetNovusphere } from "../novusphere"
+import { MigratePost } from "../migrations"
 import jQuery from "jquery"
 
 import Post from './Post.vue'
@@ -182,17 +183,7 @@ export default {
       var payload = apiResult.cursor.firstBatch;
       
       for (var i = 0; i < payload.length; i++) {
-        var p = payload[i];
-        p.children = [];
-        p.depth = 0;
-
-        var attachment = p.data.json_metadata.attachment;
-
-        // transform ipfs --> url
-        if (attachment && attachment.value && attachment.type == 'ipfs') {
-            attachment.type = 'url';
-            attachment.value = 'https://ipfs.io/ipfs/' + attachment.value;
-        }
+        MigratePost(payload[i]);
       }
 
       this.$data.posts = payload;

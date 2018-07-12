@@ -1,6 +1,6 @@
 <template>
   <div class="container"> 
-    <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.account"></SubmitPostModal>
+    <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.poster"></SubmitPostModal>
      <div class="row mb-2">
       <div class="col-md-12">
         <div class="row">
@@ -18,6 +18,7 @@
 <script>
 import { GetNovusphere } from "../novusphere"
 import { GetEOS, ScatterConfig, ScatterEosOptions } from '../eos'
+import { MigratePost } from '../migrations'
 import { v4 as uuidv4 } from "uuid"
 import jQuery from "jquery"
 
@@ -60,17 +61,8 @@ export default {
       var commentMap = {};
       for (var i = 0; i < responses.length; i++) {
         var p = responses[i];
-        p.children = [];
-        p.depth = 0;
-
-        var attachment = p.data.json_metadata.attachment;
-
-        // transform ipfs --> url
-        if (attachment && attachment.value && attachment.type == 'ipfs') {
-            attachment.type = 'url';
-            attachment.value = 'https://ipfs.io/ipfs/' + attachment.value;
-        }
-
+        MigratePost(p);
+        
         commentMap[p.data.post_uuid] = p;
 
         if (i > 0) {
@@ -87,8 +79,11 @@ export default {
                 p.data.account == parent.data.account &&
                 p.createdAt > parent.createdAt) {
 
+              var title = parent.data.json_metadata.title;
+
               parent.data.content = p.data.content;
               parent.data.json_metadata = p.data.json_metadata;
+              parent.data.json_metadata.title = title;
               parent.createdAt = p.createdAt;
               parent.transaction = p.transaction;
 

@@ -162,12 +162,18 @@ export default {
             const eos = GetEOS(window.scatter);
 
             var eosPost = {
-                    title: post.edit ? '' : post.title,
-                    account: eosAccount,
+                    //title: post.edit ? '' : post.title,
+                    //account: eosAccount,
+                    poster: eosAccount,
+                    //reply_to_account: this.replyAccount,
+                    reply_to_poster: this.replyAccount,
+                    reply_to_post_uuid: this.replyUuid,
+                    poster: eosAccount,
                     certify: 0,
                     content: post.content,
                     post_uuid: uuidv4(),
                     json_metadata: JSON.stringify({
+                        'title': post.edit ? '' : post.title,
                         'protocol': 'novusphere-forum',
                         'sub': this.sub,
                         'parent_uuid': post.parent_uuid,
@@ -177,9 +183,7 @@ export default {
                             'type': post.attachment.type,
                             'display': (post.attachment.value) ? post.attachment.display : ''
                         }
-                      }),
-                    reply_to_account: this.replyAccount,
-                    reply_to_post_uuid: this.replyUuid
+                      })
             };
 
             var eosforum = await eos.contract("eosforumtest");
@@ -211,6 +215,8 @@ export default {
         this.$data.post.status = '';
 
         this.postContentCallback(txid);
+
+        this.$data.status = '';
     }
   },
   data() {

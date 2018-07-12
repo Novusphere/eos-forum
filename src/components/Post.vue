@@ -2,11 +2,11 @@
     <div class="col-md-12 mb-3" style="border:1px solid black;">
             <span style="font-weight: bold; font-size: 20px">
                 <div v-if="p.data.json_metadata.attachment && p.data.json_metadata.attachment.value && p.data.json_metadata.attachment.display == 'link'">
-                    <a :href="p.data.json_metadata.attachment.value">{{ p.data.title }}</a>
+                    <a :href="p.data.json_metadata.attachment.value">{{ p.data.json_metadata.title }}</a>
                     <span style="font-size: x-small">({{this.getHost(p.data.json_metadata.attachment.value)}})</span>  
                 </div>
                 <div v-else-if="p.depth == 0">
-                    <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.data.title }}</router-link>
+                    <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.data.json_metadata.title }}</router-link>
                     <router-link style="font-size: x-small" :to="'/e/' + p.data.json_metadata.sub">(eos.{{p.data.json_metadata.sub}})</router-link>
                 </div>
             </span>
@@ -16,7 +16,7 @@
                     <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
-                  <li class="list-inline-item">by <a :href="'https://eostracker.io/accounts/' + p.data.account">{{ p.data.account }}</a></li>
+                  <li class="list-inline-item">by <a :href="'https://eostracker.io/accounts/' + p.data.poster">{{ p.data.poster }}</a></li>
                   <li class="list-inline-item"><a :href="'https://eostracker.io/transactions/' + p.transaction">view on chain</a></li>
                 </ul>
             </div>
@@ -123,7 +123,7 @@ export default {
         $post.title = '';
         $post.content = p.data.content;
         $post.edit = true;
-        $post.edit_account = p.data.account;
+        $post.edit_account = p.data.poster;
 
         var attachment = p.data.json_metadata.attachment;
         if (attachment) {
