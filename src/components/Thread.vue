@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <div class="container"> 
+    <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.account"></SubmitPostModal>
      <div class="row mb-2">
       <div class="col-md-12">
         <div class="row">
@@ -7,10 +8,9 @@
               <router-link :to="'/e/' + mainPost.data.json_metadata.sub">&larr; back to /e/{{ mainPost.data.json_metadata.sub }}</router-link>
             </div>
         </div>
-        <Post :post="mainPost" :showContent="true" v-bind="mainPost"></post>
+        <Post :submitModal="$refs.submitModal" :post="mainPost" :showContent="true" v-bind="mainPost"></post>
       </div>
      </div>
-     <SubmitPostModal :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.account"></SubmitPostModal>
     </div>
   </div>
 </template>
@@ -79,6 +79,22 @@ export default {
             parent_uuid = (parent_uuid) ? parent_uuid : mainPost.data.post_uuid;
 
             var parent = commentMap[parent_uuid];
+
+            // if this is is an edit, update parent content
+            // check parent content isn't already newest
+            // check that this post is actually by the person who made original post
+            if (p.data.json_metadata.edit && 
+                p.data.account == parent.data.account &&
+                p.createdAt > parent.createdAt) {
+
+              parent.data.content = p.data.content;
+              parent.data.json_metadata = p.data.json_metadata;
+              parent.createdAt = p.createdAt;
+              parent.transaction = p.transaction;
+
+              p.hide = true;
+            }
+
             p.depth = parent.depth + 1;
             parent.children.push(p);
         }

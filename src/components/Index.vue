@@ -6,6 +6,8 @@
         <li class="list-inline-item"><router-link to='/e/eos'>/e/eos</router-link></li>
         <li class="list-inline-item"><router-link to='/e/general'>/e/general</router-link></li>
         <li class="list-inline-item"><router-link to='/e/movies'>/e/movies</router-link></li>
+        <li class="list-inline-item"><router-link to='/e/music'>/e/music</router-link></li>
+        <li class="list-inline-item"><router-link to='/e/bounties'>/e/bounties</router-link></li>
         <li class="list-inline-item"><router-link to='/e/test'>/e/test</router-link></li>
       </ul>
     </div>
@@ -13,6 +15,7 @@
       <h1><router-link :to="'/e/' + sub">/e/{{ sub }}</router-link></h1>
     </div>
     <div class="container">
+      <SubmitPostModal ref="submitModal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
       <div class="row">
         <div class="col-md-8">
           <div v-if="posts.length == 0">
@@ -21,7 +24,7 @@
             </div>
           </div>
           <div class="row mb-2" v-for="p in posts" :key="p.transaction">
-            <Post :post="p" :showContent="false"></Post>
+            <Post :submitModal="$refs.submitModal" :post="p" :showContent="false"></Post>
           </div>
           <div class="row">
             <div class="col-md-2" v-if="currentPage>1">
@@ -61,20 +64,22 @@
               </div>
               <div class="row mt-3 ml-3">
                 <p class="text-center">
-                  This is an experimental reddit-style forum built on EOS by the Novusphere community,
+                  This is an experimental Reddit-style forum built on EOS by the Novusphere community,
                   using the <a href="https://github.com/eoscanada/eosio.forum">eosio.forum</a> contract deployed by EOSCanada.
                   You can follow development on our <a href="https://discord.gg/PtXzUVr">Discord</a>.
                   You need the <a href="https://get-scatter.com/">Scatter</a> browser plugin to post.
+                  <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Here is a guide</a> on markdown syntax, it's pretty much the same as Reddit.
+                </p> 
+                <p class="text-center">
                   This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub pages</a>.
                   Developers of eos-forum take no responsibility for the content of the forum.
-                  To file a DMCA compliant, please contact dmca[at]novusphere.io.
+                  No images, files or media are hosted by eos-forum, please contact the respective site owners hosting content in breach of DMCA.
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <SubmitPostModal :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
     </div>
   </div>
 </template>
@@ -148,7 +153,17 @@ export default {
                     "transaction": "$transaction",
                     "createdAt": "$createdAt",
                     "data": "$data",
-                    "total_replies": { "$size": "$replies" }
+                    "total_replies": { 
+                      "$size": {
+                        "$filter": {
+                          "input": "$replies",
+                          "as": "reply",
+                          "cond": {
+                            "$ne": [ "$$reply.data.json_metadata.edit", true  ]
+                          }
+                        }
+                      }
+                    }
                 } 
             },
             {

@@ -3,14 +3,13 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">{{ replyUuid ? 'Reply' : 'New Submission' }}</h5>
+              <h5 class="modal-title">{{ replyUuid ? (post.edit ? 'Edit' : 'Reply') : 'New Submission' }}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
               <form>
-                <input type="hidden" name="parent_uuid" v-if="replyUuid">
                 <div class="form-group row" v-if="!replyUuid">
                   <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
                   <div class="col-sm-10">
@@ -79,7 +78,7 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="text-center">
-                    <span style="font-weight: bold">{{post.status}}</span>
+                    <span style="font-weight: bold">{{status}}</span>
                   </div>
                 </div>
               </div>
@@ -125,11 +124,10 @@ export default {
   },
   methods: {
     postContent: async function() {
-        var parent_uuid = jQuery('#submitPost input[name="parent_uuid"]').val();
         var post = this.$data.post;
 
         var identity;
-        this.$data.post.status = 'Getting Scatter identity...';
+        this.$data.status = 'Getting Scatter identity...';
 
         try {
             identity = await window.scatter.getIdentity({
@@ -146,17 +144,25 @@ export default {
             return;
         }
 
+        const eosAccount = identity.accounts[0].name;
+        const eosAuth = identity.accounts[0].authority;
+
+        if (post.edit) {
+          if (eosAccount != post.edit_account) {
+            this.$data.status = 'This is not your post, you cannot edit it!';
+            return;
+          }
+        }
+
         var txid;
-        this.$data.post.status = 'Creating tx and broadcasting to EOS...';
+        this.$data.status = 'Creating tx and broadcasting to EOS...';
         try {
-            const eosAccount = identity.accounts[0].name;
-            const eosAuth = identity.accounts[0].authority;
             
             // make scatter eos instance
             const eos = GetEOS(window.scatter);
 
             var eosPost = {
-                    title: post.title,
+                    title: post.edit ? '' : post.title,
                     account: eosAccount,
                     certify: 0,
                     content: post.content,
@@ -164,12 +170,14 @@ export default {
                     json_metadata: JSON.stringify({
                         'protocol': 'novusphere-forum',
                         'sub': this.sub,
-                        'parent_uuid': parent_uuid, 
+                        'parent_uuid': post.parent_uuid,
+                        'edit': post.edit,
                         'attachment': {
                             'value': post.attachment.value.trim(),
                             'type': post.attachment.type,
                             'display': (post.attachment.value) ? post.attachment.display : ''
-                        }}),
+                        }
+                      }),
                     reply_to_account: this.replyAccount,
                     reply_to_post_uuid: this.replyUuid
             };
@@ -194,7 +202,7 @@ export default {
             return;
         }
 
-        this.$data.post.status = 'Waiting for Novusphere to index...';
+        this.$data.status = 'Waiting for Novusphere to index...';
 
         var novusphere = GetNovusphere();
         await novusphere.waitTx(txid, 500, 1000);
@@ -206,9 +214,13 @@ export default {
     }
   },
   data() {
-    return {
+    return {        
+      status: '', 
       post: { // for making a new post
-        status: '',
+        edit: false,
+        edit_account: '',
+
+        parent_uuid: '',
         title: '',
         content: '',
         attachment: {

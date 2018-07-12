@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 
-                <p style="word-wrap:break-word;" v-html="md(p.data.content) ">
+                <p class="post-content" v-html="md(p.data.content) ">
                 
                 </p>
 
@@ -54,21 +54,38 @@
                     <ul class="list-inline">
                         <li class="list-inline-item" v-if="showContent">
                             <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="reply()">reply</button>
+                            <button type="button" class="btn btn-sm btn-outline-warning" v-on:click="edit()">edit</button>
                         </li>
                         <li class="list-inline-item" v-if="p.depth > 0 && p.data.json_metadata.attachment && p.data.json_metadata.attachment.value">
                             <button 
                                 data-toggle="collapse" :data-target="'#content-' + p.data.post_uuid"
-                                type="button" class="btn btn-sm btn-outline-primary">
+                                type="button" class="btn btn-sm btn-outline-danger">
                                 show attachment
                             </button>
                         </li>
                     </ul>
                 </div>
-
-                <Post :post="child" :showContent="true" v-for="child in p.children" :key="child.transaction"></Post>
+    
+                <div v-for="child in p.children" :key="child.transaction">
+                    <div v-if="!(child.hide)">
+                        <Post :submitModal="submitModal" :post="child" :showContent="true" ></Post>
+                    </div>
+                </div>
             </div>
     </div>
 </template>
+
+<style>
+
+.post-content {
+    word-wrap: break-word;
+}
+
+.post-content img {
+    max-width: 100%;
+}
+
+</style>
 
 <script>
 import jQuery from 'jquery'
@@ -85,6 +102,10 @@ export default {
           type: Boolean,
           required: false,
           default: true
+      },
+      submitModal: {
+          type: Object,
+          required: false
       }
   },
   async mounted() {
@@ -93,12 +114,36 @@ export default {
       md: function(text) {
           return markdown(text);
       },
+      edit: function() {
+        var $post = this.submitModal.$data.post;
+        var p = this.$data.p;
+
+        // dupe existing post into submit
+        $post.parent_uuid = p.data.post_uuid;
+        $post.title = '';
+        $post.content = p.data.content;
+        $post.edit = true;
+        $post.edit_account = p.data.account;
+
+        var attachment = p.data.json_metadata.attachment;
+        if (attachment) {
+            $post.attachment.value = attachment.value;
+            $post.attachment.type = attachment.type;
+            $post.attachment.display = attachment.display;
+        }
+        else {
+            $post.attachment.value = '';
+            $post.attachment.type = '';
+            $post.attachment.display = 'link';
+        }
+        jQuery('#submitPost').modal();
+      },
       reply: function () {
-        // set the parent uuid that we're replying to
-        var $submitPost = jQuery('#submitPost');
-        var $parent_uuid = $submitPost.find('input[name="parent_uuid"]');
-        $parent_uuid.val(this.$data.p.data.post_uuid);
-        $submitPost.modal();
+        var $post = this.submitModal.$data.post;
+        $post.parent_uuid = this.$data.p.data.post_uuid;
+        $post.edit = false;
+
+        jQuery('#submitPost').modal();
       },
       getHost: function(href) {
           if (href.indexOf('magnet:') == 0)
