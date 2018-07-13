@@ -1,6 +1,6 @@
 <template>
       <div class="modal fade" tabindex="-1" role="dialog" id="submitPost">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">{{ replyUuid ? (post.edit ? 'Edit' : 'Reply') : 'New Submission' }}</h5>
@@ -8,84 +8,97 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">
-              <form>
-                <div class="form-group row" v-if="!replyUuid">
-                  <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
-                  <div class="col-sm-10">
-                    <input type="email" class="form-control" id="inputTitle" placeholder="Title" v-model="post.title">
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="inputContent" class="col-sm-2 col-form-label">Content</label>
-                  <div class="col-sm-10">
-                    <textarea rows="10" class="form-control" id="inputContent" placeholder="Content" v-model="post.content"></textarea>
-                  </div>
-                </div>
-                <fieldset class="form-group">
-                  <div class="row">
-                    <legend class="col-form-label col-sm-2 pt-0"></legend>
+            <div v-if="preview">
+              <div class="modal-body">
+                <p class="post-content" v-html="markdownPost">
+
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" v-on:click="preview = false">Back</button>
+              </div>
+            </div>
+            <div v-else>
+              <div class="modal-body">
+                <form>
+                  <div class="form-group row" v-if="!replyUuid">
+                    <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
                     <div class="col-sm-10">
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentType" value="" checked v-model="post.attachment.type">
-                        <label class="form-check-label">No attachment</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentType" value="url" v-model="post.attachment.type">
-                        <label class="form-check-label">URL</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentType" value="ipfs" v-model="post.attachment.type">
-                        <label class="form-check-label">IPFS</label>
-                      </div>
+                      <input type="email" class="form-control" id="inputTitle" placeholder="Title" v-model="post.title">
                     </div>
                   </div>
-                </fieldset>
-                <fieldset class="form-group" v-if="post.attachment.type != ''">
-                  <div class="row">
-                    <legend class="col-form-label col-sm-2 pt-0"></legend>
+                  <div class="form-group row">
+                    <label for="inputContent" class="col-sm-2 col-form-label">Content</label>
                     <div class="col-sm-10">
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentDisplay" value="link" checked v-model="post.attachment.display">
-                        <label class="form-check-label">link</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentDisplay" value="iframe" v-model="post.attachment.display">
-                        <label class="form-check-label">iframe</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentDisplay" value="img" v-model="post.attachment.display">
-                        <label class="form-check-label">image</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentDisplay" value="mp4" v-model="post.attachment.display">
-                        <label class="form-check-label">mp4</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="attachmentDisplay" value="mp3" v-model="post.attachment.display">
-                        <label class="form-check-label">mp3</label>
-                      </div>
+                      <textarea rows="10" class="form-control" id="inputContent" placeholder="Content" v-model="post.content"></textarea>
                     </div>
                   </div>
-                </fieldset>
-                <div class="form-group row" v-if="post.attachment.type != ''">
-                  <label for="inputAttachment" class="col-sm-2 col-form-label"></label>
-                  <div class="col-sm-10">
-                    <input class="form-control" id="inputAttachment" placeholder="IPFS hash / URL" v-model="post.attachment.value">
+                  <fieldset class="form-group">
+                    <div class="row">
+                      <legend class="col-form-label col-sm-2 pt-0"></legend>
+                      <div class="col-sm-10">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentType" value="" checked v-model="post.attachment.type">
+                          <label class="form-check-label">No attachment</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentType" value="url" v-model="post.attachment.type">
+                          <label class="form-check-label">URL</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentType" value="ipfs" v-model="post.attachment.type">
+                          <label class="form-check-label">IPFS</label>
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <fieldset class="form-group" v-if="post.attachment.type != ''">
+                    <div class="row">
+                      <legend class="col-form-label col-sm-2 pt-0"></legend>
+                      <div class="col-sm-10">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentDisplay" value="link" checked v-model="post.attachment.display">
+                          <label class="form-check-label">link</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentDisplay" value="iframe" v-model="post.attachment.display">
+                          <label class="form-check-label">iframe</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentDisplay" value="img" v-model="post.attachment.display">
+                          <label class="form-check-label">image</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentDisplay" value="mp4" v-model="post.attachment.display">
+                          <label class="form-check-label">mp4</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="attachmentDisplay" value="mp3" v-model="post.attachment.display">
+                          <label class="form-check-label">mp3</label>
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <div class="form-group row" v-if="post.attachment.type != ''">
+                    <label for="inputAttachment" class="col-sm-2 col-form-label"></label>
+                    <div class="col-sm-10">
+                      <input class="form-control" id="inputAttachment" placeholder="IPFS hash / URL" v-model="post.attachment.value">
+                    </div>
                   </div>
-                </div>
-              </form>
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="text-center">
-                    <span style="font-weight: bold">{{status}}</span>
+                </form>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="text-center">
+                      <span style="font-weight: bold">{{status}}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" v-on:click="postContent()">Post</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" v-on:click="postContent()">Post</button>
+                <button type="button" class="btn btn-primary" v-on:click="preview = true">Preview</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
             </div>
           </div>
         </div>
@@ -95,6 +108,7 @@
 <script>
 import { GetNovusphere } from "../novusphere"
 import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos"
+import { markdown } from "../markdown"
 import { v4 as uuidv4 } from "uuid"
 import jQuery from "jquery"
 
@@ -219,9 +233,15 @@ export default {
         this.$data.status = '';
     }
   },
+  computed: {
+    markdownPost: function() {
+      return markdown(this.post.content);
+    }
+  },
   data() {
     return {        
-      status: '', 
+      status: '',
+      preview: false,
       post: { // for making a new post
         edit: false,
         edit_account: '',
