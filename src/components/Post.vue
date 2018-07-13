@@ -1,13 +1,15 @@
 <template>
-    <div class="col-md-12 mb-3" style="border:1px solid black;">
+    <div :class="'col-md-12 mb-3 post ' + (((p.depth%2)==1) ? 'post-odd' : '')">
             <span style="font-weight: bold; font-size: 20px">
-                <div v-if="p.data.json_metadata.attachment && p.data.json_metadata.attachment.value && p.data.json_metadata.attachment.display == 'link'">
-                    <a :href="p.data.json_metadata.attachment.value">{{ p.data.json_metadata.title }}</a>
-                    <span style="font-size: x-small">({{this.getHost(p.data.json_metadata.attachment.value)}})</span>  
-                </div>
-                <div v-else-if="p.depth == 0">
-                    <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.data.json_metadata.title }}</router-link>
-                    <router-link style="font-size: x-small" :to="'/e/' + p.data.json_metadata.sub">(eos.{{p.data.json_metadata.sub}})</router-link>
+                <div v-if="p.depth == 0">
+                    <div v-if="p.data.json_metadata.attachment && p.data.json_metadata.attachment.value && p.data.json_metadata.attachment.display == 'link'">
+                        <a :href="p.data.json_metadata.attachment.value">{{ p.data.json_metadata.title }}</a>
+                        <span style="font-size: x-small">({{this.getHost(p.data.json_metadata.attachment.value)}})</span>  
+                    </div>
+                    <div v-else>
+                        <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.data.json_metadata.title }}</router-link>
+                        <router-link style="font-size: x-small" :to="'/e/' + p.data.json_metadata.sub">(eos.{{p.data.json_metadata.sub}})</router-link>
+                    </div>
                 </div>
             </span>
             <div style="font-size: x-small">
@@ -18,6 +20,7 @@
                   <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
                   <li class="list-inline-item">by <a :href="'https://eostracker.io/accounts/' + p.data.poster">{{ p.data.poster }}</a></li>
                   <li class="list-inline-item"><a :href="'https://eostracker.io/transactions/' + p.transaction">view on chain</a></li>
+                  <li class="list-inline-item"></li>
                 </ul>
             </div>
 
@@ -34,14 +37,19 @@
                             <img :src="p.data.json_metadata.attachment.value">
                         </div>
                         <div v-if="p.data.json_metadata.attachment.display == 'mp4'">
-                        <video style="width: 100%" controls>
-                            <source :src="p.data.json_metadata.attachment.value" type="video/mp4">
-                        </video>
+                            <video style="width: 100%" controls>
+                                <source :src="p.data.json_metadata.attachment.value" type="video/mp4">
+                            </video>
                         </div>
                         <div v-if="p.data.json_metadata.attachment.display == 'mp3'">
-                        <audio style="width: 100%" controls>
-                            <source :src="p.data.json_metadata.attachment.value" type="audio/mpeg">
-                        </audio>
+                            <audio style="width: 100%" controls>
+                                <source :src="p.data.json_metadata.attachment.value" type="audio/mpeg">
+                            </audio>
+                        </div>
+                        <div v-if="p.data.json_metadata.attachment.display == 'link'">
+                            <div class="text-center">
+                                <a target="_blank" :href="p.data.json_metadata.attachment.value">{{p.data.json_metadata.attachment.value}}</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -74,18 +82,6 @@
             </div>
     </div>
 </template>
-
-<style>
-
-.post-content {
-    word-wrap: break-word;
-}
-
-.post-content img {
-    max-width: 100%;
-}
-
-</style>
 
 <script>
 import jQuery from 'jquery'

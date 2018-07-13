@@ -1,18 +1,20 @@
 <template>
   <div>
-    <div class="text-center">
-      <ul class="list-inline">
-        <li class="list-inline-item"><router-link to='/e/novusphere'>/e/novusphere</router-link></li>
-        <li class="list-inline-item"><router-link to='/e/eos'>/e/eos</router-link></li>
-        <li class="list-inline-item"><router-link to='/e/general'>/e/general</router-link></li>
-        <li class="list-inline-item"><router-link to='/e/movies'>/e/movies</router-link></li>
-        <li class="list-inline-item"><router-link to='/e/music'>/e/music</router-link></li>
-        <li class="list-inline-item"><router-link to='/e/bounties'>/e/bounties</router-link></li>
-        <li class="list-inline-item"><router-link to='/e/test'>/e/test</router-link></li>
-      </ul>
+    <div class="header">
+        <ul class="list-inline">
+          <li class="list-inline-item"><router-link to='/e/novusphere'>novusphere</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/eos'>eos</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/general'>general</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/movies'>movies</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/music'>music</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/bounties'>bounties</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/test'>test</router-link></li>
+        </ul>
     </div>
-    <div class="ml-3">
-      <h1><router-link :to="'/e/' + sub">/e/{{ sub }}</router-link></h1>
+    <div class="header-second">
+      <div class="ml-3">
+        <h1><router-link :to="'/e/' + sub">{{ sub }}</router-link></h1>
+      </div>
     </div>
     <div class="container">
       <SubmitPostModal ref="submitModal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
@@ -51,13 +53,6 @@
               <div class="row mt-3">
                   <div class="col-md-4"></div>
                   <div class="col-md-4">
-                    <a class="btn btn-success" href="https://github.com/Novusphere/novusphere-eos">GitHub (Source)</a>
-                  </div>
-                  <div class="col-md-4"></div>
-              </div>
-              <div class="row mt-3">
-                  <div class="col-md-4"></div>
-                  <div class="col-md-4">
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#submitPost">Submit new post</button>
                   </div>
                   <div class="col-md-4"></div>
@@ -71,7 +66,7 @@
                   <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Here is a guide</a> on markdown syntax, it's pretty much the same as Reddit.
                 </p> 
                 <p class="text-center">
-                  This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub pages</a>.
+                  This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub Pages</a>  and is fully <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
                   Developers of eos-forum take no responsibility for the content of the forum.
                   No images, files or media are hosted by eos-forum, please contact the respective site owners hosting content in breach of DMCA.
                 </p>

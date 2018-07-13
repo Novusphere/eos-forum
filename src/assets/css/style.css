@@ -1,0 +1,30 @@
+.header {
+    background-color: grey;
+    text-align: center;
+    margin-top: 0;
+}
+
+.header .list-inline-item a {
+    color: white;
+}
+
+.header-second {
+
+}
+
+.post {
+    border: 1px solid black;
+    background-color: white;
+}
+
+.post-odd {
+    background-color:white;
+}
+
+.post-content {
+    word-wrap: break-word;
+}
+
+.post-content img {
+    max-width: 100%;
+}
