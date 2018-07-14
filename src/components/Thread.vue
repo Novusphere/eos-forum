@@ -75,23 +75,23 @@ export default {
             // if this is is an edit, update parent content
             // check parent content isn't already newest
             // check that this post is actually by the person who made original post
-            if (p.data.json_metadata.edit && 
-                p.data.account == parent.data.account &&
-                p.createdAt > parent.createdAt) {
+            if (p.data.json_metadata.edit) { 
+                if (p.data.poster == parent.data.poster &&
+                    p.createdAt > parent.createdAt) {
 
-              var title = parent.data.json_metadata.title;
+                  var title = parent.data.json_metadata.title;
 
-              parent.data.content = p.data.content;
-              parent.data.json_metadata = p.data.json_metadata;
-              parent.data.json_metadata.title = title;
-              parent.createdAt = p.createdAt;
-              parent.transaction = p.transaction;
-
-              p.hide = true;
+                  parent.data.content = p.data.content;
+                  parent.data.json_metadata = p.data.json_metadata;
+                  parent.data.json_metadata.title = title;
+                  parent.createdAt = p.createdAt;
+                  parent.transaction = p.transaction;
+                }
             }
-
-            p.depth = parent.depth + 1;
-            parent.children.push(p);
+            else {
+              p.depth = parent.depth + 1;
+              parent.children.push(p);
+            }
         }
       }
 

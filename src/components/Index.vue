@@ -41,7 +41,6 @@
         <div class="col-md-4">
           <div class="row">
             <div class="col-md-12">
-              <div class="row mt-3 ml-3">
                 <p class="text-center">
                   This is an experimental Reddit-style forum built on EOS by the Novusphere community,
                   using the <a href="https://github.com/eoscanada/eosio.forum">eosio.forum</a> contract deployed by EOSCanada.
@@ -54,8 +53,7 @@
                   Developers of eos-forum take no responsibility for the content of the forum.
                   No images, files or media are hosted by eos-forum, please contact the respective site owners hosting content in breach of DMCA.
                 </p>
-              </div>
-              <div class="row mt-3">
+              <div class="row mt-3 mb-3">
                   <div class="col-md-6">
                       <img src="https://cdn.novusphere.io/static/atmos.svg" style="width: 100%">
                   </div>

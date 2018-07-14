@@ -1,6 +1,6 @@
 <template>
       <div class="modal fade" tabindex="-1" role="dialog" id="submitPost">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-full" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">{{ replyUuid ? (post.edit ? 'Edit' : 'Reply') : 'New Submission' }}</h5>
@@ -153,7 +153,7 @@ export default {
                 ]});
         }
         catch (ex) {
-            this.$data.post.status += ' Failed!';
+            this.$data.status += ' Failed!';
             console.log(ex);
             return;
         }
@@ -215,7 +215,7 @@ export default {
             txid = eostx.transaction_id;
         }
         catch (ex) {
-            this.$data.post.status += ' Failed!';
+            this.$data.post += ' Failed!';
             console.log(ex);
             return;
         }
