@@ -2,7 +2,8 @@ import { NovusphereAdapter } from './novusphere-adapter'
 
 const NovusphereConfig = {
     url: 'https://db.novusphere.io', // point to your own instance of novusphere-db
-    collection: 'novusphere',
+    //url: 'http://localhost:8099',
+    collection: 'eosforum',
 }
 
 function GetNovusphere() {

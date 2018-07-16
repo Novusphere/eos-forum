@@ -10,11 +10,12 @@ function MigratePost(p) {
         attachment.value = 'https://ipfs.io/ipfs/' + attachment.value;
     }
 
-    if (p.createdAt < 1531434299) { // EOS Canada redeployed contract 7/12
+    // migration no longer required, this is mandatory as of 7/15
+    /*if (p.createdAt < 1531434299) { // EOS Canada redeployed contract 7/12
         p.data.json_metadata.title = p.data.title; 
         p.data.poster = p.data.account;
         p.data.reply_to_poster = p.data.reply_to_account;
-    }
+    }*/
 }
 
 export { MigratePost };

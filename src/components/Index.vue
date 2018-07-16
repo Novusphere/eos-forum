@@ -8,6 +8,7 @@
           <li class="list-inline-item"><router-link to='/e/movies'>movies</router-link></li>
           <li class="list-inline-item"><router-link to='/e/music'>music</router-link></li>
           <li class="list-inline-item"><router-link to='/e/bounties'>bounties</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/dev'>dev</router-link></li>
           <li class="list-inline-item"><router-link to='/e/test'>test</router-link></li>
         </ul>
     </div>
@@ -104,13 +105,16 @@ export default {
       var novusphere = GetNovusphere();
       var apiResult;
 
+      var MATCH_QUERY = { 
+        'data.json_metadata.sub': sub, 
+        'data.reply_to_post_uuid': '',
+        'createdAt': { '$gte': 1531434299 } /* Last eosforumtest contract redeploy */
+      };
+
       apiResult = await novusphere.api({
           'count': novusphere.config.collection,
           'maxTimeMS': 1000,
-          'query': { // only find top level posts
-            'data.json_metadata.sub': sub, 
-            'data.reply_to_post_uuid': '' 
-          }
+          'query': MATCH_QUERY
       });
 
       var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
@@ -121,14 +125,11 @@ export default {
           'cursor': {},
           'pipeline': [
             { 
-                "$match": { 
-                  'data.json_metadata.sub': sub, 
-                  'data.reply_to_post_uuid': '' 
-                } 
+                "$match": MATCH_QUERY
             },
             { 
                 "$lookup": {
-                    "from": "novusphere",
+                    "from": novusphere.config.collection,
                     "localField": "data.post_uuid",
                     "foreignField": "data.reply_to_post_uuid",
                     "as": "replies"
