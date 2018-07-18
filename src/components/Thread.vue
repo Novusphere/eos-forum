@@ -1,17 +1,14 @@
 <template>
-  <div class="container"> 
+  <div> 
     <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.poster"></SubmitPostModal>
-     <div class="row mb-2">
-      <div class="col-md-12 thread">
-        <div class="row">
-          <div class="col-md-12 mb-3">
-              <router-link :to="'/e/' + mainPost.data.json_metadata.sub">&larr; back to /e/{{ mainPost.data.json_metadata.sub }}</router-link>
-            </div>
-        </div>
+    <Header>
+      <span style="font-size: xx-large"><router-link :to="'/e/' + mainPost.data.json_metadata.sub">{{ mainPost.data.json_metadata.sub }}</router-link></span>          
+    </Header>
+    <MainSection>
+      <div class="thread">
         <Post :submitModal="$refs.submitModal" :post="mainPost" :showContent="true" v-bind="mainPost"></post>
       </div>
-     </div>
-    </div>
+    </MainSection>
   </div>
 </template>
 
@@ -24,12 +21,16 @@ import jQuery from "jquery"
 
 import Post from "./Post.vue"
 import SubmitPostModal from './SubmitPostModal.vue'
+import Header from './Header'
+import MainSection from './MainSection'
 
 export default {
   name: "Thread",
   components: {
     'Post': Post,
-    'SubmitPostModal': SubmitPostModal
+    'SubmitPostModal': SubmitPostModal,
+    'Header': Header,
+    'MainSection': MainSection
   },
   mounted: async function() {
     await this.loadThread();

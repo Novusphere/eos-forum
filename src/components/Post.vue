@@ -18,7 +18,7 @@
                     <router-link :to="'/e/' + p.data.json_metadata.sub + '/' + p.transaction">{{ p.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
-                  <li class="list-inline-item">by <a :href="'https://eosflare.io/account' + p.data.poster">{{ p.data.poster }}</a></li>
+                  <li class="list-inline-item">by <a :href="'https://eosflare.io/account/' + p.data.poster">{{ p.data.poster }}</a></li>
                   <li class="list-inline-item"><a :href="'https://eosflare.io/tx/' + p.transaction">view on chain</a></li>
                   <li class="list-inline-item"></li>
                 </ul>
