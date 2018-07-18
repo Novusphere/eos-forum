@@ -2,8 +2,8 @@
   <div>
     <SubmitPostModal ref="submitModal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
     <Header>
-      <span style="font-size: xx-large"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
-      <button type="button" class="btn btn-primary ml-3" data-toggle="modal" data-target="#submitPost">submit new post</button>
+      <span class="sub"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
+      <button type="button" class="btn btn-outline-primary ml-3" data-toggle="modal" data-target="#submitPost">submit new post</button>
     </Header>
     <MainSection>
       <div>

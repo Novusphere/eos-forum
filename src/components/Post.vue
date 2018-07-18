@@ -62,7 +62,7 @@
                     <ul class="list-inline">
                         <li class="list-inline-item" v-if="showContent">
                             <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="reply()">reply</button>
-                            <button type="button" class="btn btn-sm btn-outline-warning" v-on:click="edit()">edit</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="edit()">edit</button>
                         </li>
                         <li class="list-inline-item" v-if="p.depth > 0 && p.data.json_metadata.attachment && p.data.json_metadata.attachment.value">
                             <button 

@@ -2,7 +2,7 @@
   <div> 
     <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.poster"></SubmitPostModal>
     <Header>
-      <span style="font-size: xx-large"><router-link :to="'/e/' + mainPost.data.json_metadata.sub">{{ mainPost.data.json_metadata.sub }}</router-link></span>          
+      <span class="sub"><router-link :to="'/e/' + mainPost.data.json_metadata.sub">{{ mainPost.data.json_metadata.sub }}</router-link></span>          
     </Header>
     <MainSection>
       <div class="thread">

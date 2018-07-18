@@ -5,7 +5,7 @@
           <slot></slot>
         </div>
         <div class="col-md-3">
-          <div class="row">
+          <div class="row footer">
             <div class="col-md-12">
                 <p class="text-center">
                   This is an experimental Reddit-style forum built on EOS by the Novusphere community,

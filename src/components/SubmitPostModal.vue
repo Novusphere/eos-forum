@@ -95,10 +95,10 @@
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-success" v-on:click="postContent(false)">post</button>
-                <button type="button" class="btn btn-success" v-on:click="postContent(true)" v-if="this.sub == 'anon'">post anon</button>
-                <button type="button" class="btn btn-primary" v-on:click="preview = true">preview</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)">post</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true)" v-if="this.sub == 'anon'">post anon</button>
+                <button type="button" class="btn btn-outline-secondary" v-on:click="preview = true">preview</button>
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
               </div>
             </div>
           </div>
