@@ -5,6 +5,7 @@
           <li class="list-inline-item"><router-link to='/e/novusphere'>novusphere</router-link></li>
           <li class="list-inline-item"><router-link to='/e/eos'>eos</router-link></li>
           <li class="list-inline-item"><router-link to='/e/general'>general</router-link></li>
+          <li class="list-inline-item"><router-link to='/e/anon'>anon</router-link></li>
           <li class="list-inline-item"><router-link to='/e/movies'>movies</router-link></li>
           <li class="list-inline-item"><router-link to='/e/music'>music</router-link></li>
           <li class="list-inline-item"><router-link to='/e/bounties'>bounties</router-link></li>
@@ -15,7 +16,7 @@
     <div class="header-second mb-3">
       <div class="ml-3">
         <span style="font-size: xx-large"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
-        <button type="button" class="btn btn-primary ml-3" data-toggle="modal" data-target="#submitPost">Submit new post</button>
+        <button type="button" class="btn btn-primary ml-3" data-toggle="modal" data-target="#submitPost">submit new post</button>
       </div>
     </div>
     <div class="container">

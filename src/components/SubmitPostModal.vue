@@ -15,7 +15,7 @@
                 </p>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-primary" v-on:click="preview = false">Back</button>
+                <button type="button" class="btn btn-primary" v-on:click="preview = false">back</button>
               </div>
             </div>
             <div v-else>
@@ -95,9 +95,10 @@
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-success" v-on:click="postContent()">Post</button>
-                <button type="button" class="btn btn-primary" v-on:click="preview = true">Preview</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" v-on:click="postContent(false)">post</button>
+                <button type="button" class="btn btn-success" v-on:click="postContent(true)" v-if="this.sub == 'anon'">post anon</button>
+                <button type="button" class="btn btn-primary" v-on:click="preview = true">preview</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
               </div>
             </div>
           </div>
@@ -108,6 +109,7 @@
 <script>
 import { GetNovusphere } from "../novusphere"
 import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos"
+import { GetEOSService } from '../eos-service'
 import { markdown } from "../markdown"
 import { v4 as uuidv4 } from "uuid"
 import jQuery from "jquery"
@@ -137,52 +139,20 @@ export default {
       }
   },
   methods: {
-    postContent: async function() {
+    makePost: function(account) {
         var post = this.$data.post;
 
-        var identity;
-        this.$data.status = 'Getting Scatter identity...';
-
-        try {
-            identity = await window.scatter.getIdentity({
-                accounts: [
-                    {
-                    chainId: ScatterConfig.chainId,
-                    blockchain: ScatterConfig.blockchain
-                    }
-                ]});
-        }
-        catch (ex) {
-            this.$data.status += ' Failed!';
-            console.log(ex);
-            return;
-        }
-
-        const eosAccount = identity.accounts[0].name;
-        const eosAuth = identity.accounts[0].authority;
-
         if (post.edit) {
-          if (eosAccount != post.edit_account) {
+          if (account != post.edit_account) {
             this.$data.status = 'This is not your post, you cannot edit it!';
             return;
           }
         }
 
-        var txid;
-        this.$data.status = 'Creating tx and broadcasting to EOS...';
-        try {
-            
-            // make scatter eos instance
-            const eos = GetEOS(window.scatter);
-
-            var eosPost = {
-                    //title: post.edit ? '' : post.title,
-                    //account: eosAccount,
-                    poster: eosAccount,
-                    //reply_to_account: this.replyAccount,
+        var eosPost = {
+                    poster: account,
                     reply_to_poster: this.replyAccount,
                     reply_to_post_uuid: this.replyUuid,
-                    poster: eosAccount,
                     certify: 0,
                     content: post.content,
                     post_uuid: uuidv4(),
@@ -198,24 +168,83 @@ export default {
                             'display': (post.attachment.value) ? post.attachment.display : ''
                         }
                       })
-            };
+          };
 
-            var eosforum = await eos.contract("eosforumtest");
-            var eostx = await eosforum.transaction(tx => {
-                tx.post(eosPost,
-                {
-                    authorization: [
-                    {
-                        actor: eosAccount,
-                        permission: eosAuth
-                    }]
-                });
-            });
+          return eosPost;
+    },
+    postContent: async function(anon) {
+        var post = this.$data.post;
+        const eosService = GetEOSService();
+
+        var eosAccount;
+        var eosAuth;
+
+        if (anon) {
+          eosAccount = eosService.config.anonymousAccount;
+        }
+        else {
+          //
+          // not anonymous post: so get scatter identity
+          //
+          var identity;
+          this.$data.status = 'Getting Scatter identity...';
+
+          try {
+            identity = await window.scatter.getIdentity({
+                  accounts: [
+                      {
+                      chainId: ScatterConfig.chainId,
+                      blockchain: ScatterConfig.blockchain
+                      }
+                  ]});
+
+            eosAccount = identity.accounts[0].name;
+            eosAuth = identity.accounts[0].authority;
+          }
+          catch (ex) {
+              this.$data.status += ' Failed!';
+              console.log(ex);
+              return;
+          }
+        }
+
+        var txid;
+        this.$data.status = 'Creating tx and broadcasting to EOS...';
+        try {
+            var eosPost = this.makePost(eosAccount);
+            if (!eosPost)
+              return;
+
+            if (anon) {
+              // use eos-service to make anonymous post
+              var eostx = await eosService.anonymousPost(eosPost);
+              if (eostx.error)
+              {
+                this.$data.status = 'Error: ' + eostx.error;
+                console.log(eostx.error);
+                return;
+              }
+            }
+            else {
+              // make scatter eos instance
+              const eos = GetEOS(window.scatter);
+              var eosforum = await eos.contract("eosforumtest");
+              var eostx = await eosforum.transaction(tx => {
+                  tx.post(eosPost,
+                  {
+                      authorization: [
+                      {
+                          actor: eosAccount,
+                          permission: eosAuth
+                      }]
+                  });
+              });
+            }
 
             txid = eostx.transaction_id;
         }
         catch (ex) {
-            this.$data.post += ' Failed!';
+            this.$data.status += ' Failed!';
             console.log(ex);
             return;
         }

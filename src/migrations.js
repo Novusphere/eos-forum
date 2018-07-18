@@ -7,7 +7,7 @@ function MigratePost(p) {
     // transform ipfs --> url
     if (attachment && attachment.value && attachment.type == 'ipfs') {
         attachment.type = 'url';
-        attachment.value = 'https://ipfs.io/ipfs/' + attachment.value;
+        attachment.value = 'https://gateway.ipfs.io/ipfs/' + attachment.value;
     }
 
     // migration no longer required, this is mandatory as of 7/15
