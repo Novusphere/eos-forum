@@ -21,7 +21,7 @@
             <div v-else>
               <div class="modal-body">
                 <form>
-                  <div class="form-group row" v-if="!replyUuid">
+                  <div class="form-group row" v-if="!replyUuid || (post.edit && post.title)">
                     <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
                     <div class="col-sm-10">
                       <input type="email" class="form-control" id="inputTitle" placeholder="Title" v-model="post.title">
@@ -31,6 +31,12 @@
                     <label for="inputContent" class="col-sm-2 col-form-label">Content</label>
                     <div class="col-sm-10">
                       <textarea rows="10" class="form-control" id="inputContent" placeholder="Content" v-model="post.content"></textarea>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Characters</label>
+                    <div class="col-sm-10">
+                      {{ markdownPost.length }} / {{ 1024 * 10 }}
                     </div>
                   </div>
                   <fieldset class="form-group">
@@ -110,7 +116,7 @@
 import { GetNovusphere } from "../novusphere"
 import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos"
 import { GetEOSService } from '../eos-service'
-import { markdown } from "../markdown"
+import { MarkdownParser } from "../markdown"
 import { v4 as uuidv4 } from "uuid"
 import jQuery from "jquery"
 
@@ -149,6 +155,16 @@ export default {
           }
         }
 
+        if (post.content.length == 0) {
+          this.$data.status = 'Post must have at least 1 character of content';
+          return;
+        }
+
+        if (post.content.length > 1024 * 10) {
+          this.$data.status = 'Post is too long, over limit by ' + ((1024*10) - post.content.length) + ' characters';
+          return;
+        }
+
         var eosPost = {
                     poster: account,
                     reply_to_poster: this.replyAccount,
@@ -157,7 +173,7 @@ export default {
                     content: post.content,
                     post_uuid: uuidv4(),
                     json_metadata: JSON.stringify({
-                        'title': post.edit ? '' : post.title,
+                        'title': post.title,
                         'protocol': 'novusphere-forum',
                         'sub': this.sub,
                         'parent_uuid': post.parent_uuid,
@@ -264,7 +280,8 @@ export default {
   },
   computed: {
     markdownPost: function() {
-      return markdown(this.post.content);
+      var md = new MarkdownParser(this.post.content);
+      return md.html;
     }
   },
   data() {

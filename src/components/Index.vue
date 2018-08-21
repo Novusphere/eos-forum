@@ -1,10 +1,12 @@
 <template>
   <div>
     <SubmitPostModal ref="submitModal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
-    <Header>
-      <span class="sub"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
-      <button type="button" class="btn btn-outline-primary ml-3" data-toggle="modal" data-target="#submitPost">submit new post</button>
-    </Header>
+    <HeaderSection>
+      <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
+      <button v-if="!isSubscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-outline-primary ml-1">subscribe</button>
+      <button v-if="isSubscribed" v-on:click="subscribe(false)" type="button" class="btn btn-outline-danger ml-1">unsubscribe</button>
+      <button type="button" class="btn btn-outline-secondary ml-1" data-toggle="modal" data-target="#submitPost">new</button>
+    </HeaderSection>
     <MainSection>
       <div>
         <div v-if="posts.length == 0">
@@ -15,13 +17,13 @@
         <div class="row mb-2" v-for="p in posts" :key="p.transaction">
               <Post :submitModal="$refs.submitModal" :post="p" :showContent="false"></Post>
         </div>
-        <div class="row">
-              <div class="col-md-2" v-if="currentPage>1">
-                <router-link :to="'/e/' + sub + '?page=' + (currentPage-1)">&larr; prev</router-link>
+        <div class="row mb-4">
+            <div class="col-12">
+              <div class="float-right">
+                  <router-link v-if="currentPage>1" class="btn btn-outline-primary" :to="'/e/' + sub + '?page=' + (currentPage-1)">&larr; prev</router-link>
+                  <router-link v-if="currentPage<pages" class="btn btn-outline-primary" :to="'/e/' + sub + '?page=' + (currentPage+1)">next &rarr;</router-link>
               </div>
-              <div class="col-md-2" v-if="currentPage<pages">
-                <router-link :to="'/e/' + sub + '?page=' + (currentPage+1)">next &rarr;</router-link>
-              </div>
+            </div>
         </div>
       </div>
     </MainSection>
@@ -30,26 +32,28 @@
 
 <script>
 import { GetNovusphere } from "../novusphere"
-import { MigratePost } from "../migrations"
+import { MigratePost, ApplyPostEdit } from "../migrations"
+import { storage, SaveStorage } from "../storage"
 import jQuery from "jquery"
 
 import Post from './Post.vue'
 import SubmitPostModal from './SubmitPostModal.vue'
-import Header from './Header'
+import HeaderSection from './HeaderSection'
 import MainSection from './MainSection'
 
 const MAX_ITEMS_PER_PAGE = 25;
+const DEFAULT_SUB = 'all';
 
 export default {
   name: "Index",
   components: {
     'Post': Post,
     'SubmitPostModal': SubmitPostModal,
-    'Header': Header,
+    'HeaderSection': HeaderSection,
     'MainSection': MainSection
   },
   watch: {
-    '$route.query.page': function (id) {
+    '$route.query.page': function () {
       this.load();
     },
     '$route.params.sub': function() {
@@ -62,8 +66,7 @@ export default {
   methods: {
    load: async function() {
       var currentPage = parseInt(((this.$route.query.page) ? (this.$route.query.page) : 1));
-      //console.log(currentPage);
-      var sub = ((this.$route.params.sub) ? (this.$route.params.sub) : 'novusphere');
+      var sub = ((this.$route.params.sub) ? (this.$route.params.sub) : DEFAULT_SUB).toLowerCase();
       var novusphere = GetNovusphere();
       var apiResult;
 
@@ -72,6 +75,10 @@ export default {
         'data.reply_to_post_uuid': '',
         'createdAt': { '$gte': 1531434299 } /* Last eosforumtest contract redeploy */
       };
+
+      if (sub == 'all') {
+        MATCH_QUERY['data.json_metadata.sub'] = { '$exists': true, '$ne': '' };
+      }
 
       apiResult = await novusphere.api({
           'count': novusphere.config.collection,
@@ -89,6 +96,17 @@ export default {
             { 
                 "$match": MATCH_QUERY
             },
+            {
+                "$sort": {
+                  "createdAt": -1
+                }
+            },
+            {
+                "$skip": (currentPage-1) * MAX_ITEMS_PER_PAGE
+            },
+            {
+                "$limit": MAX_ITEMS_PER_PAGE
+            },
             { 
                 "$lookup": {
                     "from": novusphere.config.collection,
@@ -102,6 +120,21 @@ export default {
                     "transaction": "$transaction",
                     "createdAt": "$createdAt",
                     "data": "$data",
+                    "recent_edit": {
+                      "$arrayElemAt": [ {"$filter": {
+                       
+                        "input": "$replies",
+                        "as": "reply",
+                        "cond": {
+                            "$and": [ 
+                              {"$eq": ["$$reply.data.json_metadata.edit", true]},
+                              {"$eq": ["$$reply.data.json_metadata.parent_uuid", "$data.post_uuid"]},
+                              {"$eq": ["$$reply.data.poster", "$data.poster"]}
+                            ]
+                        }
+
+                      }}, -1 ] 
+                    },
                     "total_replies": { 
                       "$size": {
                         "$filter": {
@@ -114,37 +147,63 @@ export default {
                       }
                     }
                 } 
-            },
-            {
-                "$sort": {
-                  "createdAt": -1
-                }
-            },
-            {
-                "$skip": (currentPage-1) * MAX_ITEMS_PER_PAGE
-            },
-            {
-                "$limit": MAX_ITEMS_PER_PAGE
             }]
       });
 
       var payload = apiResult.cursor.firstBatch;
       
       for (var i = 0; i < payload.length; i++) {
-        MigratePost(payload[i]);
+        var post = payload[i];
+        MigratePost(post);
+        
+        if (post.recent_edit)
+          ApplyPostEdit(post, post.recent_edit);
+
+        var old_replies = storage.new_posts[post.data.post_uuid];
+        post.new_replies = (old_replies == undefined) ? (post.total_replies + 1) : (post.total_replies - old_replies); 
+        post.new_replies = Math.max(post.new_replies, 0); // bug fix
       }
 
-      this.$data.posts = payload;
-      this.$data.pages = numPages;
-      this.$data.currentPage = currentPage;
-      this.$data.sub = sub;
-  },
-  postContent: function(txid) {
+      // push data to this
+      this.isSubscribed = storage.subscribed_subs.includes(sub);
+      this.posts = payload;
+      this.pages = numPages;
+      this.currentPage = currentPage;
+      this.sub = sub;
+   },
+   postContent: function(txid) {
      this.$router.push('/e/' + this.sub + '/' + txid);
+   },
+   subscribe: function(sub) {
+     if (sub) {
+       if (storage.subscribed_subs.includes(this.sub))
+          return;
+       storage.subscribed_subs.push(this.sub);
+       //console.log(storage.subscribed_subs);
+       SaveStorage();
+
+       this.isSubscribed = true;
+     }
+     else {
+
+       // remove all
+       for (;;) {
+          var i = storage.subscribed_subs.indexOf(this.sub);
+          if (i < 0)
+            break;
+          storage.subscribed_subs.splice(i, 1);
+          //console.log(storage.subscribed_subs);
+       }
+
+       SaveStorage();
+
+       this.isSubscribed = false;
+     }
    }
   },
   data() {
     return {
+      isSubscribed: false,
       currentPage: 0,
       pages: 0,
       sub: '',

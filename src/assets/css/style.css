@@ -25,11 +25,11 @@ body a:hover {
     color: #f0b90b;
 }
 
-.header-second .sub {
+.header-second .title {
     font-size: xx-large;
 }
 
-.header-second .sub a {
+.header-second .title a {
     color: #f0b90b;
 }
 
@@ -42,11 +42,15 @@ body a:hover {
     background-color: #1f2833;
 }
 
-.post-content {
+.post .title a {
+    color: white;
+}
+
+.post-content, .post-attachment {
     word-wrap: break-word;
 }
 
-.post-content img {
+.post img {
     max-width: 100%;
 }
 
@@ -62,6 +66,10 @@ body a:hover {
 
 .modal-full .modal-content {
     min-height: 100vh;
+}
+
+.text-xsmall {
+    font-size: x-small;
 }
 
 .btn:hover, .btn:focus, .btn:active, .btn:active:focus, .btn.active, .open>.dropdown-toggle.btn {
@@ -80,4 +88,14 @@ body a:hover {
 .btn-outline-secondary {
     color: #619200;
     border-color: #619200;
+}
+
+.post-collapse.collapsed:before
+{
+    content: '[+]';
+}
+
+.post-collapse:before
+{
+    content: '[-]';
 }

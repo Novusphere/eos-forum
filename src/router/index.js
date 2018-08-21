@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Index from '@/components/Index'
 import Test from '@/components/Test'
 import Thread from '@/components/Thread'
+import UserProfile from '@/components/UserProfile'
 
 Vue.use(Router)
 
@@ -19,9 +20,14 @@ export default new Router({
       component: Index
     },
     {
-      path: '/e/:sub/:id',
+      path: '/e/:sub/:id/:child_id?',
       name: 'Thread',
       component: Thread
+    },
+    {
+      path: '/u/:account',
+      name: 'UserProfile',
+      component: UserProfile
     },
     {
         path: '/test',

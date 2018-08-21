@@ -14,58 +14,80 @@ const RX_JAVASCRIPT = new RegExp('javascript', 'i');
 const RX_VBSCRIPT = new RegExp('vbscript', 'i');
 const RX_DATA = new RegExp('data', 'i');
 
-function strip(el) {
-    if (el.children) {
-        for (var i = 0; i < el.children.length; i++) {
-            strip(el.children[i]);
+class MarkdownParser {
+    constructor(text) {
+        this.text = text;
+        this.html = '';
+        this.attachments = [];
+
+        this._generateHtml();
+        this._postProcess();
+    }
+    _generateHtml() {
+        var sd = new showdown.Converter({
+            simplifiedAutoLink: true
+        });
+        
+        this.html = sd.makeHtml(this.text);
+    }
+    _postProcess() {
+        var nodes = jQuery.parseHTML(this.html);
+        var html = '';
+        for (var i = 0 ; i < nodes.length; i++) {
+            html += this._strip(nodes[i]);
         }
+        
+        this.html = html;
     }
+    _safeAttribute(value) {
+        if (value.search(RX_JAVASCRIPT) == 0 ||
+            value.search(RX_VBSCRIPT) == 0 ||
+            value.search(RX_DATA) == 0) {
+                
+                return '';
+        }
 
-    if (el.nodeName == 'SCRIPT') {
-        el.innerHTML = '';
+        return value;
     }
-    else if (WHITE_LIST.indexOf(el.nodeName) == -1) {
-        el.innerHTML = '';
-    }
-
-    if (el.attributes) {
-        for (var i = 0; i < el.attributes.length; i++) {
-
-            var value = el.attributes[i].value;
-            if (value.search(RX_JAVASCRIPT) == 0 ||
-                value.search(RX_VBSCRIPT) == 0 ||
-                value.search(RX_DATA) == 0) {
-
-                el.attributes[i].value = '';
+    _strip(el) {
+        if (el.children) {
+            for (var i = 0; i < el.children.length; i++) {
+                this._strip(el.children[i]);
             }
         }
+    
+        if (el.nodeName == 'SCRIPT') {
+            el.innerHTML = '';
+        }
+        else if (WHITE_LIST.indexOf(el.nodeName) == -1) {
+            if (el.nodeName == 'IFRAME') {
+                this.attachments.push({
+                    value: this._safeAttribute(el.getAttribute('src')),
+                    width: this._safeAttribute(el.getAttribute('width')),
+                    height: this._safeAttribute(el.getAttribute('height')),
+                    display: 'iframe',
+                    type: 'url'
+                });
+            }
+
+            for (var i = 0; i < el.attributes.length; i++) {
+                el.attributes[i].value = '';
+            }
+
+            el.innerHTML = '';
+            el.style = 'display: none;';
+        }
+    
+        if (el.attributes) {
+            for (var i = 0; i < el.attributes.length; i++) {
+                el.attributes[i].value = this._safeAttribute(el.attributes[i].value);
+            }
+        }
+    
+        if (el.outerHTML)
+            return el.outerHTML;
+        return '';
     }
-
-    if (el.outerHTML)
-        return el.outerHTML;
-    return '';
 }
 
-function markdown_html(text) {
-    var sd = new showdown.Converter({
-        simplifiedAutoLink: true
-    });
-    var html = sd.makeHtml(text);
-    return html;
-}
-
-function markdown_postprocess(mdHtml) {
-    var nodes = jQuery.parseHTML(mdHtml);
-    var html = '';
-    for (var i = 0 ; i < nodes.length; i++) {
-        html += strip(nodes[i]);
-    }
-
-    return html;
-}
-
-function markdown(text) {
-    return markdown_postprocess(markdown_html(text));
-}
-
-export { markdown, markdown_html, markdown_postprocess };
+export { MarkdownParser };

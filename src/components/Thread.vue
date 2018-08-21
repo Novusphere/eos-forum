@@ -1,12 +1,18 @@
 <template>
   <div> 
+    <PostHistoryModal ref="historyModal"></PostHistoryModal>
     <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.poster"></SubmitPostModal>
-    <Header>
-      <span class="sub"><router-link :to="'/e/' + mainPost.data.json_metadata.sub">{{ mainPost.data.json_metadata.sub }}</router-link></span>          
-    </Header>
+    <HeaderSection>
+      <span class="title mr-3"><router-link :to="'/e/' + mainPost.data.json_metadata.sub">{{ mainPost.data.json_metadata.sub }}</router-link></span>          
+    </HeaderSection>
     <MainSection>
       <div class="thread">
-        <Post :submitModal="$refs.submitModal" :post="mainPost" :showContent="true" v-bind="mainPost"></post>
+        <Post :submitModal="$refs.submitModal"
+          :historyModal="$refs.historyModal"
+          :post="mainPost" 
+          :showContent="true" 
+          v-bind="mainPost">
+        </Post>
       </div>
     </MainSection>
   </div>
@@ -15,58 +21,75 @@
 <script>
 import { GetNovusphere } from "../novusphere"
 import { GetEOS, ScatterConfig, ScatterEosOptions } from '../eos'
-import { MigratePost } from '../migrations'
+import { MigratePost, PlaceholderPost, ApplyPostEdit } from '../migrations'
+import { storage, SaveStorage } from "../storage"
 import { v4 as uuidv4 } from "uuid"
 import jQuery from "jquery"
 
-import Post from "./Post.vue"
 import SubmitPostModal from './SubmitPostModal.vue'
-import Header from './Header'
+import PostHistoryModal from './PostHistoryModal.vue'
+import Post from "./Post.vue"
+import HeaderSection from './HeaderSection'
 import MainSection from './MainSection'
 
 export default {
   name: "Thread",
   components: {
-    'Post': Post,
     'SubmitPostModal': SubmitPostModal,
-    'Header': Header,
+    'PostHistoryModal': PostHistoryModal,
+    'Post': Post,
+    'HeaderSection': HeaderSection,
     'MainSection': MainSection
   },
-  mounted: async function() {
-    await this.loadThread();
+  watch: {
+    '$route.params.id': function () {
+      this.load();
+    },
+    '$route.params.child_id': function() {
+      this.load();
+    }
+  },
+  mounted: function() {
+    this.load();
   },
   methods: {
-    loadThread: async function() {
+    load: async function() {
       var novusphere = GetNovusphere();
-      var apiResult = await novusphere.api({
+
+      var mainPost = (await novusphere.api({
         'find': novusphere.config.collection,
         'maxTimeMS': 1000,
         'filter': {
           'transaction': this.$route.params.id
         }
-      });
+      })).cursor.firstBatch[0];
 
-      var mainPost = apiResult.cursor.firstBatch[0];
-
-      apiResult = await novusphere.api({
+      var responses = (await novusphere.api({
           'find': novusphere.config.collection,
           'maxTimeMS': 1000,
           'filter': {
             'data.reply_to_post_uuid': mainPost.data.post_uuid
           }
-      });
+      })).cursor.firstBatch;
 
-      var responses = apiResult.cursor.firstBatch;
       responses.splice(0, 0, mainPost);
-      
+
+      // only count non-edits for new_posts length
+      var new_posts = (responses.filter(r => !r.data.json_metadata.edit).length - 1);
+      storage.new_posts[mainPost.data.post_uuid] = new_posts;
+      SaveStorage();
+
       var commentMap = {};
       for (var i = 0; i < responses.length; i++) {
         var p = responses[i];
         MigratePost(p);
         
+        p.thread_transaction = mainPost.transaction;
         commentMap[p.data.post_uuid] = p;
 
         if (i > 0) {
+            p.parent = mainPost;
+
             var tree;
             var parent_uuid = p.data.json_metadata.parent_uuid;
             parent_uuid = (parent_uuid) ? parent_uuid : mainPost.data.post_uuid;
@@ -80,13 +103,7 @@ export default {
                 if (p.data.poster == parent.data.poster &&
                     p.createdAt > parent.createdAt) {
 
-                  var title = parent.data.json_metadata.title;
-
-                  parent.data.content = p.data.content;
-                  parent.data.json_metadata = p.data.json_metadata;
-                  parent.data.json_metadata.title = title;
-                  parent.createdAt = p.createdAt;
-                  parent.transaction = p.transaction;
+                  ApplyPostEdit(parent, p);
                 }
             }
             else {
@@ -96,25 +113,26 @@ export default {
         }
       }
 
-      //console.log(responses);
-      //console.log(mainPost);
-      this.$data.mainPost = mainPost;
+      // permalink child
+      if (this.$route.params.child_id) {
+        var childTxId = this.$route.params.child_id;
+        var childPost = responses.find(p => p.transaction == childTxId);
+        
+        childPost.depth = 0;
+        childPost.data.json_metadata.title = mainPost.data.json_metadata.title;
+        this.mainPost = childPost;
+      }
+      else {
+        this.mainPost = mainPost;
+      }
     },
     postContent: function(txid) {
-      this.loadThread(); // reload thread
+      this.load(); // reload thread
     }
   },
   data() {
     return {
-      mainPost: {
-        children: [],
-        data: {
-          title: '',
-          json_metadata: {
-            'sub': 'novusphere'
-          },
-        }
-      },
+      mainPost: PlaceholderPost(),
       post: { // for making a new post
         content: '',
       }
