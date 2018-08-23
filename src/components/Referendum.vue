@@ -188,7 +188,7 @@ export default {
       };
 
       apiResult = await novusphere.api({
-        count: "eosforum_test",
+        count: novusphere.config.collection,
         maxTimeMS: 1000,
         query: MATCH_QUERY
       });
@@ -196,7 +196,7 @@ export default {
       var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
 
       apiResult = await novusphere.api({
-        aggregate: "eosforum_test",
+        aggregate: novusphere.config.collection,
         maxTimeMS: 1000,
         cursor: {},
         pipeline: [
@@ -284,7 +284,7 @@ export default {
 
       // wait for tx, then reload
       this.proposal.status = 'Waiting for Novusphere to index...';
-      await novusphere.waitTx(eostx.transaction_id, 500, 1000, "eosforum_test");
+      await novusphere.waitTx(eostx.transaction_id, 500, 1000);
       jQuery('#submitProposal').modal('hide');
       this.proposal.status = '';
       await this.load();
@@ -306,7 +306,7 @@ export default {
     async getProposal(txid) {
       var novusphere = GetNovusphere();
       var prop = (await novusphere.api({
-        find: "eosforum_test",
+        find: novusphere.config.collection,
         maxTimeMS: 1000,
         filter: {
           name: "propose",
@@ -324,7 +324,7 @@ export default {
       var prop_hash = this.getPropHash(prop);
 
       var votes = (await novusphere.api({
-        find: "eosforum_test",
+        find: novusphere.config.collection,
         maxTimeMS: 1000,
         filter: {
           name: "vote",

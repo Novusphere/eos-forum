@@ -174,7 +174,7 @@ export default {
                     post_uuid: uuidv4(),
                     json_metadata: JSON.stringify({
                         'title': post.title,
-                        'protocol': 'novusphere-forum',
+                        'type': 'novusphere-forum',
                         'sub': this.sub,
                         'parent_uuid': post.parent_uuid,
                         'edit': post.edit,
@@ -235,7 +235,7 @@ export default {
             else {
               // make scatter eos instance
               const eos = GetEOS();
-              var eosforum = await eos.contract("eosforumtest");
+              var eosforum = await eos.contract("eosforumdapp");
               var eostx = await eosforum.transaction(tx => {
                   tx.post(eosPost,
                   {

@@ -32,7 +32,7 @@ function TransformPropose(p) {
         certify: 0,
         json_metadata: {
             title: data.title,
-            protocol: 'novusphere-forum',
+            type: 'novusphere-forum',
             sub: '',
             parent_uuid: '',
             edit: false,
