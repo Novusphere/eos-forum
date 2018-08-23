@@ -39,9 +39,9 @@ class NovusphereAdapter {
             _try();
         });
     }
-    async waitTx(txid, tryDelay, maxtimeMS) {
+    async waitTx(txid, tryDelay, maxtimeMS, collection) {
         var tx = await this.wait(tryDelay, {
-            'find': this.config.collection,
+            'find': collection ? collection : this.config.collection,
             'maxTimeMS': maxtimeMS,
             'filter': {
               'transaction': txid

@@ -24,7 +24,7 @@
                   <div class="form-group row" v-if="!replyUuid || (post.edit && post.title)">
                     <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
                     <div class="col-sm-10">
-                      <input type="email" class="form-control" id="inputTitle" placeholder="Title" v-model="post.title">
+                      <input type="text" class="form-control" id="inputTitle" placeholder="Title" v-model="post.title">
                     </div>
                   </div>
                   <div class="form-group row">
@@ -34,7 +34,7 @@
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Characters</label>
+                    <label class="col-sm-2 col-form-label"></label>
                     <div class="col-sm-10">
                       {{ markdownPost.length }} / {{ 1024 * 10 }}
                     </div>
@@ -102,7 +102,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)">post</button>
-                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true)" v-if="this.sub == 'anon'">post anon</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true)" v-if="isAnonSub">post anon</button>
                 <button type="button" class="btn btn-outline-secondary" v-on:click="preview = true">preview</button>
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
               </div>
@@ -114,7 +114,7 @@
 
 <script>
 import { GetNovusphere } from "../novusphere"
-import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos"
+import { GetEOS, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos"
 import { GetEOSService } from '../eos-service'
 import { MarkdownParser } from "../markdown"
 import { v4 as uuidv4 } from "uuid"
@@ -192,8 +192,7 @@ export default {
         var post = this.$data.post;
         const eosService = GetEOSService();
 
-        var eosAccount;
-        var eosAuth;
+        var eosAccount, eosAuth;
 
         if (anon) {
           eosAccount = eosService.config.anonymousAccount;
@@ -202,30 +201,22 @@ export default {
           //
           // not anonymous post: so get scatter identity
           //
-          var identity;
-          this.$data.status = 'Getting Scatter identity...';
+          this.status = 'Getting Scatter identity...';
 
           try {
-            identity = await window.scatter.getIdentity({
-                  accounts: [
-                      {
-                      chainId: ScatterConfig.chainId,
-                      blockchain: ScatterConfig.blockchain
-                      }
-                  ]});
-
-            eosAccount = identity.accounts[0].name;
-            eosAuth = identity.accounts[0].authority;
+            var identity = GetScatterIdentity();
+            eosAccount = identity.account;
+            eosAuth = identity.auth;
           }
           catch (ex) {
-              this.$data.status += ' Failed!';
+              this.status += ' Failed!';
               console.log(ex);
               return;
           }
         }
 
         var txid;
-        this.$data.status = 'Creating tx and broadcasting to EOS...';
+        this.status = 'Creating tx and broadcasting to EOS...';
         try {
             var eosPost = this.makePost(eosAccount);
             if (!eosPost)
@@ -236,14 +227,14 @@ export default {
               var eostx = await eosService.anonymousPost(eosPost);
               if (eostx.error)
               {
-                this.$data.status = 'Error: ' + eostx.error;
+                this.status = 'Error: ' + eostx.error;
                 console.log(eostx.error);
                 return;
               }
             }
             else {
               // make scatter eos instance
-              const eos = GetEOS(window.scatter);
+              const eos = GetEOS();
               var eosforum = await eos.contract("eosforumtest");
               var eostx = await eosforum.transaction(tx => {
                   tx.post(eosPost,
@@ -260,12 +251,12 @@ export default {
             txid = eostx.transaction_id;
         }
         catch (ex) {
-            this.$data.status += ' Failed!';
+            this.status += ' Failed!';
             console.log(ex);
             return;
         }
 
-        this.$data.status = 'Waiting for Novusphere to index...';
+        this.status = 'Waiting for Novusphere to index...';
 
         var novusphere = GetNovusphere();
         await novusphere.waitTx(txid, 500, 1000);
@@ -275,13 +266,16 @@ export default {
 
         this.postContentCallback(txid);
 
-        this.$data.status = '';
+        this.status = '';
     }
   },
   computed: {
     markdownPost: function() {
       var md = new MarkdownParser(this.post.content);
       return md.html;
+    },
+    isAnonSub: function() {
+      return (this.sub == 'anon') || (this.sub.indexOf('anon-') == 0);
     }
   },
   data() {

@@ -10,7 +10,7 @@
                     </div>
                     <div v-else>
                         <span class="title"><router-link :to="threadLink">{{ title }}</router-link></span>
-                        <span class="text-xsmall"><router-link :to="'/e/' + sub">(eos.{{sub}})</router-link></span>
+                        <span v-if="sub" class="text-xsmall"><router-link :to="'/e/' + sub">(eos.{{sub}})</router-link></span>
                      
                         <span v-if="p.new_replies" class="badge badge-danger text-xsmall">new ({{p.new_replies}})</span>
                     </div>

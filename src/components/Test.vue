@@ -12,7 +12,7 @@ var data = {};
 export default {
   name: "Test",
   async mounted() {
-      var eos = GetEOS(window.scatter);
+      var eos = GetEOS();
       var test = await eos.getTransaction({
         block_num_hint: 9250295,
         id: '6048934cad3c75db4f2e00249e28fdf34682e113c02ae5c0ccb3bbea090bd48a'

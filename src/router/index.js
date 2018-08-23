@@ -4,6 +4,7 @@ import Index from '@/components/Index'
 import Test from '@/components/Test'
 import Thread from '@/components/Thread'
 import UserProfile from '@/components/UserProfile'
+import Referendum from '@/components/Referendum'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/u/:account',
       name: 'UserProfile',
       component: UserProfile
+    },
+    {
+      path: '/referendum',
+      name: 'Referendum',
+      component: Referendum
     },
     {
         path: '/test',

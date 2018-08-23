@@ -98,7 +98,7 @@ export default {
           this.currentPage = parseInt(((this.$route.query.page) ? (this.$route.query.page) : 1));
           this.account = this.$route.params.account;
 
-          const eos = GetEOS(window.scatter);
+          const eos = GetEOS();
           const novusphere = GetNovusphere();
 
           var balanceEos, balanceAtmos, cpu, bandwidth;

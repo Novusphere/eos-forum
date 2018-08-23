@@ -19,6 +19,32 @@ function MigratePost(p) {
     }*/
 }
 
+function TransformPropose(p) {
+    var data = p.data;
+
+    // transform to be like a post() data
+    p.data = {
+        poster: data.proposer,
+        post_uuid: data.proposal_name,
+        content: data.proposal_json.content,
+        reply_to_poster: '',
+        reply_to_post_uuid: '',
+        certify: 0,
+        json_metadata: {
+            title: data.title,
+            protocol: 'novusphere-forum',
+            sub: '',
+            parent_uuid: '',
+            edit: false,
+            attachment: {
+                value: '',
+                type: '',
+                display: ''
+            }
+        }
+    };
+}
+
 function ApplyPostEdit(parent, p) {
     // if the edit does not set a title, take title from parent
     if (!(p.data.json_metadata.title)) {
@@ -43,4 +69,4 @@ function PlaceholderPost() {
     };
 }
 
-export { MigratePost, PlaceholderPost, ApplyPostEdit };
+export { MigratePost, PlaceholderPost, ApplyPostEdit, TransformPropose };

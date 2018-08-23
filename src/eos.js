@@ -1,4 +1,5 @@
 const Eos =  require('eosjs');
+var _scatter;
 
 const ScatterConfig = {
         blockchain: "eos",
@@ -12,12 +13,40 @@ const ScatterEosOptions = {
         sign: true,
         chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906" // Or null to fetch automatically ( takes longer )
     };
+
+document.addEventListener('scatterLoaded', scatterExtension => {
+    console.log('Scatter loaded');
+    _scatter = window.scatter;
+    window.scatter = null;
+});
+
+async function GetScatterIdentity() {
+    var identity = await _scatter.getIdentity({
+        accounts: [
+          {
+            chainId: ScatterConfig.chainId,
+            blockchain: ScatterConfig.blockchain
+          }
+        ]
+      });
+
+    return {
+        account: identity.accounts[0].name,
+        auth: identity.accounts[0].authority
+    };
+}
     
-function GetEOS(scatter) {
+function GetEOS() {
     var eos;
+
+    if (window.scatter) {    
+        console.log('Scatter loaded');
+        _scatter = window.scatter;
+        window.scatter = null;
+    }
     
-    if (scatter) {
-        eos = scatter.eos(ScatterConfig, Eos, ScatterEosOptions, 'https');
+    if (_scatter ) {
+        eos = _scatter.eos(ScatterConfig, Eos, ScatterEosOptions, 'https');
     }
     else {
         eos = Eos({
@@ -30,4 +59,4 @@ function GetEOS(scatter) {
     return eos;
 }
 
-export { GetEOS, ScatterConfig, ScatterEosOptions };
+export { GetEOS, GetScatterIdentity, ScatterConfig, ScatterEosOptions };

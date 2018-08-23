@@ -70,7 +70,8 @@ export default {
       var novusphere = GetNovusphere();
       var apiResult;
 
-      var MATCH_QUERY = { 
+      var MATCH_QUERY = {
+        //'name': 'post',
         'data.json_metadata.sub': sub, 
         'data.reply_to_post_uuid': '',
         'createdAt': { '$gte': 1531434299 } /* Last eosforumtest contract redeploy */
