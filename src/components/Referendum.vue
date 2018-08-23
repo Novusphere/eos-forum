@@ -235,7 +235,7 @@ export default {
       var eosAccount, eosAuth;
 
       try {
-        var identity = GetScatterIdentity();
+        var identity = await GetScatterIdentity();
         eosAccount = identity.account;
         eosAuth = identity.auth;
       } 
@@ -344,7 +344,7 @@ export default {
 
       var eosAccount, eosAuth;
       try {
-        var identity = GetScatterIdentity();
+        var identity = await GetScatterIdentity();
         eosAccount = identity.account;
         eosAuth = identity.auth;
       }

@@ -204,7 +204,7 @@ export default {
           this.status = 'Getting Scatter identity...';
 
           try {
-            var identity = GetScatterIdentity();
+            var identity = await GetScatterIdentity();
             eosAccount = identity.account;
             eosAuth = identity.auth;
           }
@@ -234,6 +234,8 @@ export default {
             }
             else {
               // make scatter eos instance
+              console.log(eosAccount);
+              console.log(eosAuth);
               const eos = GetEOS();
               var eosforum = await eos.contract("eosforumdapp");
               var eostx = await eosforum.transaction(tx => {
