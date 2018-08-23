@@ -234,8 +234,7 @@ export default {
             }
             else {
               // make scatter eos instance
-              console.log(eosAccount);
-              console.log(eosAuth);
+              
               const eos = GetEOS();
               var eosforum = await eos.contract("eosforumdapp");
               var eostx = await eosforum.transaction(tx => {
