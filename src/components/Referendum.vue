@@ -150,7 +150,7 @@
 import jQuery from "jquery";
 import { GetNovusphere } from "../novusphere";
 import { MigratePost, ApplyPostEdit, TransformPropose } from "../migrations";
-import { GetEOS, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos";
+import { GetEOS, GetScatter, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos";
 import { MarkdownParser } from "../markdown";
 
 import Post from "./Post.vue";
@@ -249,7 +249,7 @@ export default {
 
       var eostx;
       try {
-        var eos = GetEOS();
+        var eos = GetEOS(await GetScatter());
 
         var proposal_json = JSON.stringify({
             content: this.proposal.content,
@@ -354,7 +354,7 @@ export default {
           return;
       }
 
-      var eos = GetEOS();
+      var eos = GetEOS(await GetScatter());
       var prop = await this.getProposal(propTxid);
       var prop_hash = this.getPropHash(prop);
 
@@ -379,11 +379,11 @@ export default {
       });
 
       // show status
-      await novusphere.waitTx(eostx.transaction_id, 500, 1000, "eosforum_test");
+      await novusphere.waitTx(eostx.transaction_id, 500, 1000);
       await this.proposalStatus(prop.transaction);
     },
     async proposalStatus(txid) {
-      var eos = GetEOS();
+      var eos = GetEOS(await GetScatter());
       var prop = await this.getProposal(txid);
       var votes = await this.getProposalVotes(prop);
 

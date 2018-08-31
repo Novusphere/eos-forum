@@ -1,5 +1,4 @@
-import jQuery from 'jquery'
-import { NovuspherePager } from './novusphere-pager'
+import jQuery from 'jquery';
 
 class NovusphereAdapter {
     constructor(config) {
@@ -19,9 +18,6 @@ class NovusphereAdapter {
                 reject(reason);
             });
         });
-    }
-    pager(size, query) {
-        return new NovuspherePager(this, size);
     }
     wait(tryDelay, query) {
         var _this = this;

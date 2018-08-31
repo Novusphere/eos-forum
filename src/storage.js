@@ -1,10 +1,22 @@
+import jQuery from 'jquery';
+
 const MAX_TRACK_NEW_POSTS = 1000;
 
-var storage = {
-    version: 5,
+const DEFAULT_STORAGE = {
+    version: 6,
     subscribed_subs: [ "all", "novusphere", "eos", "general", "anon", "movies", "music", "games", "bounties", "test" ],
-    new_posts: {}
+    new_posts: {},
+    settings: {
+        novusphere_api: 'https://db.novusphere.io',
+        eos_api: {
+            host: "eos.greymass.com", // ( or null if endorsed chainId )
+            port: "443", // ( or null if defaulting to 80 )
+            protocol: "https"
+        }
+    }
 };
+
+var storage = jQuery.extend(true, {}, DEFAULT_STORAGE);
 
 function importStorage(obj) {
     while (obj.version < storage.version) {
@@ -13,6 +25,10 @@ function importStorage(obj) {
             // subs introduced into storage
             obj.subscribed_subs = storage.subscribed_subs;
         }
+        else if (obj.version == 5)
+        {
+            obj.settings = storage.settings;
+        }
 
         obj.version++;
     }
@@ -20,15 +36,22 @@ function importStorage(obj) {
     if (obj.version >= storage.version)
     {
         storage = obj;
-        //console.log('Loaded storage');
+        console.log('Loaded storage');
         //console.log(storage);
         return true;
     }
+    console.log('Loaded storage failed');
     return false;
 }
 
 window.forgetStorage = function() {
     window.localStorage.setItem('eosforum', '');
+    window.location.reload();
+}
+
+window.forgetSettings = function() {
+    storage.settings = DEFAULT_STORAGE.settings;
+    SaveStorage();
     window.location.reload();
 }
 
@@ -65,4 +88,4 @@ function LoadStorage() {
 
 }
 
-export { storage, SaveStorage, LoadStorage };
+export { DEFAULT_STORAGE, storage, SaveStorage, LoadStorage };

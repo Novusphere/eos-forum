@@ -66,7 +66,7 @@
 
 <script>
 import { GetNovusphere } from '../novusphere'
-import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos"
+import { GetEOS, GetScatter, ScatterConfig, ScatterEosOptions } from "../eos"
 import { MigratePost } from "../migrations"
 
 import Post from './Post.vue'
@@ -98,7 +98,7 @@ export default {
           this.currentPage = parseInt(((this.$route.query.page) ? (this.$route.query.page) : 1));
           this.account = this.$route.params.account;
 
-          const eos = GetEOS();
+          const eos = GetEOS(await GetScatter());
           const novusphere = GetNovusphere();
 
           var balanceEos, balanceAtmos, cpu, bandwidth;

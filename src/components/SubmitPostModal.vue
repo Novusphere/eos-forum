@@ -114,7 +114,7 @@
 
 <script>
 import { GetNovusphere } from "../novusphere"
-import { GetEOS, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos"
+import { GetEOS, GetScatter, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos"
 import { GetEOSService } from '../eos-service'
 import { MarkdownParser } from "../markdown"
 import { v4 as uuidv4 } from "uuid"
@@ -188,7 +188,7 @@ export default {
 
           return eosPost;
     },
-    postContent: async function(anon) {
+    async postContent(anon) {
         var post = this.$data.post;
         const eosService = GetEOSService();
 
@@ -235,7 +235,7 @@ export default {
             else {
               // make scatter eos instance
               
-              const eos = GetEOS();
+              const eos = GetEOS(await GetScatter());
               var eosforum = await eos.contract("eosforumdapp");
               var eostx = await eosforum.transaction(tx => {
                   tx.post(eosPost,

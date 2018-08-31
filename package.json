@@ -15,6 +15,7 @@
     "eosjs": "^15.0.6",
     "gh-pages": "^1.2.0",
     "jquery": "^3.3.1",
+    "readable-stream": "^3.0.2",
     "scatter-js": "^2.5.1",
     "sha256": "^0.2.0",
     "showdown": "^1.8.6",

@@ -1,7 +1,8 @@
-import Eos from 'eosjs'
+import Eos from 'eosjs';
 import ScatterJS from 'scatter-js/dist/scatter.esm';
+import { storage } from './storage.js';
 
-var _scatter;
+var _scatter = null;
 
 const ScatterConfig = {
     blockchain: "eos",
@@ -16,22 +17,37 @@ const ScatterEosOptions = {
     chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906" // Or null to fetch automatically ( takes longer )
 };
 
-/*document.addEventListener('scatterLoaded', scatterExtension => {
-    console.log('Scatter loaded');
-    _scatter = window.scatter;
-    window.scatter = null;
-});*/
-
 ScatterJS.scatter.connect('eos-forum').then(connected => {
     if (connected) {
         console.log('Scatter loaded');
         _scatter = ScatterJS.scatter;
         window.scatter = null;
     }
+    else {
+        _scatter = -1;
+    }
 });
 
+function GetScatter() {
+    return new Promise((resolve, reject) => {
+
+        function _check() {
+            if (_scatter == -1)
+                reject();
+            else if (_scatter)
+                resolve(_scatter);
+            else {
+                setTimeout(_check, 1000);
+            }
+        }
+
+        _check();
+
+    });
+}
+
 async function GetScatterIdentity() {
-    var identity = await _scatter.getIdentity({
+    var identity = await (await GetScatter()).getIdentity({
         accounts: [
             {
                 chainId: ScatterConfig.chainId,
@@ -46,27 +62,20 @@ async function GetScatterIdentity() {
     };
 }
 
-function GetEOS() {
-    var eos;
+function GetEOS(scatter) {
+    ScatterConfig.host = storage.settings.eos_api.host;
+    ScatterConfig.port = storage.settings.eos_api.port;
 
-    if (window.scatter) {
-        console.log('Scatter loaded');
-        _scatter = window.scatter;
-        window.scatter = null;
-    }
-
-    if (_scatter) {
-        eos = _scatter.eos(ScatterConfig, Eos, ScatterEosOptions, 'https');
+    if (scatter) {
+        return scatter.eos(ScatterConfig, Eos, ScatterEosOptions, storage.settings.eos_api.protocol);
     }
     else {
-        eos = Eos({
-            httpEndpoint: 'https://' + ScatterConfig.host,
+        return Eos({
+            httpEndpoint: storage.settings.eos_api.protocol + '://' + ScatterConfig.host,
             chainId: ScatterConfig.chainId,
             keyProvider: []
         });
     }
-
-    return eos;
 }
 
-export { GetEOS, GetScatterIdentity, ScatterConfig, ScatterEosOptions };
+export { GetEOS, GetScatter, GetScatterIdentity, ScatterConfig, ScatterEosOptions };
