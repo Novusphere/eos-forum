@@ -19,27 +19,24 @@
 </template>
 
 <script>
-import { storage } from '../storage.js';
+import { storage } from "../storage.js";
 
-import SettingsModal from './SettingsModal.vue';
+import SettingsModal from "./SettingsModal.vue";
 
 export default {
   name: "HeaderSection",
   components: {
-    'SettingsModal': SettingsModal
+    SettingsModal: SettingsModal
   },
-  async mounted() {
-  },
-  methods: {
-  },
+  async mounted() {},
+  methods: {},
   computed: {
-    subs: function() {
+    subs() {
       return storage.subscribed_subs;
     }
   },
   data() {
-    return {
-    };
+    return {};
   }
-}
+};
 </script>

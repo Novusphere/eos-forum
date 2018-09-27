@@ -1,34 +1,39 @@
 <template>
     <div :class="'col-md-12 mb-3 post ' + (((p.depth%2)==1) ? 'post-odd' : '')">
+      <div class="row">
+        <div class="col-md-12">
             <span style="font-weight: bold; font-size: 20px">
                 <div v-if="!(p.data.reply_to_post_uuid) || (p.parent && !(p.parent.data.reply_to_post_uuid) && !historyModal)">
-                    <div v-if="this.hasAttachment('link')">
+                    <span v-if="this.hasAttachment('link')">
                         <span class="title"><a target="_blank" :href="attachment">{{ title }}</a></span>
                         <span class="text-xsmall">({{this.getHost(attachment)}})</span>
-
-                        <span v-if="p.new_replies" class="badge badge-danger text-xsmall">new ({{p.new_replies}})</span>
-                    </div>
-                    <div v-else>
+                    </span>
+                    <span v-else>
                         <span class="title"><router-link :to="threadLink">{{ title }}</router-link></span>
                         <span v-if="sub" class="text-xsmall"><router-link :to="'/e/' + sub">(eos.{{sub}})</router-link></span>
-                     
-                        <span v-if="p.new_replies" class="badge badge-danger text-xsmall">new ({{p.new_replies}})</span>
-                    </div>
+                     </span>
+                     <span v-if="p.new_replies" class="badge badge-danger text-xsmall">new ({{p.new_replies}})</span>
                 </div>
             </span>
             <div style="font-size: x-small">
                 <ul class="list-inline">
                   <li v-if="showContent" class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + p.transaction"></a></li>
+                  <li class="list-inline-item">
+                    <a :class="(p.my_vote ? 'text-success': '')" href="javascript:void(0)" v-on:click="upvote()">▲ {{p.up}} upvotes</a>
+                  </li>
                   <li class="list-inline-item" v-if="!showContent">
                     <router-link :to="threadLink">{{ p.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
-                  <li class="list-inline-item">by <a :href="'https://bloks.io/account/' + p.data.poster">{{ p.data.poster }}</a></li>
+                  <li class="list-inline-item">by <router-link :to="'/u/' + p.data.poster">{{ p.data.poster }}</router-link></li>
                   <li class="list-inline-item"><a :href="'https://bloks.io/transaction/' + p.transaction">on chain</a></li>
                   <li v-if="historyModal && p.depth > 0" class="list-inline-item"><router-link :to="permaLink">permalink</router-link></li>
                   <li v-if="historyModal && showContent && p.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                 </ul>
             </div>
+        </div>
+      </div>
+
             <div :id="'post-' + p.transaction" class="post-attachment collapse show" v-if="showContent">
 
                         <PostAttachment
@@ -76,6 +81,13 @@
 <script>
 import jQuery from "jquery";
 import { MarkdownParser } from "../markdown";
+import {
+  GetEOS,
+  GetScatter,
+  ScatterConfig,
+  ScatterEosOptions,
+  GetScatterIdentity
+} from "../eos";
 
 import PostAttachment from "./PostAttachment.vue";
 
@@ -107,9 +119,13 @@ export default {
     this.load();
   },
   computed: {
-    title: function() {
+    title() {
       var title = this.post.data.json_metadata.title;
-      if (!title && this.post.parent && this.post.parent.data.json_metadata.title) {
+      if (
+        !title &&
+        this.post.parent &&
+        this.post.parent.data.json_metadata.title
+      ) {
         title = this.post.parent.data.json_metadata.title;
       }
 
@@ -118,13 +134,13 @@ export default {
 
       return title;
     },
-    sub: function() {
+    sub() {
       return this.post.data.json_metadata.sub;
     },
-    attachment: function() {
+    attachment() {
       return this.post.data.json_metadata.attachment.value;
     },
-    permaLink: function() {
+    permaLink() {
       var path = "/e/" + this.sub + "/";
       if (this.post.parent) {
         path += this.post.parent.o_transaction + "/";
@@ -132,7 +148,7 @@ export default {
       path += this.post.transaction;
       return path;
     },
-    threadLink: function() {
+    threadLink() {
       var txid = this.post.parent
         ? this.post.parent.o_transaction
         : this.post.o_transaction;
@@ -140,7 +156,7 @@ export default {
     }
   },
   methods: {
-    load: function() {
+    async load() {
       if (this.showContent) {
         // md parse
         var md = new MarkdownParser(this.p.data.content);
@@ -158,25 +174,25 @@ export default {
           }
         }
 
-        this.showFrame = (this.p.depth == 0);
+        this.showFrame = this.p.depth == 0;
       }
     },
-    showAttachment: function() {
+    showAttachment() {
       // only load iframe in p.depth>0 when requested
       this.showFrame = !this.showFrame;
     },
-    hasAttachment: function(type) {
+    hasAttachment(type) {
       return (
         this.post.data.json_metadata.attachment &&
         this.post.data.json_metadata.attachment.value &&
         (type ? this.post.data.json_metadata.attachment.display == type : true)
       );
     },
-    history: async function() {
+    async history() {
       await this.historyModal.load(this.p.o_transaction);
       jQuery("#postHistory").modal();
     },
-    edit: function() {
+    edit() {
       var $post = this.submitModal.$data.post;
       var p = this.p;
 
@@ -199,7 +215,7 @@ export default {
       }
       jQuery("#submitPost").modal();
     },
-    reply: function() {
+    reply() {
       var $post = this.submitModal.$data.post;
       $post.parent_uuid = this.$data.p.data.post_uuid;
       $post.title = "";
@@ -211,12 +227,51 @@ export default {
 
       jQuery("#submitPost").modal();
     },
-    getHost: function(href) {
-      if (href.indexOf("magnet:") == 0) return "magnet link";
+    getHost(href) {
+      if (href.indexOf("magnet:") == 0) {
+        return "magnet link";
+      }
 
       var parser = document.createElement("a");
       parser.href = href;
       return parser.host;
+    },
+    async upvote() {
+      if (this.post.my_vote) {
+        return;
+      }
+
+      const identity = await GetScatterIdentity();
+      if (!(identity.account)) {
+        alert('You must have Scatter to upvote comments!');
+        return;
+      }
+
+      const eos = GetEOS(await GetScatter());
+      var contract = await eos.contract("novuspheredb");
+      var eostxArg = {
+        account: identity.account,
+        json: JSON.stringify({
+          protocol: "novusphere",
+          method: "forum_vote",
+          data: {
+            txid: this.post.o_transaction
+          }
+        })
+      };
+      var eostx = await contract.transaction(tx => {
+        tx.push(eostxArg, {
+          authorization: [
+            {
+              actor: identity.account,
+              permission: identity.auth
+            }
+          ]
+        });
+      });
+
+      this.post.my_vote = { account: identity.account, txid: this.post.o_transaction };
+      this.post.up = (this.post.up ? this.post.up : 0) + 1;
     }
   },
   watch: {

@@ -1,5 +1,6 @@
 <template>
     <div>
+        <PostHistoryModal ref="historyModal"></PostHistoryModal>
         <HeaderSection>
             <span class="title mr-3"><router-link :to="'/u/' + account">{{account}}</router-link></span>
             <a class="btn btn-outline-secondary ml-1" :href="'https://bloks.io/account/' + account">view on chain</a>
@@ -49,7 +50,12 @@
                 </div>
             </div>
             <div class="row mb-2" v-for="p in posts" :key="p.transaction">
-                <Post :submitModal="null" :post="p" :showContent="true"></Post>
+                <Post 
+                :submitModal="null" 
+                :historyModal="$refs.historyModal"
+                :post="p" 
+                :showContent="true">
+                </Post>
             </div>
             <div class="row">
                 <div class="col-md-2" v-if="currentPage>1">
@@ -72,12 +78,14 @@ import { MigratePost } from "../migrations"
 import Post from './Post.vue'
 import HeaderSection from './HeaderSection'
 import MainSection from './MainSection'
+import PostHistoryModal from './PostHistoryModal.vue'
 
 const MAX_ITEMS_PER_PAGE = 25;
 
 export default {
   name: "UserProfile",
-  components: {
+  components: {    
+    'PostHistoryModal': PostHistoryModal,
     'HeaderSection': HeaderSection,
     'MainSection': MainSection,
     'Post': Post
@@ -98,7 +106,7 @@ export default {
           this.currentPage = parseInt(((this.$route.query.page) ? (this.$route.query.page) : 1));
           this.account = this.$route.params.account;
 
-          const eos = GetEOS(await GetScatter());
+          const eos = GetEOS();
           const novusphere = GetNovusphere();
 
           var balanceEos, balanceAtmos, cpu, bandwidth;
@@ -146,7 +154,7 @@ export default {
                 'query': MATCH_QUERY
             })).n;
 
-          pages = Math.ceil((this.comments + this.threads) / MAX_ITEMS_PER_PAGE);
+          pages = Math.ceil((comments + threads) / MAX_ITEMS_PER_PAGE);
 
           delete MATCH_QUERY['data.reply_to_post_uuid'];
 

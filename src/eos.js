@@ -17,13 +17,14 @@ const ScatterEosOptions = {
     chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906" // Or null to fetch automatically ( takes longer )
 };
 
-ScatterJS.scatter.connect('eos-forum').then(connected => {
+console.log('Trying to connect to scatter...');
+ScatterJS.scatter.connect('eos-forum', { initTimeout: 1500 }).then(connected => {
     if (connected) {
         console.log('Scatter loaded');
         _scatter = ScatterJS.scatter;
-        window.scatter = null;
     }
     else {
+        console.log('Scatter could not be loaded');
         _scatter = -1;
     }
 });
@@ -32,10 +33,8 @@ function GetScatter() {
     return new Promise((resolve, reject) => {
 
         function _check() {
-            if (_scatter == -1)
-                reject();
-            else if (_scatter)
-                resolve(_scatter);
+            if (_scatter)
+                resolve((_scatter == -1) ? null : _scatter);
             else {
                 setTimeout(_check, 1000);
             }
@@ -47,7 +46,12 @@ function GetScatter() {
 }
 
 async function GetScatterIdentity() {
-    var identity = await (await GetScatter()).getIdentity({
+    var scatter = await GetScatter();
+    if (scatter == null) {
+        return { account: '', auth: '' };
+    }
+
+    var identity = await scatter.getIdentity({
         accounts: [
             {
                 chainId: ScatterConfig.chainId,

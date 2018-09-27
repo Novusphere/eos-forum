@@ -39,12 +39,10 @@
 <script>
 export default {
   name: "MainSection",
-  async mounted() {
-  },
-  methods: {
-  },
+  async mounted() {},
+  methods: {},
   data() {
     return {};
   }
-}
+};
 </script>
