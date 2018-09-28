@@ -5,7 +5,7 @@
       <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
       <button v-if="!isSubscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-outline-primary ml-1">subscribe</button>
       <button v-if="isSubscribed" v-on:click="subscribe(false)" type="button" class="btn btn-outline-danger ml-1">unsubscribe</button>
-      <button type="button" class="btn btn-outline-secondary ml-1" data-toggle="modal" data-target="#submitPost">new</button>
+      <button type="button" class="btn btn-outline-secondary ml-1" v-on:click="newPost()">new</button>
     </HeaderSection>
     <MainSection>
       <div>
@@ -128,6 +128,15 @@ export default {
       this.pages = numPages;
       this.currentPage = currentPage;
       this.sub = sub;
+    },
+    async newPost() {
+      const identity = await GetScatterIdentity();
+      if (identity.account || this.sub == 'anon' || this.sub.indexOf('anon-') == 0) {
+        jQuery("#submitPost").modal();
+      }
+      else {
+        alert('You must be logged in to post a new thread here!');
+      }
     },
     postContent(txid) {
       this.$router.push("/e/" + this.sub + "/" + txid);

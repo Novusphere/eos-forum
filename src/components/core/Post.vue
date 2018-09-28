@@ -1,5 +1,5 @@
 <template>
-    <div :class="'col-md-12 mb-3 post ' + (((p.depth%2)==1) ? 'post-odd' : '')">
+    <div :class="'col-md-12 mb-3 post ' + (((post.depth%2)==1) ? 'post-odd' : '')">
       <div class="row">
         <div class="col-md-12">
             <span style="font-weight: bold; font-size: 20px">
@@ -12,35 +12,35 @@
                         <span class="title"><router-link :to="threadLink">{{ title }}</router-link></span>
                         <span v-if="sub" class="text-xsmall"><router-link :to="'/e/' + sub">(eos.{{sub}})</router-link></span>
                      </span>
-                     <span v-if="p.new_replies" class="badge badge-danger text-xsmall">new ({{p.new_replies}})</span>
+                     <span v-if="post.new_replies" class="badge badge-danger text-xsmall">new ({{post.new_replies}})</span>
                 </div>
             </span>
             <div style="font-size: x-small">
                 <ul class="list-inline">
-                  <li v-if="showContent" class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + p.transaction"></a></li>
+                  <li v-if="showContent" class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + post.transaction"></a></li>
                   <li class="list-inline-item">
-                    <a :class="(p.my_vote ? 'text-success': '')" href="javascript:void(0)" v-on:click="upvote()">▲ {{p.up}} upvotes</a>
+                    <a :class="(post.my_vote ? 'text-success': '')" href="javascript:void(0)" v-on:click="upvote()">▲ {{post.up}} upvotes</a>
                   </li>
                   <li class="list-inline-item" v-if="!showContent">
-                    <router-link :to="threadLink">{{ p.total_replies }} comments</router-link>
+                    <router-link :to="threadLink">{{ post.total_replies }} comments</router-link>
                   </li>
-                  <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
-                  <li class="list-inline-item">by <router-link :to="'/u/' + p.data.poster">{{ p.data.poster }}</router-link></li>
-                  <li class="list-inline-item"><a :href="'https://bloks.io/transaction/' + p.transaction">on chain</a></li>
-                  <li v-if="historyModal && p.depth > 0" class="list-inline-item"><router-link :to="permaLink">permalink</router-link></li>
-                  <li v-if="historyModal && showContent && p.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
+                  <li class="list-inline-item">{{ new Date(post.createdAt * 1000).toLocaleString() }}</li>
+                  <li class="list-inline-item">by <router-link :to="'/u/' + post.data.poster">{{ post.data.poster }}</router-link></li>
+                  <li class="list-inline-item"><a :href="'https://bloks.io/transaction/' + post.transaction">on chain</a></li>
+                  <li v-if="historyModal && post.depth > 0" class="list-inline-item"><router-link :to="permaLink">permalink</router-link></li>
+                  <li v-if="historyModal && showContent && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                 </ul>
             </div>
         </div>
       </div>
 
-            <div :id="'post-' + p.transaction" class="post-attachment collapse show" v-if="showContent">
+            <div :id="'post-' + post.transaction" class="post-attachment collapse show" v-if="showContent">
 
                         <PostAttachment
                             ref="postAttachment" 
-                            :attachment="p.data.json_metadata.attachment"
-                            :id="'content-' + p.data.post_uuid"
-                            :collapse="(p.depth > 0)"
+                            :attachment="post.data.json_metadata.attachment"
+                            :id="'content-' + post.data.post_uuid"
+                            :collapse="(post.depth > 0)"
                             :showFrame="showFrame">
                         </PostAttachment>
                 
@@ -50,14 +50,14 @@
 
                 <div style="font-size: x-small">
                     <ul class="list-inline">
-                        <li class="list-inline-item" v-if="showContent && submitModal">
+                        <li class="list-inline-item" v-if="showContent && submitModal && (identity || isAnonSub)">
                             <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="reply()">reply</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="edit()">edit</button>
+                            <button v-if="post.data.poster == identity" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="edit()">edit</button>
                         </li>
-                        <li class="list-inline-item" v-if="p.depth > 0 && p.data.json_metadata.attachment && p.data.json_metadata.attachment.value">
+                        <li class="list-inline-item" v-if="post.depth > 0 && post.data.json_metadata.attachment && post.data.json_metadata.attachment.value">
                             <button 
                                 v-on:click="showAttachment()"
-                                data-toggle="collapse" :data-target="'#content-' + p.data.post_uuid"
+                                data-toggle="collapse" :data-target="'#content-' + post.data.post_uuid"
                                 type="button" class="btn btn-sm btn-outline-danger">
                                 show attachment
                             </button>
@@ -65,7 +65,7 @@
                     </ul>
                 </div>
     
-                <div v-for="child in p.children" :key="child.transaction">
+                <div v-for="child in post.children" :key="child.transaction">
                     <div v-if="!(child.hide)">
                         <Post :submitModal="submitModal"
                             :historyModal="historyModal" 
@@ -121,10 +121,10 @@ export default {
   },
   computed: {
     showTitle() {
-      if (!(this.p.data.reply_to_post_uuid))
+      if (!(this.post.data.reply_to_post_uuid))
         return true; // top level post
 
-      if (this.p.parent && !this.p.depth)
+      if (this.post.parent && !this.post.depth)
         return true; // has a parent, so userprofile/home
 
       return false;
@@ -147,6 +147,10 @@ export default {
     sub() {
       return this.post.data.json_metadata.sub;
     },
+    isAnonSub() {
+      var sub = this.sub;
+      return (sub == 'anon') || (sub.indexOf('anon-') == 0);
+    },
     attachment() {
       return this.post.data.json_metadata.attachment.value;
     },
@@ -167,24 +171,27 @@ export default {
   },
   methods: {
     async load() {
+      const identity = await GetScatterIdentity();
+      this.identity = identity.account;
+
       if (this.showContent) {
         // md parse
-        var md = new MarkdownParser(this.p.data.content, this.p.createdAt);
+        var md = new MarkdownParser(this.post.data.content, this.post.createdAt);
         this.postContent = md.html;
 
         // only allow one attachment through
         if (md.attachments.length > 0) {
-          this.p.data.json_metadata.attachment = md.attachments[0];
+          this.post.data.json_metadata.attachment = md.attachments[0];
         }
 
         if (this.hasAttachment("iframe")) {
           // only load iframe automatically if p.depth == 0 (start of thread)
-          if (this.p.depth == 0) {
+          if (this.post.depth == 0) {
             this.$refs.postAttachment.showFrame = true;
           }
         }
 
-        this.showFrame = this.p.depth == 0;
+        this.showFrame = (this.post.depth == 0);
       }
     },
     showAttachment() {
@@ -199,12 +206,12 @@ export default {
       );
     },
     async history() {
-      await this.historyModal.load(this.p.o_transaction);
+      await this.historyModal.load(this.post.o_transaction);
       jQuery("#postHistory").modal();
     },
     edit() {
       var $post = this.submitModal.$data.post;
-      var p = this.p;
+      var p = this.post;
 
       // dupe existing post into submit
       $post.parent_uuid = p.data.post_uuid;
@@ -253,7 +260,7 @@ export default {
 
       const identity = await GetScatterIdentity();
       if (!(identity.account)) {
-        alert('You must have Scatter to upvote comments!');
+        alert('You must be logged in to upvote comments!');
         return;
       }
 
@@ -286,15 +293,14 @@ export default {
   },
   watch: {
     post: function() {
-      this.p = this.post;
       this.load();
     }
   },
   data() {
     return {
-      p: this.post,
       postContent: "",
-      showFrame: false
+      showFrame: false,
+      identity: ''
     };
   }
 };

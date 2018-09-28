@@ -2,6 +2,7 @@
     <div>
       <SettingsModal></SettingsModal>
       <FaqModal></FaqModal>
+      <ErrorModal></ErrorModal>
 
       <div class="header">
           <ul class="list-inline mb-0">
@@ -35,16 +36,23 @@
 
 <script>
 import { storage } from "@/storage";
-import { DEFAULT_IDENTITY, ForgetScatterIdentity, GetScatterIdentity, GetScatter } from '@/eos';
+import {
+  DEFAULT_IDENTITY,
+  ForgetScatterIdentity,
+  GetScatterIdentity,
+  GetScatter
+} from "@/eos";
 
 import SettingsModal from "@/components/modal/SettingsModal";
 import FaqModal from "@/components/modal/FaqModal";
+import ErrorModal from "@/components/modal/ErrorModal";
 
 export default {
   name: "HeaderSection",
   components: {
     SettingsModal: SettingsModal,
-    FaqModal: FaqModal
+    FaqModal: FaqModal,
+    ErrorModal: ErrorModal
   },
   props: {
     load: {
@@ -58,8 +66,12 @@ export default {
   methods: {
     async login() {
       this.identity = await GetScatterIdentity(true);
-      if (this.load) {
-        this.load();
+      if (this.identity.account) {
+        if (this.load) {
+          this.load();
+        }
+      } else {
+        alert('Failed to find Scatter or get Scatter identity! Please see our FAQ!')
       }
     },
     async logout() {
