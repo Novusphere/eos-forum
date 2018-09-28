@@ -148,15 +148,18 @@
 
 <script>
 import jQuery from "jquery";
-import { GetNovusphere } from "../novusphere";
-import { MigratePost, ApplyPostEdit, TransformPropose } from "../migrations";
-import { GetEOS, GetScatter, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos";
-import { MarkdownParser } from "../markdown";
 
-import Post from "./Post.vue";
-import SubmitPostModal from "./SubmitPostModal.vue";
-import HeaderSection from "./HeaderSection";
-import MainSection from "./MainSection";
+import { GetEOS, GetScatter, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "@/eos";
+import { GetNovusphere } from "@/novusphere";
+import { MigratePost, ApplyPostEdit, TransformPropose } from "@/migrations";
+import { MarkdownParser } from "@/markdown";
+
+import Post from "@/components/core/Post";
+
+import SubmitPostModal from "@/components/modal/SubmitPostModal";
+
+import HeaderSection from "@/components/section/HeaderSection";
+import MainSection from "@/components/section/MainSection";
 
 import sha256 from "sha256";
 

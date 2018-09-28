@@ -1,5 +1,7 @@
-import showdown from 'showdown'
-import jQuery from 'jquery'
+import showdown from "showdown";
+import jQuery from "jquery";
+
+import twitter from "@/showdown-twitter";
 
 const WHITE_LIST = [
     'A', 'B', 'BLOCKQUOTE', 'CODE', 'DEL', 
@@ -24,8 +26,20 @@ class MarkdownParser {
         this._postProcess();
     }
     _generateHtml() {
+        //
+        // idk why I need to use \\ for the link instead of /, it just breaks if I don't
+        // but hey, at least it works
+        //
+        var sdExt = twitter(
+            (username) => '<a href="\\#/u/' + username + '">@' + username + '</a>',
+            //(tag) => '<a href="">#' + tag + '</a>'
+            (tag) => '<a href="\\#/tag/' + tag + '">#' + tag + '</a>'
+        );
+
         var sd = new showdown.Converter({
-            simplifiedAutoLink: true
+            extensions: [ sdExt ],
+            simplifiedAutoLink: true,
+            requireSpaceBeforeHeadingText: true /* enabled for hashtags */
         });
         
         this.html = sd.makeHtml(this.text);

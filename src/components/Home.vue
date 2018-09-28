@@ -1,7 +1,7 @@
 <template>
   <div>
     <SubmitPostModal ref="submitModal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
-    <HeaderSection>
+    <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
       <button v-if="!isSubscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-outline-primary ml-1">subscribe</button>
       <button v-if="isSubscribed" v-on:click="subscribe(false)" type="button" class="btn btn-outline-danger ml-1">unsubscribe</button>
@@ -31,23 +31,26 @@
 </template>
 
 <script>
-import { GetNovusphere } from "../novusphere";
-import { MigratePost, ApplyPostEdit } from "../migrations";
-import { storage, SaveStorage } from "../storage";
-import { forum } from "../novusphere-forum";
 import jQuery from "jquery";
 
-import Post from "./Post.vue";
-import SubmitPostModal from "./SubmitPostModal.vue";
-import HeaderSection from "./HeaderSection";
-import MainSection from "./MainSection";
-import { GetScatter, GetScatterIdentity } from '../eos';
+import { GetScatter, GetScatterIdentity } from '@/eos';
+import { GetNovusphere } from "@/novusphere";
+import { forum } from "@/novusphere-forum";
+import { MigratePost, ApplyPostEdit } from "@/migrations";
+import { storage, SaveStorage } from "@/storage";
+
+import Post from "@/components/core/Post";
+
+import SubmitPostModal from "@/components/modal/SubmitPostModal";
+
+import HeaderSection from "@/components/section/HeaderSection";
+import MainSection from "@/components/section/MainSection";
 
 const MAX_ITEMS_PER_PAGE = 25;
 const DEFAULT_SUB = "all";
 
 export default {
-  name: "Index",
+  name: "Home",
   components: {
     Post: Post,
     SubmitPostModal: SubmitPostModal,
@@ -62,7 +65,7 @@ export default {
       this.load();
     }
   },
-  mounted() {
+  async mounted() {
     this.load();
   },
   methods: {
@@ -86,7 +89,7 @@ export default {
       });
 
       var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
-      var identity = await GetScatterIdentity(true);
+      const identity = await GetScatterIdentity();
 
       apiResult = await novusphere.api({
         aggregate: novusphere.config.collection,
@@ -110,10 +113,6 @@ export default {
       for (var i = 0; i < payload.length; i++) {
         var post = payload[i];
         MigratePost(post);
-
-        if (post.recent_edit) {
-          ApplyPostEdit(post, post.recent_edit);
-        }
 
         var old_replies = storage.new_posts[post.data.post_uuid];
         post.new_replies =

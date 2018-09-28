@@ -1,4 +1,4 @@
-import { GetNovusphere } from './novusphere'
+import { GetNovusphere } from "@/novusphere";
 
 class NovusphereForum {
     //
@@ -10,9 +10,14 @@ class NovusphereForum {
     //
     //  MONGODB SORT QUERY HELPERS
     //
-    sort_by_score() {
+    sort_by_score(asc) {
         return {
-            __score: -1
+            __score: asc ? 1 : -1
+        };
+    }
+    sort_by_time(asc) {
+        return {
+            createdAt: asc ? 1 : -1
         };
     }
     //
@@ -41,9 +46,54 @@ class NovusphereForum {
 
         return query;
     }
+    match_threads_by_account(account) {
+        return {
+            "data.json_metadata.edit": false,
+            "data.json_metadata.sub": { $exists: true, $ne: "" },
+            "data.reply_to_post_uuid": "",
+            "data.poster": account,
+            createdAt: {
+                $gte: 1531434299
+            } /* Last eosforumtest contract redeploy */
+        };
+    }
+    match_post_edits(poster, post_uuid) {
+        return {
+            "data.poster": poster,
+            "data.json_metadata.parent_uuid": post_uuid,
+            "data.json_metadata.edit": true
+        };
+    }
+    match_posts_by_account(account, commentsOnly) {
+        var query = this.match_threads_by_account(account);
+        if (commentsOnly) {
+            query["data.reply_to_post_uuid"] = { $ne: "" };
+        }
+        else {
+            delete query["data.reply_to_post_uuid"];
+        }
+        return query;
+    }
+    match_valid_parent() {
+        return {
+            $or: [
+                { parent: null },
+                { "parent.data.json_metadata": { $ne: null } }
+            ]
+        };
+    }
     //
     //  MONGODB LOOKUP QUERY HELPERS
     //
+    lookup_post_parent() {
+        const novusphere = GetNovusphere();
+        return {
+            from: novusphere.config.collection,
+            localField: "data.reply_to_post_uuid",
+            foreignField: "data.post_uuid",
+            as: "parent"
+        };
+    }
     lookup_post_state() {
         const novusphere = GetNovusphere();
         return {
@@ -95,8 +145,9 @@ class NovusphereForum {
             transaction: "$transaction",
             createdAt: "$createdAt",
             data: "$data",
-            up: this.pipeline_up(),
-            __score: this.pipeline_score()
+            up: { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
+            parent: { $arrayElemAt: ["$parent", 0] },
+            __score: this.score()
         };
     }
     project_post_final(recentEdit, totalReplies) {
@@ -106,6 +157,7 @@ class NovusphereForum {
             data: "$data",
             up: "$up",
             my_vote: { $arrayElemAt: ["$my_vote", 0] },
+            parent: "$parent",
             __score: "$__score"
         };
 
@@ -154,10 +206,7 @@ class NovusphereForum {
     //
     //  MONGODB PIPELINE QUERY HELPERS
     //
-    pipeline_up() {
-        return { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] };
-    }
-    pipeline_score() {
+    score() {
         const unix_now = new Date().getTime() / 1000;
         return {
             // (p+1)/(T+2)^G -- p=upvotes, T=time since post in hrs, G=1.8

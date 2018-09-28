@@ -17,6 +17,10 @@ function MigratePost(p) {
         p.data.poster = p.data.account;
         p.data.reply_to_poster = p.data.reply_to_account;
     }*/
+
+    if (p.recent_edit) {
+        ApplyPostEdit(p, p.recent_edit);
+    }
 }
 
 function TransformPropose(p) {

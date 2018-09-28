@@ -1,4 +1,4 @@
-import jQuery from 'jquery';
+import jQuery from "jquery";
 
 const MAX_TRACK_NEW_POSTS = 1000;
 

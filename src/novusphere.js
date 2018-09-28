@@ -1,5 +1,5 @@
-import { NovusphereAdapter } from './novusphere-adapter.js';
-import { storage, SaveStorage } from './storage.js';
+import { NovusphereAdapter } from "@/novusphere-adapter"
+import { storage, SaveStorage } from "@/storage"
 
 const NovusphereConfig = {
     url: 'https://db.novusphere.io', // point to your own instance of novusphere-db

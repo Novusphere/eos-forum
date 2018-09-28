@@ -3,7 +3,7 @@
       <div class="row">
         <div class="col-md-12">
             <span style="font-weight: bold; font-size: 20px">
-                <div v-if="!(p.data.reply_to_post_uuid) || (p.parent && !(p.parent.data.reply_to_post_uuid) && !historyModal)">
+                <div v-if="showTitle">
                     <span v-if="this.hasAttachment('link')">
                         <span class="title"><a target="_blank" :href="attachment">{{ title }}</a></span>
                         <span class="text-xsmall">({{this.getHost(attachment)}})</span>
@@ -80,16 +80,17 @@
 
 <script>
 import jQuery from "jquery";
-import { MarkdownParser } from "../markdown";
+
+import { MarkdownParser } from "@/markdown";
 import {
   GetEOS,
   GetScatter,
   ScatterConfig,
   ScatterEosOptions,
   GetScatterIdentity
-} from "../eos";
+} from "@/eos";
 
-import PostAttachment from "./PostAttachment.vue";
+import PostAttachment from "@/components/core/PostAttachment.vue";
 
 export default {
   name: "Post",
@@ -119,6 +120,15 @@ export default {
     this.load();
   },
   computed: {
+    showTitle() {
+      if (!(this.p.data.reply_to_post_uuid))
+        return true; // top level post
+
+      if (this.p.parent && !this.p.depth)
+        return true; // has a parent, so userprofile/home
+
+      return false;
+    },
     title() {
       var title = this.post.data.json_metadata.title;
       if (
@@ -217,7 +227,7 @@ export default {
     },
     reply() {
       var $post = this.submitModal.$data.post;
-      $post.parent_uuid = this.$data.p.data.post_uuid;
+      $post.parent_uuid = this.post.data.post_uuid;
       $post.title = "";
       //$post.content = "";
       $post.edit = false;

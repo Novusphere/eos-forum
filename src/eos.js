@@ -1,8 +1,12 @@
-import Eos from 'eosjs';
-import ScatterJS from 'scatter-js/dist/scatter.esm';
-import { storage } from './storage.js';
+import Eos from "eosjs";
+import ScatterJS from "scatter-js/dist/scatter.esm";
+
+import { storage } from '@/storage';
+
+const DEFAULT_IDENTITY = { account: '', auth: '' };
 
 var _scatter = null;
+var _identity = DEFAULT_IDENTITY;
 
 const ScatterConfig = {
     blockchain: "eos",
@@ -22,6 +26,16 @@ ScatterJS.scatter.connect('eos-forum', { initTimeout: 1500 }).then(connected => 
     if (connected) {
         console.log('Scatter loaded');
         _scatter = ScatterJS.scatter;
+        window.scatter = null;
+        
+        if (_scatter.identity) {
+            const identity = _scatter.identity;
+
+                _identity = { 
+                    account: identity.accounts[0].name,
+                    auth: identity.accounts[0].authority
+                };
+        }
     }
     else {
         console.log('Scatter could not be loaded');
@@ -36,7 +50,7 @@ function GetScatter() {
             if (_scatter)
                 resolve((_scatter == -1) ? null : _scatter);
             else {
-                setTimeout(_check, 1000);
+                setTimeout(_check, 100);
             }
         }
 
@@ -45,25 +59,34 @@ function GetScatter() {
     });
 }
 
-async function GetScatterIdentity() {
+async function GetScatterIdentity(tryPull) {
     var scatter = await GetScatter();
-    if (scatter == null) {
-        return { account: '', auth: '' };
+    if (tryPull && !_identity.account) {
+        if (scatter != null) {
+            const identity = await scatter.getIdentity({
+                accounts: [
+                    {
+                        chainId: ScatterConfig.chainId,
+                        blockchain: ScatterConfig.blockchain
+                    }
+                ]
+            });
+
+            _identity = { 
+                account: identity.accounts[0].name,
+                auth: identity.accounts[0].authority
+            };
+        }
     }
+    return _identity;
+}
 
-    var identity = await scatter.getIdentity({
-        accounts: [
-            {
-                chainId: ScatterConfig.chainId,
-                blockchain: ScatterConfig.blockchain
-            }
-        ]
-    });
+async function ForgetScatterIdentity() {
+    const scatter = await GetScatter();
+    scatter.forgetIdentity();
 
-    return {
-        account: identity.accounts[0].name,
-        auth: identity.accounts[0].authority
-    };
+    _identity = DEFAULT_IDENTITY;
+    return _identity;
 }
 
 function GetEOS(scatter) {
@@ -82,4 +105,12 @@ function GetEOS(scatter) {
     }
 }
 
-export { GetEOS, GetScatter, GetScatterIdentity, ScatterConfig, ScatterEosOptions };
+export { 
+    DEFAULT_IDENTITY, 
+    GetEOS, 
+    GetScatter, 
+    GetScatterIdentity, 
+    ForgetScatterIdentity,
+    ScatterConfig, 
+    ScatterEosOptions 
+};

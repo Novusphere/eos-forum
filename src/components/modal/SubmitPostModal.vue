@@ -113,161 +113,165 @@
 </template>
 
 <script>
-import { GetNovusphere } from "../novusphere"
-import { GetEOS, GetScatter, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos"
-import { GetEOSService } from '../eos-service'
-import { MarkdownParser } from "../markdown"
-import { v4 as uuidv4 } from "uuid"
-import jQuery from "jquery"
+import { v4 as uuidv4 } from "uuid";
+import jQuery from "jquery";
+
+import { GetNovusphere } from "@/novusphere";
+import {
+  GetEOS,
+  GetScatter,
+  ScatterConfig,
+  ScatterEosOptions,
+  GetScatterIdentity
+} from "@/eos";
+import { GetEOSService } from "@/eos-service";
+import { MarkdownParser } from "@/markdown";
 
 export default {
   name: "SubmitPostModal",
   props: {
-      replyAccount: {
-          type: String,
-          required: false,
-          default: ''
-      },
-      replyUuid: {
-          type: String,
-          required: false,
-          default: ''       
-      },
-      sub: {
-          type: String,
-          required: true,
-          default: '',
-      },
-      postContentCallback: {
-          type: Function,
-          required: false,
-          default: () => {}
-      }
+    replyAccount: {
+      type: String,
+      required: false,
+      default: ""
+    },
+    replyUuid: {
+      type: String,
+      required: false,
+      default: ""
+    },
+    sub: {
+      type: String,
+      required: true,
+      default: ""
+    },
+    postContentCallback: {
+      type: Function,
+      required: false,
+      default: () => {}
+    }
   },
   methods: {
     makePost: function(account) {
-        var post = this.$data.post;
+      var post = this.post;
 
-        if (post.edit) {
-          if (account != post.edit_account) {
-            this.$data.status = 'This is not your post, you cannot edit it!';
-            return;
+      if (post.edit) {
+        if (account != post.edit_account) {
+          this.status = "This is not your post, you cannot edit it!";
+          return;
+        }
+      }
+
+      if (post.content.length == 0) {
+        this.status = "Post must have at least 1 character of content";
+        return;
+      }
+
+      if (post.content.length > 1024 * 10) {
+        this.status =
+          "Post is too long, over limit by " +
+          (1024 * 10 - post.content.length) +
+          " characters";
+        return;
+      }
+
+      var eosPost = {
+        poster: account,
+        reply_to_poster: this.replyAccount,
+        reply_to_post_uuid: this.replyUuid,
+        certify: 0,
+        content: post.content,
+        post_uuid: uuidv4(),
+        json_metadata: JSON.stringify({
+          title: post.title,
+          type: "novusphere-forum",
+          sub: this.sub,
+          parent_uuid: post.parent_uuid,
+          edit: post.edit,
+          attachment: {
+            value: post.attachment.value.trim(),
+            type: post.attachment.type,
+            display: post.attachment.value ? post.attachment.display : ""
           }
-        }
+        })
+      };
 
-        if (post.content.length == 0) {
-          this.$data.status = 'Post must have at least 1 character of content';
-          return;
-        }
-
-        if (post.content.length > 1024 * 10) {
-          this.$data.status = 'Post is too long, over limit by ' + ((1024*10) - post.content.length) + ' characters';
-          return;
-        }
-
-        var eosPost = {
-                    poster: account,
-                    reply_to_poster: this.replyAccount,
-                    reply_to_post_uuid: this.replyUuid,
-                    certify: 0,
-                    content: post.content,
-                    post_uuid: uuidv4(),
-                    json_metadata: JSON.stringify({
-                        'title': post.title,
-                        'type': 'novusphere-forum',
-                        'sub': this.sub,
-                        'parent_uuid': post.parent_uuid,
-                        'edit': post.edit,
-                        'attachment': {
-                            'value': post.attachment.value.trim(),
-                            'type': post.attachment.type,
-                            'display': (post.attachment.value) ? post.attachment.display : ''
-                        }
-                      })
-          };
-
-          return eosPost;
+      return eosPost;
     },
     async postContent(anon) {
-        var post = this.$data.post;
-        const eosService = GetEOSService();
+      var post = this.post;
+      const eosService = GetEOSService();
 
-        var eosAccount, eosAuth;
+      var eosAccount, eosAuth;
+
+      if (anon) {
+        eosAccount = eosService.config.anonymousAccount;
+      } else {
+        //
+        // not anonymous post: so get scatter identity
+        //
+        this.status = "Getting Scatter identity...";
+
+        try {
+          var identity = await GetScatterIdentity();
+          eosAccount = identity.account;
+          eosAuth = identity.auth;
+        } catch (ex) {
+          this.status += " Failed!";
+          console.log(ex);
+          return;
+        }
+      }
+
+      var txid;
+      this.status = "Creating tx and broadcasting to EOS...";
+      try {
+        var eosPost = this.makePost(eosAccount);
+        if (!eosPost) return;
 
         if (anon) {
-          eosAccount = eosService.config.anonymousAccount;
-        }
-        else {
-          //
-          // not anonymous post: so get scatter identity
-          //
-          this.status = 'Getting Scatter identity...';
-
-          try {
-            var identity = await GetScatterIdentity();
-            eosAccount = identity.account;
-            eosAuth = identity.auth;
-          }
-          catch (ex) {
-              this.status += ' Failed!';
-              console.log(ex);
-              return;
-          }
-        }
-
-        var txid;
-        this.status = 'Creating tx and broadcasting to EOS...';
-        try {
-            var eosPost = this.makePost(eosAccount);
-            if (!eosPost)
-              return;
-
-            if (anon) {
-              // use eos-service to make anonymous post
-              var eostx = await eosService.anonymousPost(eosPost);
-              if (eostx.error)
-              {
-                this.status = 'Error: ' + eostx.error;
-                console.log(eostx.error);
-                return;
-              }
-            }
-            else {
-              // make scatter eos instance
-              
-              const eos = GetEOS(await GetScatter());
-              var eosforum = await eos.contract("eosforumdapp");
-              var eostx = await eosforum.transaction(tx => {
-                  tx.post(eosPost,
-                  {
-                      authorization: [
-                      {
-                          actor: eosAccount,
-                          permission: eosAuth
-                      }]
-                  });
-              });
-            }
-
-            txid = eostx.transaction_id;
-        }
-        catch (ex) {
-            this.status += ' Failed!';
-            console.log(ex);
+          // use eos-service to make anonymous post
+          var eostx = await eosService.anonymousPost(eosPost);
+          if (eostx.error) {
+            this.status = "Error: " + eostx.error;
+            console.log(eostx.error);
             return;
+          }
+        } else {
+          // make scatter eos instance
+
+          const eos = GetEOS(await GetScatter());
+          var eosforum = await eos.contract("eosforumdapp");
+          var eostx = await eosforum.transaction(tx => {
+            tx.post(eosPost, {
+              authorization: [
+                {
+                  actor: eosAccount,
+                  permission: eosAuth
+                }
+              ]
+            });
+          });
         }
 
-        this.status = 'Waiting for Novusphere to index...';
+        txid = eostx.transaction_id;
+      } catch (ex) {
+        this.status += " Failed!";
+        console.log(ex);
+        return;
+      }
 
-        var novusphere = GetNovusphere();
-        await novusphere.waitTx(txid, 500, 1000);
+      this.status = "Waiting for Novusphere to index...";
 
-        jQuery('#submitPost').modal('hide');
-        this.$data.post.status = '';
+      var novusphere = GetNovusphere();
+      await novusphere.waitTx(txid, 500, 1000);
 
-        this.postContentCallback(txid);
+      jQuery("#submitPost").modal("hide");
+      this.post.status = "";
 
-        this.status = '';
+      this.postContentCallback(txid);
+
+      this.status = "";
     }
   },
   computed: {
@@ -276,27 +280,28 @@ export default {
       return md.html;
     },
     isAnonSub: function() {
-      return (this.sub == 'anon') || (this.sub.indexOf('anon-') == 0);
+      return this.sub == "anon" || this.sub.indexOf("anon-") == 0;
     }
   },
   data() {
-    return {        
-      status: '',
+    return {
+      status: "",
       preview: false,
-      post: { // for making a new post
+      post: {
+        // for making a new post
         edit: false,
-        edit_account: '',
+        edit_account: "",
 
-        parent_uuid: '',
-        title: '',
-        content: '',
+        parent_uuid: "",
+        title: "",
+        content: "",
         attachment: {
-          value: '',
-          type: '',
-          display: 'link'
+          value: "",
+          type: "",
+          display: "link"
         }
       }
-    }
+    };
   }
-}
+};
 </script>

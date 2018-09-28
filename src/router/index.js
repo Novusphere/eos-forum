@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from '@/components/Index'
+
+import Home from '@/components/Home'
 import Test from '@/components/Test'
 import Thread from '@/components/Thread'
 import UserProfile from '@/components/UserProfile'
@@ -13,12 +14,12 @@ export default new Router({
     { // default route
       path: '/',
       name: 'Index',
-      component: Index
+      component: Home
     },
     {
       path: '/e/:sub?',
       name: 'Sub',
-      component: Index
+      component: Home
     },
     {
       path: '/e/:sub/:id/:child_id?',

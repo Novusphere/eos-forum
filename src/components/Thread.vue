@@ -2,7 +2,7 @@
   <div> 
     <PostHistoryModal ref="historyModal"></PostHistoryModal>
     <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.poster"></SubmitPostModal>
-    <HeaderSection>
+    <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/e/' + mainPost.data.json_metadata.sub">{{ mainPost.data.json_metadata.sub }}</router-link></span>          
     </HeaderSection>
     <MainSection>
@@ -19,19 +19,23 @@
 </template>
 
 <script>
-import { GetNovusphere } from "../novusphere";
-import { forum } from "../novusphere-forum"
-import { GetEOS, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "../eos";
-import { MigratePost, PlaceholderPost, ApplyPostEdit } from "../migrations";
-import { storage, SaveStorage } from "../storage";
 import { v4 as uuidv4 } from "uuid";
 import jQuery from "jquery";
 
-import SubmitPostModal from "./SubmitPostModal.vue";
-import PostHistoryModal from "./PostHistoryModal.vue";
-import Post from "./Post.vue";
-import HeaderSection from "./HeaderSection";
-import MainSection from "./MainSection";
+
+import { GetEOS, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "@/eos";
+import { GetNovusphere } from "@/novusphere";
+import { forum } from "@/novusphere-forum"
+import { MigratePost, PlaceholderPost, ApplyPostEdit } from "@/migrations";
+import { storage, SaveStorage } from "@/storage";
+
+import SubmitPostModal from "@/components/modal/SubmitPostModal";
+import PostHistoryModal from "@/components/modal/PostHistoryModal";
+
+import Post from "@/components/core/Post";
+
+import HeaderSection from "@/components/section/HeaderSection";
+import MainSection from "@/components/section/MainSection";
 
 export default {
   name: "Thread",
@@ -50,11 +54,11 @@ export default {
       this.load();
     }
   },
-  mounted: function() {
+  async mounted() {
     this.load();
   },
   methods: {
-    load: async function() {
+    async load() {
       const novusphere = GetNovusphere();
       const identity = await GetScatterIdentity();
 
@@ -142,7 +146,7 @@ export default {
         this.mainPost = mainPost;
       }
     },
-    postContent: function(txid) {
+    postContent(txid) {
       this.load(); // reload thread
     }
   },

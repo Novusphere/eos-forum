@@ -1,5 +1,4 @@
-import jQuery from 'jquery'
-import { resolve } from 'url';
+import jQuery from "jquery";
 
 var ServiceConfig = {
     url: 'https://eos-service.novusphere.io',

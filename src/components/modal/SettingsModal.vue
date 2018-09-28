@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import { GetNovusphere } from "../novusphere.js";
-import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos.js";
-import { storage, DEFAULT_STORAGE, SaveStorage } from "../storage.js";
+import { GetNovusphere } from "@/novusphere";
+import { GetEOS, ScatterConfig, ScatterEosOptions } from "@/eos";
+import { storage, DEFAULT_STORAGE, SaveStorage } from "@/storage";
 
 export default {
   name: "SettingsModal",
@@ -49,8 +49,8 @@ export default {
       this.settings = JSON.stringify(DEFAULT_STORAGE.settings, null, 2);
     },
     save() {
-        storage.settings = JSON.parse(this.settings);
-        SaveStorage();
+      storage.settings = JSON.parse(this.settings);
+      SaveStorage();
     }
   },
   data() {
