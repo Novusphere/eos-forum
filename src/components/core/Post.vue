@@ -169,7 +169,7 @@ export default {
     async load() {
       if (this.showContent) {
         // md parse
-        var md = new MarkdownParser(this.p.data.content);
+        var md = new MarkdownParser(this.p.data.content, this.p.createdAt);
         this.postContent = md.html;
 
         // only allow one attachment through
