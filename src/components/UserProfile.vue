@@ -3,11 +3,12 @@
         <PostHistoryModal ref="historyModal"></PostHistoryModal>
         <HeaderSection :load="load">
             <span class="title mr-3"><router-link :to="'/u/' + account">{{account}}</router-link></span>
-            <a class="btn btn-outline-secondary ml-1" :href="'https://bloks.io/account/' + account">view on chain</a>
+            <a class="btn btn-outline-primary ml-1" :href="'https://bloks.io/account/' + account">view on chain</a>
+            <PostSorter ref="sorter" :change="load"></PostSorter>
         </HeaderSection>
         <MainSection>
         <div>
-            <div class="row mb-2">
+            <div class="row mb-4">
                 <div class="col-md-6 col-12">
                     <div class="row">
                         <div class="col-md-6 col-5">Balances</div>
@@ -38,12 +39,12 @@
                 :showContent="true">
                 </Post>
             </div>
-            <div class="row">
-                <div class="col-md-2" v-if="currentPage>1">
-                    <router-link :to="'/u/' + account + '?page=' + (currentPage-1)">&larr; prev</router-link>
-                </div>
-                <div class="col-md-2" v-if="currentPage<pages">
-                    <router-link :to="'/u/' + account + '?page=' + (currentPage+1)">next &rarr;</router-link>
+            <div class="row mb-4">
+                <div class="col-12">
+                  <div class="float-right">
+                      <router-link v-if="currentPage>1" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (currentPage-1)">&larr; prev</router-link>
+                      <router-link v-if="currentPage<pages" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (currentPage+1)">next &rarr;</router-link>
+                  </div>
                 </div>
             </div>
         </div>
@@ -64,6 +65,7 @@ import { forum } from "@/novusphere-forum";
 import { MigratePost, ApplyPostEdit } from "@/migrations";
 
 import Post from "@/components/core/Post";
+import PostSorter from "@/components/core/PostSorter";
 
 import PostHistoryModal from "@/components/modal/PostHistoryModal";
 
@@ -78,7 +80,8 @@ export default {
     PostHistoryModal: PostHistoryModal,
     HeaderSection: HeaderSection,
     MainSection: MainSection,
-    Post: Post
+    Post: Post,
+    PostSorter: PostSorter
   },
   watch: {
     "$route.query.page": function() {
@@ -89,6 +92,7 @@ export default {
     }
   },
   async mounted() {
+    this.$refs.sorter.by = 'time';
     this.load();
   },
   methods: {
@@ -131,12 +135,12 @@ export default {
         cursor: {},
         pipeline: [
           { $match: forum.match_posts_by_account(this.account, false) },
-          { $sort: forum.sort_by_time() },
+          { $lookup: forum.lookup_post_state() },
+          { $lookup: forum.lookup_post_parent() },
+          { $project: forum.project_post() },
+          { $sort: this.$refs.sorter.getSorter() },
           { $skip: forum.skip_page(this.currentPage, MAX_ITEMS_PER_PAGE) },
           { $limit: MAX_ITEMS_PER_PAGE },
-          { $lookup: forum.lookup_post_parent() },
-          { $lookup: forum.lookup_post_state() },
-          { $project: forum.project_post() },
           { $lookup: forum.lookup_post_replies() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
           { $project: forum.project_post_final(true, false) },
@@ -150,7 +154,7 @@ export default {
 
         if (p.parent) {
           MigratePost(p.parent);
-          
+
           if (p.parent.data.json_metadata) {
             const title = p.parent.data.json_metadata.title;
             p.data.json_metadata.title = title;

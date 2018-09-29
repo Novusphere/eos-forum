@@ -9,12 +9,12 @@
               </button>
             </div>
             <div class="modal-body">
-                <div class="text-danger text-center">
+                <div class="text-alert text-center">
                     {{ text }}
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-dismiss="modal">close</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">close</button>
             </div>
           </div>
         </div>

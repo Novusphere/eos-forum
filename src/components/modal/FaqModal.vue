@@ -1,6 +1,6 @@
 <template>
       <div class="modal fade" tabindex="-1" role="dialog" id="faq">
-        <div class="modal-dialog modal-full" role="document">
+        <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">FAQ/Help</h5>
@@ -51,7 +51,7 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-dismiss="modal">close</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">close</button>
             </div>
           </div>
         </div>

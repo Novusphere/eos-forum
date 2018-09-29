@@ -4,7 +4,7 @@ const MAX_TRACK_NEW_POSTS = 1000;
 
 const DEFAULT_STORAGE = {
     version: 6,
-    subscribed_subs: [ "all", "novusphere", "eos", "general", "anon", "movies", "music", "games", "bounties", "test" ],
+    subscribed_subs: [ "all", "novusphere", "eos", "anon", "movies", "music", "games", "bounties", "test" ],
     new_posts: {},
     settings: {
         novusphere_api: 'https://db.novusphere.io',

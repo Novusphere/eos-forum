@@ -34,7 +34,7 @@
                         <ul class="list-inline">
                             <li class="list-inline-item">
                                 <button type="button" class="btn btn-sm btn-outline-info" v-on:click="proposalStatus(p.transaction)">status</button>
-                                <button type="button" class="btn btn-sm btn-outline-success" v-on:click="castVote(p.transaction, 1)">vote for</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="castVote(p.transaction, 1)">vote for</button>
                                 <button type="button" class="btn btn-sm btn-outline-danger" v-on:click="castVote(p.transaction, 0)">vote against</button>
                             </li>
                         </ul>
@@ -64,11 +64,11 @@
             </div>
             <div class="modal-body">
                 This proposal has an approval rating of
-                <span :class="vote.approval >= 0.5 ? 'text-success' : 'text-danger'">{{ (vote.approval * 100).toFixed(2) }}%</span>
+                <span :class="vote.approval >= 0.5 ? 'text-highlight' : 'text-alert'">{{ (vote.approval * 100).toFixed(2) }}%</span>
                 with 
-                <span class="text-success">{{ vote.for.toFixed(4) }} EOS</span> 
+                <span class="text-highlight">{{ vote.for.toFixed(4) }} EOS</span> 
                 for and 
-                <span class="text-danger">{{ vote.against.toFixed(4) }} EOS</span> 
+                <span class="text-alert">{{ vote.against.toFixed(4) }} EOS</span> 
                 against and a total of 
                 <span class="text-info">{{ vote.votes }} votes</span> 
                 casted.

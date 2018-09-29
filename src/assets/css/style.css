@@ -5,10 +5,11 @@ html {
 body {
     background-color: #12161c;
     color: white;
+    padding-right: 0 !important;
 }
 
 body a {
-    color: #ec5f67;
+    color: cyan;
 }
 
 body a:hover {
@@ -26,7 +27,7 @@ body a:hover {
 }
 
 .header .list-inline-item a {
-    color: #f0b90b;
+    color: cyan;
 }
 
 .header-second .title {
@@ -34,7 +35,7 @@ body a:hover {
 }
 
 .header-second .title a {
-    color: #f0b90b;
+    color: cyan;
 }
 
 .footer {
@@ -42,7 +43,7 @@ body a:hover {
 }
 
 .post {
-    border: 1px solid #f0b90b;
+    border: 1px solid #053331;
     background-color: #1f2833;
 }
 
@@ -76,6 +77,18 @@ body a:hover {
     font-size: x-small;
 }
 
+.text-alert {
+    color: red !important;
+}
+
+.text-highlight {
+    color: lime !important; 
+}
+
+.badge-danger {
+    background-color: red;
+}
+
 .btn:hover, .btn:focus, .btn:active, .btn:active:focus, .btn.active, .open>.dropdown-toggle.btn {
     color: #fff !important;
     background-color: gray !important;
@@ -85,13 +98,18 @@ body a:hover {
 }
 
 .btn-outline-primary {
-    color: #f0b90b;
-    border-color: #f0b90b;
+    color: cyan;
+    border-color: cyan;
 }
 
 .btn-outline-secondary {
-    color: #619200;
-    border-color: #619200;
+    color: white;
+    border-color: white;
+}
+
+.btn-outline-danger {
+    color: red;
+    border-color: red;
 }
 
 .post-collapse.collapsed:before

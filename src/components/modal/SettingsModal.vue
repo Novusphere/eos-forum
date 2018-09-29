@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <div class="text-center">
-                    <p class="text-danger">
+                    <p class="text-alert">
                         <strong>Warning:</strong> You should not modify these settings unless you know what you're doing! 
                         If you incorrectly change something, click "reset" then "save" to restore the default settings.
                     </p>
@@ -22,9 +22,9 @@
                   </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-dismiss="modal" v-on:click="save()">save</button>
+                <button type="button" class="btn btn-outline-primary" data-dismiss="modal" v-on:click="save()">save</button>
                 <button type="button" class="btn btn-outline-warning" v-on:click="reset()">reset</button>
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">close</button>
             </div>
           </div>
         </div>

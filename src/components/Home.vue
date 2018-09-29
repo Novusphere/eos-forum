@@ -5,7 +5,8 @@
       <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
       <button v-if="!isSubscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-outline-primary ml-1">subscribe</button>
       <button v-if="isSubscribed" v-on:click="subscribe(false)" type="button" class="btn btn-outline-danger ml-1">unsubscribe</button>
-      <button type="button" class="btn btn-outline-secondary ml-1" v-on:click="newPost()">new</button>
+      <button type="button" class="btn btn-outline-primary" v-on:click="newPost()">new</button>
+      <PostSorter ref="sorter" :change="load"></PostSorter>
     </HeaderSection>
     <MainSection>
       <div>
@@ -33,13 +34,14 @@
 <script>
 import jQuery from "jquery";
 
-import { GetScatter, GetScatterIdentity } from '@/eos';
+import { GetScatter, GetScatterIdentity } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { forum } from "@/novusphere-forum";
 import { MigratePost, ApplyPostEdit } from "@/migrations";
 import { storage, SaveStorage } from "@/storage";
 
 import Post from "@/components/core/Post";
+import PostSorter from "@/components/core/PostSorter";
 
 import SubmitPostModal from "@/components/modal/SubmitPostModal";
 
@@ -53,6 +55,7 @@ export default {
   name: "Home",
   components: {
     Post: Post,
+    PostSorter: PostSorter,
     SubmitPostModal: SubmitPostModal,
     HeaderSection: HeaderSection,
     MainSection: MainSection
@@ -97,9 +100,9 @@ export default {
         cursor: {},
         pipeline: [
           { $match: forum.match_threads(sub) },
-          { $lookup: forum.lookup_post_state()},
+          { $lookup: forum.lookup_post_state() },
           { $project: forum.project_post() },
-          { $sort: forum.sort_by_score() },
+          { $sort: this.$refs.sorter.getSorter() },
           { $skip: forum.skip_page(currentPage, MAX_ITEMS_PER_PAGE) },
           { $limit: MAX_ITEMS_PER_PAGE },
           { $lookup: forum.lookup_post_replies() },
@@ -131,11 +134,14 @@ export default {
     },
     async newPost() {
       const identity = await GetScatterIdentity();
-      if (identity.account || this.sub == 'anon' || this.sub.indexOf('anon-') == 0) {
+      if (
+        identity.account ||
+        this.sub == "anon" ||
+        this.sub.indexOf("anon-") == 0
+      ) {
         jQuery("#submitPost").modal();
-      }
-      else {
-        alert('You must be logged in to post a new thread here!');
+      } else {
+        alert("You must be logged in to post a new thread here!");
       }
     },
     postContent(txid) {

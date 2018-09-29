@@ -7,19 +7,19 @@
       <div class="header">
           <ul class="list-inline mb-0">
             <li v-if="!identity.account" class="list-inline-item">
-              <a v-on:click="login()" href="javascript:void(0)" class="text-success">login</a>
+              <a v-on:click="login()" href="javascript:void(0)">login</a>
             </li>
             <li v-if="identity.account" class="list-inline-item">
-              <router-link class="text-success" :to="'/u/' + identity.account">{{ identity.account }}</router-link>
+              <router-link :to="'/u/' + identity.account" class="text-highlight">{{ identity.account }}</router-link>
             </li>
             <li v-if="identity.account" class="list-inline-item">
-              <a v-on:click="logout()" href="javascript:void(0)" class="text-danger">logout</a>
+              <a v-on:click="logout()" href="javascript:void(0)">logout</a>
             </li>
             <li class="list-inline-item">
-              <a href="#settings" data-toggle="modal" class="text-danger">settings</a>
+              <a href="#settings" data-toggle="modal">settings</a>
             </li>
             <li class="list-inline-item">
-              <a href="#faq" data-toggle="modal" class="text-success">faq/help</a>
+              <a href="#faq" data-toggle="modal">faq/help</a>
             </li>
           </ul>
           <ul class="list-inline">

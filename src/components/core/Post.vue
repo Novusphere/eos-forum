@@ -19,13 +19,13 @@
                 <ul class="list-inline">
                   <li v-if="showContent" class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + post.transaction"></a></li>
                   <li class="list-inline-item">
-                    <a :class="(post.my_vote ? 'text-success': '')" href="javascript:void(0)" v-on:click="upvote()">▲ {{post.up}} upvotes</a>
+                    <a :class="(post.my_vote ? 'text-highlight': '')" href="javascript:void(0)" v-on:click="upvote()">▲ {{post.up}} upvotes</a>
                   </li>
                   <li class="list-inline-item" v-if="!showContent">
                     <router-link :to="threadLink">{{ post.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item">{{ new Date(post.createdAt * 1000).toLocaleString() }}</li>
-                  <li class="list-inline-item">by <router-link :to="'/u/' + post.data.poster">{{ post.data.poster }}</router-link></li>
+                  <li class="list-inline-item">by <router-link :to="'/u/' + post.data.poster" :class="(post.data.poster == identity) ? 'text-highlight' : ''">{{ post.data.poster }}</router-link></li>
                   <li class="list-inline-item"><a :href="'https://bloks.io/transaction/' + post.transaction">on chain</a></li>
                   <li v-if="historyModal && post.depth > 0" class="list-inline-item"><router-link :to="permaLink">permalink</router-link></li>
                   <li v-if="historyModal && showContent && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
