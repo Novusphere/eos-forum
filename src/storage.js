@@ -3,11 +3,12 @@ import jQuery from "jquery";
 const MAX_TRACK_NEW_POSTS = 1000;
 
 const DEFAULT_STORAGE = {
-    version: 6,
-    subscribed_subs: [ "all", "novusphere", "eos", "anon", "movies", "music", "games", "bounties", "test" ],
+    version: 7,
+    subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "games", "bounties", "test"],
     new_posts: {},
     settings: {
-        novusphere_api: 'https://db.novusphere.io',
+        theme: "/static/css/theme/night.css",
+        novusphere_api: "https://db.novusphere.io",
         eos_api: {
             host: "eos.greymass.com", // ( or null if endorsed chainId )
             port: "443", // ( or null if defaulting to 80 )
@@ -22,19 +23,16 @@ function importStorage(obj) {
     while (obj.version < storage.version) {
 
         if (obj.version < 5) {
-            // subs introduced into storage
             obj.subscribed_subs = storage.subscribed_subs;
         }
-        else if (obj.version == 5)
-        {
+        else if (obj.version < 7) {
             obj.settings = storage.settings;
         }
 
         obj.version++;
     }
 
-    if (obj.version >= storage.version)
-    {
+    if (obj.version >= storage.version) {
         storage = obj;
         console.log('Loaded storage');
         //console.log(storage);
@@ -44,12 +42,20 @@ function importStorage(obj) {
     return false;
 }
 
-window.forgetStorage = function() {
+window.__getStorage = function() {
+    return storage;
+}
+
+window.__saveStorage = function() {
+    SaveStorage();
+}
+
+window.__forgetStorage = function () {
     window.localStorage.setItem('eosforum', '');
     window.location.reload();
 }
 
-window.forgetSettings = function() {
+window.__forgetSettings = function () {
     storage.settings = DEFAULT_STORAGE.settings;
     SaveStorage();
     window.location.reload();

@@ -15,7 +15,7 @@
                 </p>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-primary" v-on:click="preview = false">back</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="preview = false">back</button>
               </div>
             </div>
             <div v-else>

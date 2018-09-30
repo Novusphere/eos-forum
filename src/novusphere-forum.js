@@ -57,6 +57,20 @@ class NovusphereForum {
             } /* Last eosforumtest contract redeploy */
         };
     }
+    match_posts_by_tag(tag) {
+        //
+        //  NOTE & TO-DO:
+        //  this is very inefficient using regex, build an index with novusphere-db
+        //  and use $in on the pre-processed hashtag array
+        //
+        return {
+            "data.json_metadata.edit": false,
+            "data.content": { $regex: ".*#" + tag + ".*" },
+            createdAt: {
+                $gte: 1531434299
+            } /* Last eosforumtest contract redeploy */
+        }
+    }
     match_post_edits(poster, post_uuid) {
         return {
             "data.poster": poster,

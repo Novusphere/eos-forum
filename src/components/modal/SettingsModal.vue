@@ -1,5 +1,8 @@
 <template>
-      <div class="modal fade" tabindex="-1" role="dialog" id="settings">
+  <div>
+    <link rel="stylesheet" type="text/css" :href="theme"> 
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="settings">
         <div class="modal-dialog modal-full" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -9,26 +12,46 @@
               </button>
             </div>
             <div class="modal-body">
-                <div class="text-center">
-                    <p class="text-alert">
-                        <strong>Warning:</strong> You should not modify these settings unless you know what you're doing! 
-                        If you incorrectly change something, click "reset" then "save" to restore the default settings.
-                    </p>
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" data-toggle="tab" href="#settings-theme" role="tab">Theme</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="tab" href="#settings-api" role="tab">Raw</a>
+                </li>
+              </ul>
+              <div class="tab-content mt-2" id="myTabContent">
+                <div class="tab-pane fade show active" id="settings-theme" role="tabpanel">
+                  <div class="text-center">
+                    <h2>Coming soon, easy to set custom themes!</h2>
+                  </div>
                 </div>
+                <div class="tab-pane fade" id="settings-api" role="tabpanel">
+                  <div class="text-center">
+                      <p class="text-alert">
+                          <strong>Warning:</strong> You should not modify these settings unless you know what you're doing! 
+                          If you incorrectly change something, click "reset" then "save" to restore the default settings.
+                      </p>
+                  </div>
                   <div class="form-group row">
                     <div class="col-sm-12">
                       <textarea rows="10" class="form-control" placeholder="Content" v-model="settings"></textarea>
                     </div>
                   </div>
+                  <div class="text-center">
+                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal" v-on:click="save()">save</button>
+                    <button type="button" class="btn btn-outline-secondary  " v-on:click="reset()">reset</button>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" data-dismiss="modal" v-on:click="save()">save</button>
-                <button type="button" class="btn btn-outline-warning" v-on:click="reset()">reset</button>
                 <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">close</button>
             </div>
           </div>
         </div>
-      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -50,12 +73,14 @@ export default {
     },
     save() {
       storage.settings = JSON.parse(this.settings);
+      this.theme = storage.settings.theme;
       SaveStorage();
     }
   },
   data() {
     return {
-      settings: ""
+      settings: "",
+      theme: storage.settings.theme
     };
   }
 };

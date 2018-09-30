@@ -1,9 +1,5 @@
 <template>
     <div>
-      <SettingsModal></SettingsModal>
-      <FaqModal></FaqModal>
-      <ErrorModal></ErrorModal>
-
       <div class="header">
           <ul class="list-inline mb-0">
             <li v-if="!identity.account" class="list-inline-item">
@@ -43,17 +39,8 @@ import {
   GetScatter
 } from "@/eos";
 
-import SettingsModal from "@/components/modal/SettingsModal";
-import FaqModal from "@/components/modal/FaqModal";
-import ErrorModal from "@/components/modal/ErrorModal";
-
 export default {
   name: "HeaderSection",
-  components: {
-    SettingsModal: SettingsModal,
-    FaqModal: FaqModal,
-    ErrorModal: ErrorModal
-  },
   props: {
     load: {
       type: Function,

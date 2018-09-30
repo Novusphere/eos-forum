@@ -3,52 +3,16 @@ html {
 }
 
 body {
-    background-color: #12161c;
-    color: white;
     padding-right: 0 !important;
 }
 
-body a {
-    color: cyan;
-}
-
-body a:hover {
-    color: white;
-}
-
-.close, .close:hover {
-    color: white;
-}
-
 .header {
-    background-color: black;
     text-align: center;
     margin-top: 0;
 }
 
-.header .list-inline-item a {
-    color: cyan;
-}
-
 .header-second .title {
     font-size: xx-large;
-}
-
-.header-second .title a {
-    color: cyan;
-}
-
-.footer {
-    color: white;
-}
-
-.post {
-    border: 1px solid #053331;
-    background-color: #1f2833;
-}
-
-.post .title a {
-    color: white;
 }
 
 .post-content, .post-attachment {
@@ -58,11 +22,6 @@ body a:hover {
 .post img {
     max-width: 100%;
 }
-
-.modal-content {
-    background-color: #1f2833;
-    color: white;
- }
 
 .modal-full {
     min-width: 100%;
@@ -75,41 +34,6 @@ body a:hover {
 
 .text-xsmall {
     font-size: x-small;
-}
-
-.text-alert {
-    color: red !important;
-}
-
-.text-highlight {
-    color: lime !important; 
-}
-
-.badge-danger {
-    background-color: red;
-}
-
-.btn:hover, .btn:focus, .btn:active, .btn:active:focus, .btn.active, .open>.dropdown-toggle.btn {
-    color: #fff !important;
-    background-color: gray !important;
-    border-color: gray !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-.btn-outline-primary {
-    color: cyan;
-    border-color: cyan;
-}
-
-.btn-outline-secondary {
-    color: white;
-    border-color: white;
-}
-
-.btn-outline-danger {
-    color: red;
-    border-color: red;
 }
 
 .post-collapse.collapsed:before
