@@ -1,8 +1,8 @@
 <template>
   <div>
-    <HeaderSection>
+    <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/referendum'">EOS Referendum</router-link></span>
-      <button type="button" class="btn btn-outline-secondary ml-1" data-toggle="modal" data-target="#submitProposal">new</button>
+      <button type="button" class="btn btn-outline-secondary ml-1" v-on:click="newProposal()">new</button>
     </HeaderSection>
     <MainSection>
       <div>
@@ -17,6 +17,7 @@
                     <div>
                         <span class="title">{{ p.data.title }}</span>
                         <span v-if="p.expired" class="text-danger">[expired]</span>
+                        <span v-else class="text-warning">[exp. {{ getDeltaDays(new Date(p.data.expires_at)) }} days]</span>
                     </div>
                 </span>
                 
@@ -24,7 +25,7 @@
                     <ul class="list-inline">
                     <li class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + p.transaction"></a></li>
                     <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
-                    <li class="list-inline-item">by <a :href="'https://bloks.io/account/' + p.data.proposer">{{ p.data.proposer }}</a></li>
+                    <li class="list-inline-item">by <router-link :to="'/u/' + p.data.proposer" :class="(p.data.proposer == identity) ? 'text-highlight' : ''">{{ p.data.proposer }}</router-link></li>
                     <li class="list-inline-item"><a :href="'https://bloks.io/transaction/' + p.transaction">on chain</a></li>
                     </ul>
                 </div>
@@ -37,6 +38,10 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="proposalStatus(p.transaction)">{{ p.expired ? ' results' : 'status' }}</button>
                                 <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="castVote(p.transaction, 1)">vote for</button>
                                 <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-danger" v-on:click="castVote(p.transaction, 0)">vote against</button>
+                            </li>
+                            <li v-if="p.data.proposer == identity" class="list-inline-item">
+                                <button v-if="p.expired" type="button" class="btn btn-sm btn-outline-primary" v-on:click="cleanProposal(p.transaction)">clean</button>
+                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-danger" v-on:click="expire(p.transaction)">force expire</button>
                             </li>
                         </ul>
                     </div>
@@ -91,24 +96,55 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div v-if="!proposal.preview">
-                    <div class="text-center">
-                      <h1>Creating proposals have been disabled until eosio.forum is officially deployed.</h1>
+                <div v-if="!post.preview">
+                  <form>
+                    <div class="form-group row">
+                      <label class="col-sm-2 col-form-label">Title</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control" placeholder="Title" v-model="post.title">
+                      </div>
                     </div>
+                    <div class="form-group row">
+                      <label class="col-sm-2 col-form-label">Expiry</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" placeholder="mm-dd-yyyy" v-model="post.expiry">
+                      </div>
+                      <label class="col-sm-2 col-form-label">({{ expiry_delta }} days from now)</label>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputContent" class="col-sm-2 col-form-label">Content</label>
+                      <div class="col-sm-10">
+                        <textarea rows="10" class="form-control" id="inputContent" placeholder="Content" v-model="post.content"></textarea>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-2 col-form-label"></label>
+                      <div class="col-sm-10">
+                        {{ post.content.length }} / {{ 30000 }}
+                      </div>
+                    </div>
+                  </form>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="text-center">
+                        <span style="font-weight: bold">{{status}}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div v-else>
-                    <p v-html="md(proposal.content)">
+                    <p v-html="md(post.content)">
                     </p>
                 </div>
             </div>
             <div class="modal-footer">
-                <div v-if="!proposal.preview">
+                <div v-if="!post.preview">
                     <button type="button" class="btn btn-outline-primary" v-on:click="submitProposal()">post</button>
-                    <button type="button" class="btn btn-outline-secondary" v-on:click="proposal.preview = true">preview</button>
+                    <button type="button" class="btn btn-outline-secondary" v-on:click="post.preview = true">preview</button>
                     <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
                 </div>
                 <div v-else>
-                    <button type="button" class="btn btn-outline-primary" v-on:click="proposal.preview = false">back</button>
+                    <button type="button" class="btn btn-outline-primary" v-on:click="post.preview = false">back</button>
                 </div>
             </div>
             </div>
@@ -119,6 +155,7 @@
 
 <script>
 import jQuery from "jquery";
+import sha256 from "sha256";
 
 import {
   GetEOS,
@@ -150,8 +187,34 @@ export default {
   async mounted() {
     await this.load();
   },
+  computed: {
+    expiry_delta: function() {
+      var expiry = new Date(this.post.expiry);
+      if (isNaN(expiry.getTime())) {
+        return "?";
+      }
+      return this.getDeltaDays(expiry);
+    }
+  },
   methods: {
+    getDeltaDays(future) {
+      var delta = future.getTime() - new Date().getTime();
+      return (delta / (1000 * 60 * 60 * 24)).toFixed(2);
+    },
+    generateName(identity, content) {
+      var hash = sha256(identity + content);
+      var name = "";
+      for (var i = 0; i < 12; i++) {
+        var cc = hash.charCodeAt(i);
+        if (cc >= 48 && cc <= 57) name += String.fromCharCode(122 - (cc - 48));
+        else name += String.fromCharCode(cc);
+      }
+      return name;
+    },
     async load() {
+      const identity = await GetScatterIdentity();
+      this.identity = identity.account;
+
       var currentPage = parseInt(
         this.$route.query.page ? this.$route.query.page : 1
       );
@@ -178,7 +241,32 @@ export default {
           { $match: MATCH_QUERY },
           { $sort: forum.sort_by_time() },
           { $skip: forum.skip_page(currentPage, MAX_ITEMS_PER_PAGE) },
-          { $limit: MAX_ITEMS_PER_PAGE }
+          { $limit: MAX_ITEMS_PER_PAGE },
+          {
+            $lookup: {
+              from: REFERENDUM_COLLECTION,
+              let: {
+                proposal_name: "$data.proposal_name",
+                createdAt: "$createdAt"
+              },
+              pipeline: [
+                { $match: { name: "expire" } },
+                {
+                  $project: {
+                    txid: "$transaction",
+                    test: {
+                      $and: [
+                        { $eq: ["$data.proposal_name", "$$proposal_name"] },
+                        { $gte: ["$createdAt", "$$createdAt"] }
+                      ]
+                    }
+                  }
+                },
+                { $match: { test: true } }
+              ],
+              as: "expired"
+            }
+          }
         ]
       });
 
@@ -187,6 +275,8 @@ export default {
       var payload = apiResult.cursor.firstBatch;
       for (var i = 0; i < payload.length; i++) {
         var p = payload[i];
+        p.expired = (p.expired.length > 0); 
+        
         if (unixNow > new Date(p.data.expires_at)) {
           p.expired = true;
         }
@@ -197,8 +287,73 @@ export default {
       this.pages = numPages;
       this.currentPage = currentPage;
     },
+    async newProposal() {
+      const identity = await GetScatterIdentity();
+      if (identity.account) {
+        jQuery("#submitProposal").modal();
+      } else {
+        alert("You must be logged in to create a proposal!");
+      }
+    },
     async submitProposal() {
-      return;
+      if (this.post.title.length > 1024) {
+        this.status =
+          "Title is too long, over limit by " +
+          (1024 - post.title.length) +
+          " characters";
+        return;
+      }
+
+      if (this.post.content.length > 30000) {
+        this.status =
+          "Post is too long, over limit by " +
+          (30000 - post.content.length) +
+          " characters";
+        return;
+      }
+
+      const identity = await GetScatterIdentity();
+
+      var eostxArg = {
+        proposer: identity.account,
+        proposal_name: this.generateName(identity.account, this.post.content),
+        title: this.post.title,
+        proposal_json: JSON.stringify({
+          content: this.post.content,
+          src: "novusphere-forum"
+        }),
+        expires_at: new Date(this.post.expiry).getTime() / 1000
+      };
+
+      var txid;
+      try {
+        const eos = GetEOS(await GetScatter());
+        var contract = await eos.contract(REFERENDUM_CONTRACT);
+        var eostx = await contract.transaction(tx => {
+          tx.propose(eostxArg, {
+            authorization: [
+              {
+                actor: identity.account,
+                permission: identity.auth
+              }
+            ]
+          });
+        });
+
+        txid = eostx.transaction_id;
+      } catch (ex) {
+        console.log(ex);
+        this.status = "Error: Failed to submit proposal!";
+        return;
+      }
+
+      const novusphere = GetNovusphere();
+      await novusphere.waitTx(txid, 500, 1000, REFERENDUM_COLLECTION);
+
+      jQuery("#submitProposal").modal("hide");
+      this.status = "";
+
+      await this.load();
     },
     md(text) {
       var md = new MarkdownParser(text);
@@ -243,6 +398,60 @@ export default {
       })).cursor.firstBatch;
 
       return { votes: votes, unvotes: unvotes };
+    },
+    async cleanProposal(propTxid) {
+      const novusphere = GetNovusphere();
+      const identity = await GetScatterIdentity();
+
+      const eos = GetEOS(await GetScatter());
+      const prop = await this.getProposal(propTxid);
+
+      var eostxArg = {
+        proposal_name: prop.data.proposal_name,
+        max_count: 0xffffffff
+      };
+      var eosforum = await eos.contract(REFERENDUM_CONTRACT);
+      var eostx = await eosforum.transaction(tx => {
+        tx.clnproposal(eostxArg, {
+          authorization: [
+            {
+              actor: identity.account,
+              permission: identity.auth
+            }
+          ]
+        });
+      });
+    },
+    async expire(propTxid) {
+      const novusphere = GetNovusphere();
+      const identity = await GetScatterIdentity();
+
+      const eos = GetEOS(await GetScatter());
+      const prop = await this.getProposal(propTxid);
+
+      var eostxArg = {
+        proposal_name: prop.data.proposal_name
+      };
+      var eosforum = await eos.contract(REFERENDUM_CONTRACT);
+      var eostx = await eosforum.transaction(tx => {
+        tx.expire(eostxArg, {
+          authorization: [
+            {
+              actor: identity.account,
+              permission: identity.auth
+            }
+          ]
+        });
+      });
+
+      // show status
+      await novusphere.waitTx(
+        eostx.transaction_id,
+        500,
+        1000,
+        REFERENDUM_COLLECTION
+      );
+      await this.load();
     },
     async castVote(propTxid, vote) {
       const novusphere = GetNovusphere();
@@ -317,17 +526,27 @@ export default {
         }
       }
 
-      // pull stake data from bp api
-      for (var voter in voteResult) {
-        var account = await eos.getAccount(voter);
-        var staked = account.voter_info.staked / 10000;
-        var vr = voteResult[voter];
+      // pull stake data from bp api async
+      await Promise.all(
+        Object.keys(voteResult).map(
+          voter =>
+            new Promise(async resolve => {
+              var account = await eos.getAccount(voter);
+              var staked = account.voter_info.staked / 10000;
+              var vr = voteResult[voter];
+              vr.staked = staked;
+              resolve();
+            })
+        )
+      );
 
-        vr.staked = staked;
+      // tall up votes
+      for (var voter in voteResult) {
+        var vr = voteResult[voter];
         if (vr.vote) {
-          voteResult_for += staked;
+          voteResult_for += vr.staked;
         } else {
-          voteResult_against += staked;
+          voteResult_against += vr.staked;
         }
       }
 
@@ -346,6 +565,7 @@ export default {
       currentPage: 0,
       pages: 0,
       posts: [],
+      identity: "",
       vote: {
         title: "",
         for: 0,
@@ -353,12 +573,12 @@ export default {
         votes: 0,
         approval: 0
       },
-      proposal: {
-        status: "",
+      status: "", // of post
+      post: {
         preview: false,
+        expiry: "",
         title: "",
-        content: "",
-        end: 0
+        content: ""
       }
     };
   }

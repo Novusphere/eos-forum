@@ -65,7 +65,7 @@ class NovusphereForum {
         //
         return {
             "data.json_metadata.edit": false,
-            "data.content": { $regex: ".*#" + tag + ".*" },
+            "data.content": { $regex: ".*#" + tag + ".*", $options: 'i' },
             createdAt: {
                 $gte: 1531434299
             } /* Last eosforumtest contract redeploy */

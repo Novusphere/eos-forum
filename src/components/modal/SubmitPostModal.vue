@@ -36,7 +36,7 @@
                   <div class="form-group row">
                     <label class="col-sm-2 col-form-label"></label>
                     <div class="col-sm-10">
-                      {{ markdownPost.length }} / {{ 1024 * 10 }}
+                      {{ post.content.length }} / {{ 1024 * 10 }}
                     </div>
                   </div>
                   <fieldset class="form-group">
