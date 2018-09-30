@@ -16,6 +16,7 @@
                 <span style="font-weight: bold; font-size: 20px">
                     <div>
                         <span class="title">{{ p.data.title }}</span>
+                        <span v-if="p.expired" class="text-danger">[expired]</span>
                     </div>
                 </span>
                 
@@ -33,9 +34,9 @@
                     <div style="font-size: x-small">
                         <ul class="list-inline">
                             <li class="list-inline-item">
-                                <button type="button" class="btn btn-sm btn-outline-info" v-on:click="proposalStatus(p.transaction)">status</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="castVote(p.transaction, 1)">vote for</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" v-on:click="castVote(p.transaction, 0)">vote against</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="proposalStatus(p.transaction)">{{ p.expired ? ' results' : 'status' }}</button>
+                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="castVote(p.transaction, 1)">vote for</button>
+                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-danger" v-on:click="castVote(p.transaction, 0)">vote against</button>
                             </li>
                         </ul>
                     </div>
@@ -91,38 +92,8 @@
             </div>
             <div class="modal-body">
                 <div v-if="!proposal.preview">
-                    <form>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">End at block height</label>
-                        <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="optional" v-model="proposal.end">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Title</label>
-                        <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="Title" v-model="proposal.title">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Proposal</label>
-                        <div class="col-sm-10">
-                        <textarea rows="10" class="form-control" placeholder="Proposal" v-model="proposal.content"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label"></label>
-                        <div class="col-sm-10">
-                        {{ proposal.content.length }} / {{ 30000 }}
-                        </div>
-                    </div>
-                    </form>
-                    <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                        <span style="font-weight: bold">{{proposal.status}}</span>
-                        </div>
-                    </div>
+                    <div class="text-center">
+                      <h1>Creating proposals have been disabled until eosio.forum is officially deployed.</h1>
                     </div>
                 </div>
                 <div v-else>
@@ -149,32 +120,34 @@
 <script>
 import jQuery from "jquery";
 
-import { GetEOS, GetScatter, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "@/eos";
+import {
+  GetEOS,
+  GetScatter,
+  ScatterConfig,
+  ScatterEosOptions,
+  GetScatterIdentity
+} from "@/eos";
 import { GetNovusphere } from "@/novusphere";
-import { MigratePost, ApplyPostEdit, TransformPropose } from "@/migrations";
+import { forum } from "@/novusphere-forum";
 import { MarkdownParser } from "@/markdown";
 
 import Post from "@/components/core/Post";
 
-import SubmitPostModal from "@/components/modal/SubmitPostModal";
-
 import HeaderSection from "@/components/section/HeaderSection";
 import MainSection from "@/components/section/MainSection";
 
-import sha256 from "sha256";
-
 const MAX_ITEMS_PER_PAGE = 25;
+const REFERENDUM_CONTRACT = "eosforumrcpp";
+const REFERENDUM_COLLECTION = "_eosforum";
 
 export default {
   name: "Referendum",
   components: {
     Post: Post,
-    SubmitPostModal: SubmitPostModal,
     HeaderSection: HeaderSection,
     MainSection: MainSection
   },
   async mounted() {
-    window.sha256 = sha256;
     await this.load();
   },
   methods: {
@@ -182,16 +155,15 @@ export default {
       var currentPage = parseInt(
         this.$route.query.page ? this.$route.query.page : 1
       );
-      var novusphere = GetNovusphere();
 
-      var apiResult;
+      const novusphere = GetNovusphere();
 
       var MATCH_QUERY = {
         name: "propose"
       };
 
-      apiResult = await novusphere.api({
-        count: novusphere.config.collection,
+      var apiResult = await novusphere.api({
+        count: REFERENDUM_COLLECTION,
         maxTimeMS: 1000,
         query: MATCH_QUERY
       });
@@ -199,31 +171,25 @@ export default {
       var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
 
       apiResult = await novusphere.api({
-        aggregate: novusphere.config.collection,
+        aggregate: REFERENDUM_COLLECTION,
         maxTimeMS: 1000,
         cursor: {},
         pipeline: [
-          {
-            $match: MATCH_QUERY
-          },
-          {
-            $sort: {
-              createdAt: -1
-            }
-          },
-          {
-            $skip: (currentPage - 1) * MAX_ITEMS_PER_PAGE
-          },
-          {
-            $limit: MAX_ITEMS_PER_PAGE
-          }
+          { $match: MATCH_QUERY },
+          { $sort: forum.sort_by_time() },
+          { $skip: forum.skip_page(currentPage, MAX_ITEMS_PER_PAGE) },
+          { $limit: MAX_ITEMS_PER_PAGE }
         ]
       });
 
+      // mark expired proposals
+      const unixNow = new Date();
       var payload = apiResult.cursor.firstBatch;
-
       for (var i = 0; i < payload.length; i++) {
-        var post = payload[i];
+        var p = payload[i];
+        if (unixNow > new Date(p.data.expires_at)) {
+          p.expired = true;
+        }
       }
 
       // push data to this
@@ -232,84 +198,16 @@ export default {
       this.currentPage = currentPage;
     },
     async submitProposal() {
-      var novusphere = GetNovusphere();
-
-      this.proposal.status = "Getting Scatter identity...";
-      var eosAccount, eosAuth;
-
-      try {
-        var identity = await GetScatterIdentity();
-        eosAccount = identity.account;
-        eosAuth = identity.auth;
-      } 
-      catch (ex) {
-        this.proposal.status += " Failed!";
-        console.log(ex);
-        return;
-      }
-
-      this.proposal.status = 'Creating tx and broadcasting to EOS...';
-
-      var eostx;
-      try {
-        var eos = GetEOS(await GetScatter());
-
-        var proposal_json = JSON.stringify({
-            content: this.proposal.content,
-            ends_at_block_height: parseInt(this.proposal.end)
-        });
-
-        var proposal_name = this.generateName(this.proposal.title, proposal_json);
-
-        var eosprop = {
-            proposer: eosAccount,
-            proposal_name: proposal_name,
-            title: this.proposal.title,
-            proposal_json: proposal_json
-        };
-        var eosforum = await eos.contract("eosforumdapp");
-        eostx = await eosforum.transaction(tx => {
-            tx.propose(eosprop, {
-            authorization: [
-                {
-                actor: eosAccount,
-                permission: eosAuth
-                }
-            ]
-            });
-        });
-      }
-      catch (ex) {
-        this.proposal.status += " Failed!";
-        console.log(ex);
-        return;
-      }
-
-      // wait for tx, then reload
-      this.proposal.status = 'Waiting for Novusphere to index...';
-      await novusphere.waitTx(eostx.transaction_id, 500, 1000);
-      jQuery('#submitProposal').modal('hide');
-      this.proposal.status = '';
-      await this.load();
+      return;
     },
     md(text) {
       var md = new MarkdownParser(text);
       return md.html;
     },
-    generateName(title, json) {
-      var hash = sha256(title + json);
-      var name = "";
-      for (var i = 0; i < 12; i++) {
-        var cc = hash.charCodeAt(i);
-        if (cc >= 48 && cc <= 57) name += String.fromCharCode(122 - (cc - 48));
-        else name += String.fromCharCode(cc);
-      }
-      return name;
-    },
     async getProposal(txid) {
-      var novusphere = GetNovusphere();
+      const novusphere = GetNovusphere();
       var prop = (await novusphere.api({
-        find: novusphere.config.collection,
+        find: REFERENDUM_COLLECTION,
         maxTimeMS: 1000,
         filter: {
           name: "propose",
@@ -319,95 +217,114 @@ export default {
 
       return prop;
     },
-    getPropHash(prop) {
-      return sha256(prop.data.title + prop.data._proposal_json);
-    },
     async getProposalVotes(prop) {
       var novusphere = GetNovusphere();
-      var prop_hash = this.getPropHash(prop);
 
       var votes = (await novusphere.api({
-        find: novusphere.config.collection,
+        find: REFERENDUM_COLLECTION,
         maxTimeMS: 1000,
         filter: {
           name: "vote",
-          "data.proposal_hash": prop_hash,
           "data.proposal_name": prop.data.proposal_name,
           createdAt: { $gte: prop.createdAt }
         },
-        sort: {
-          createdAt: -1
-        }
+        sort: forum.sort_by_time()
       })).cursor.firstBatch;
 
-      return votes;
+      var unvotes = (await novusphere.api({
+        find: REFERENDUM_COLLECTION,
+        maxTimeMS: 1000,
+        filter: {
+          name: "unvote",
+          "data.proposal_name": prop.data.proposal_name,
+          createdAt: { $gte: prop.createdAt }
+        },
+        sort: forum.sort_by_time()
+      })).cursor.firstBatch;
+
+      return { votes: votes, unvotes: unvotes };
     },
     async castVote(propTxid, vote) {
-      var novusphere = GetNovusphere();
+      const novusphere = GetNovusphere();
+      const identity = await GetScatterIdentity();
 
-      var eosAccount, eosAuth;
-      try {
-        var identity = await GetScatterIdentity();
-        eosAccount = identity.account;
-        eosAuth = identity.auth;
-      }
-      catch (ex) {
-          console.log(ex);
-          alert('Error: Scatter failed to load');
-          return;
+      if (!identity.account) {
+        alert("You must be logged in to vote!");
+        return;
       }
 
-      var eos = GetEOS(await GetScatter());
-      var prop = await this.getProposal(propTxid);
-      var prop_hash = this.getPropHash(prop);
+      const eos = GetEOS(await GetScatter());
+      const prop = await this.getProposal(propTxid);
 
-      var eosvote = {
-        voter: eosAccount,
-        proposer: prop.data.proposer,
+      // NOTE & TO-DO: "vote" is changing to "vote_value"
+      var eostxArg = {
+        voter: identity.account,
         proposal_name: prop.data.proposal_name,
-        proposal_hash: prop_hash,
         vote: vote,
         vote_json: ""
       };
-      var eosforum = await eos.contract("eosforumdapp");
+      var eosforum = await eos.contract(REFERENDUM_CONTRACT);
       var eostx = await eosforum.transaction(tx => {
-        tx.vote(eosvote, {
+        tx.vote(eostxArg, {
           authorization: [
             {
-              actor: eosAccount,
-              permission: eosAuth
+              actor: identity.account,
+              permission: identity.auth
             }
           ]
         });
       });
 
       // show status
-      await novusphere.waitTx(eostx.transaction_id, 500, 1000);
+      await novusphere.waitTx(
+        eostx.transaction_id,
+        500,
+        1000,
+        REFERENDUM_COLLECTION
+      );
       await this.proposalStatus(prop.transaction);
     },
     async proposalStatus(txid) {
       var eos = GetEOS(await GetScatter());
       var prop = await this.getProposal(txid);
-      var votes = await this.getProposalVotes(prop);
+      var pv = await this.getProposalVotes(prop);
 
       var voteResult = {};
       var voteResult_for = 0;
       var voteResult_against = 0;
-      for (var i = 0; i < votes.length; i++) {
-        var v = votes[i];
-        if (v.data.voter in voteResult) continue;
 
-        var account = await eos.getAccount(v.data.voter);
-        var staked = account.voter_info.staked / 10000;
-
+      // update vote results
+      for (var i = 0; i < pv.votes.length; i++) {
+        var v = pv.votes[i];
+        if (v.data.voter in voteResult) {
+          continue;
+        }
         voteResult[v.data.voter] = {
           txid: v.transaction,
+          time: v.createdAt,
           vote: v.data.vote,
           json: v.data.vote_json,
-          staked: staked
+          staked: 0
         };
+      }
 
-        if (v.data.vote) {
+      // remove unvoted unvotes
+      for (var i = 0; i < pv.unvotes.length; i++) {
+        var uv = pv.unvotes[i];
+        var vr = voteResult[uv.data.voter];
+        if (vr.time < uv.createdAt) {
+          delete voteResult[uv.data.voter];
+        }
+      }
+
+      // pull stake data from bp api
+      for (var voter in voteResult) {
+        var account = await eos.getAccount(voter);
+        var staked = account.voter_info.staked / 10000;
+        var vr = voteResult[voter];
+
+        vr.staked = staked;
+        if (vr.vote) {
           voteResult_for += staked;
         } else {
           voteResult_against += staked;

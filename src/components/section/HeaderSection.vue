@@ -14,6 +14,9 @@
             <li class="list-inline-item">
               <a href="#settings" data-toggle="modal">settings</a>
             </li>
+            <li v-if="identity.account" class="list-inline-item">
+              <router-link :to="'/referendum'" class="text-highlight">eos-referendum</router-link>
+            </li>
             <li class="list-inline-item">
               <a href="#faq" data-toggle="modal">faq/help</a>
             </li>
