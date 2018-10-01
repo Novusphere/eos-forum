@@ -9,7 +9,7 @@
               </button>
             </div>
             <div class="modal-body">
-                <Post :submitModal="null" :post="mainPost" :showContent="true" v-bind="mainPost"></post>
+                <Post :post="mainPost" :show_content="true" v-bind="mainPost"></post>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal" v-on:click="resetPost()">close</button>

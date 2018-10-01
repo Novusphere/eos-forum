@@ -1,16 +1,16 @@
 <template>
   <div> 
-    <PostHistoryModal ref="historyModal"></PostHistoryModal>
-    <SubmitPostModal ref="submitModal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :replyUuid="mainPost.data.post_uuid" :replyAccount="mainPost.data.poster"></SubmitPostModal>
+    <PostHistoryModal ref="history_modal"></PostHistoryModal>
+    <SubmitPostModal ref="submit_modal" :sub="mainPost.data.json_metadata.sub" :postContentCallback="postContent" :reply_uuid="mainPost.data.post_uuid" :reply_account="mainPost.data.poster"></SubmitPostModal>
     <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/e/' + mainPost.data.json_metadata.sub">{{ mainPost.data.json_metadata.sub }}</router-link></span>          
     </HeaderSection>
     <MainSection>
       <div class="thread">
-        <Post :submitModal="$refs.submitModal"
-          :historyModal="$refs.historyModal"
+        <Post :submit_modal="$refs.submit_modal"
+          :history_modal="$refs.history_modal"
           :post="mainPost" 
-          :showContent="true" 
+          :show_content="true" 
           v-bind="mainPost">
         </Post>
       </div>

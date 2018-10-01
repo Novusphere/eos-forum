@@ -12,13 +12,12 @@
           <div class="row footer">
             <div class="col-md-12">
                 <p class="text-center">
-                  This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>,
-                  using the <a href="https://github.com/eoscanada/eosio.forum">eosio.forum</a> contract.
+                  This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>.
                   Special thanks to <a href="https://www.eoscanada.com/">EOS Canada</a>, <a href="https://greymass.com/">Greymass</a>, <a href="https://www.genereos.io/">GenerEOS</a>, and <a href="https://get-scatter.com/">Scatter</a>.
                 </p> 
                 <p class="text-center">
                   This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub Pages</a> and is fully <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
-                  Developers of eos-forum take no responsibility for the content of the forum.
+                  Developers of take no responsibility for the content displayed.
                   No images, files or media are hosted by eos-forum, please contact the respective site owners hosting content in breach of DMCA.
                 </p>
               <div class="row">

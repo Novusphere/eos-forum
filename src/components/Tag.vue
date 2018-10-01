@@ -1,6 +1,6 @@
 <template>
   <div>
-    <PostHistoryModal ref="historyModal"></PostHistoryModal>
+    <PostHistoryModal ref="history_modal"></PostHistoryModal>
     <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/tag/' + tag">#{{ tag }}</router-link></span>
       <PostSorter ref="sorter" :change="load"></PostSorter>
@@ -8,18 +8,13 @@
     <MainSection>
       <div>
         <div v-if="posts.length == 0">
-              <div class="text-center">
-                <h1>No posts with #{{ tag }} found!</h1>
-              </div>
+          <div class="text-center">
+            <h1>No posts with #{{ tag }} found!</h1>
+          </div>
         </div>
-            <div class="row mb-2" v-for="p in posts" :key="p.transaction">
-                <Post 
-                :submitModal="null" 
-                :historyModal="$refs.historyModal"
-                :post="p" 
-                :showContent="true">
-                </Post>
-            </div>
+        <div class="row mb-2" v-for="p in posts" :key="p.transaction">
+          <Post :history_modal="$refs.history_modal" :post="p" :show_content="true"></Post>
+        </div>
         <div class="row mb-4">
             <div class="col-12">
               <div class="float-right">

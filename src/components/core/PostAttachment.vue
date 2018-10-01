@@ -5,13 +5,14 @@
 
         <div class="col-md-12">
             <div v-if="iframe">
-                <iframe :src="this.showFrame ? attachment.value : ''" 
+              <iframe :src="this.show_iframe ? attachment.value : ''" 
                     style="width: 100%;" 
                     :height="attachment.height" 
                     :width="attachment.width" 
                     frameborder="0" 
                     allow="encrypted-media" 
-                    allowfullscreen></iframe>
+                    allowfullscreen>
+              </iframe>
             </div>
             <div v-if="img">
                 <img :src="attachment.value">
@@ -51,14 +52,11 @@ export default {
     collapse: {
       type: Boolean,
       required: true
-    },
-    showFrame: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
-  async mounted() {},
+  async mounted() {
+    this.show_iframe = !this.collapse;
+  },
   computed: {
     iframe() {
       return this.hasAttachment("iframe");
@@ -88,6 +86,7 @@ export default {
   },
   data() {
     return {
+      show_iframe: false
     };
   }
 };

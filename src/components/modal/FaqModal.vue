@@ -11,6 +11,14 @@
             <div class="modal-body">
                 <ul class="">
                     <li class="">
+                        <strong>This is entirely open source and all data is stored on the EOS blockchain!</strong>
+                        The forum software can be found on
+                        <a target="_blank" href="https://github.com/Novusphere/eos-forum">GitHub</a>
+                        and can be configured to fully run locally, provided you also run a
+                        <a target="_blank" href="https://github.com/Novusphere/novusphere-db">novusphere-db</a>
+                        node.
+                    </li>
+                    <li class="">
                         You can post anonymously, for free, on any anon-* sub, for example: 
                         <router-link :to="'/e/anon'">anon</router-link>, 
                         <router-link :to="'/e/anon-general'">anon-general</router-link>
@@ -22,29 +30,22 @@
                         to post and interact.
                     </li>
                     <li class="">
-                        A sub doesn't need to be "created", just go to it and start posting!
+                        A sub doesn't need to be created, just go to it and start posting!
                     </li>
                     <li class="">
                         A guide to markdown (formatting your post) can be found 
                         <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">here</a>
                     </li>
                     <li class="">
-                        The forum software can be found on
-                        <a target="_blank" href="https://github.com/Novusphere/eos-forum">GitHub</a>
-                        and can be configured to fully run locally, provided you also run a
-                        <a target="_blank" href="https://github.com/Novusphere/novusphere-db">novusphere-db</a>
-                        node.
-                    </li>
-                    <li class="">
-                        Our main project website is
+                        Our main project website:
                         <a target="_blank" href="https://novusphere.io">novusphere.io</a>
                     </li>
                     <li class="">
-                        Our Twitter handle is
+                        Our Twitter:
                         <a target="_blank" href="https://twitter.com/thenovusphere">@thenovusphere</a>
                     </li>
                     <li class="">
-                        Our Discord can be joined by
+                        Our Discord:
                         <a target="_blank" href="https://discord.gg/PtXzUVr">clicking here</a>,
                         come chat with us live!
                     </li>

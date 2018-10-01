@@ -16,7 +16,7 @@
                 <span style="font-weight: bold; font-size: 20px">
                     <div>
                         <span class="title">{{ p.data.title }}</span>
-                        <span v-if="p.expired" class="text-danger">[expired]</span>
+                        <span v-if="p.expired" class="text-danger">[exp.]</span>
                         <span v-else class="text-warning">[exp. {{ getDeltaDays(new Date(p.data.expires_at)) }} days]</span>
                     </div>
                 </span>
@@ -69,15 +69,29 @@
                 </button>
             </div>
             <div class="modal-body">
+              <div class="text-center">
                 This proposal has an approval rating of
-                <span :class="vote.approval >= 0.5 ? 'text-highlight' : 'text-alert'">{{ (vote.approval * 100).toFixed(2) }}%</span>
+                <span :class="vote.approval >= 0.5 ? 'text-success' : 'text-danger'">{{ (vote.approval * 100).toFixed(2) }}%</span>
                 with 
-                <span class="text-highlight">{{ vote.for.toFixed(4) }} EOS</span> 
+                <span class="text-success">{{ vote.for.toFixed(4) }} EOS</span> 
                 for and 
-                <span class="text-alert">{{ vote.against.toFixed(4) }} EOS</span> 
+                <span class="text-danger">{{ vote.against.toFixed(4) }} EOS</span> 
                 against and a total of 
-                <span class="text-info">{{ vote.votes }} votes</span> 
+                <span class="text-primary">{{ vote.voters.length }} votes</span> 
                 casted.
+
+                <button data-toggle="collapse" data-target="#voteResults" type="button" class="btn btn-sm btn-outline-primary mt-2 mb-2">show voters</button>
+
+              </div>
+              <div id="voteResults" class="collapse">
+                <ul>
+                  <li v-for="voter in vote.voters" :key="voter.account">
+                    <span :class="voter.vote ? 'text-success' : 'text-danger'">
+                      {{ voter.account }} - {{ voter.staked }} EOS ({{ voter.vote ? 'for' : 'against'}})
+                    </span>
+                  </li>
+                </ul>
+              </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
@@ -509,6 +523,7 @@ export default {
           continue;
         }
         voteResult[v.data.voter] = {
+          account: v.data.voter,
           txid: v.transaction,
           time: v.createdAt,
           vote: v.data.vote,
@@ -555,7 +570,7 @@ export default {
       this.vote.against = voteResult_against;
       this.vote.approval =
         voteResult_for / Math.max(voteResult_for + voteResult_against, 1);
-      this.vote.votes = Object.keys(voteResult).length;
+      this.vote.voters = Object.values(voteResult).sort((v1, v2) => v2.staked - v1.staked);
 
       jQuery("#voteResult").modal();
     }
@@ -570,8 +585,8 @@ export default {
         title: "",
         for: 0,
         against: 0,
-        votes: 0,
-        approval: 0
+        approval: 0,
+        voters: []
       },
       status: "", // of post
       post: {

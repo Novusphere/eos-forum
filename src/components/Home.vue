@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SubmitPostModal ref="submitModal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
+    <SubmitPostModal ref="submit_modal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
     <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
       <button v-if="!isSubscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-outline-primary ml-1">subscribe</button>
@@ -16,7 +16,7 @@
               </div>
         </div>
         <div class="row mb-2" v-for="p in posts" :key="p.transaction">
-              <Post :submitModal="$refs.submitModal" :post="p" :showContent="false"></Post>
+          <Post :submit_modal="$refs.submit_modal" :post="p" :show_content="false"></Post>
         </div>
         <div class="row mb-4">
             <div class="col-12">

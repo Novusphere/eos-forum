@@ -3,14 +3,14 @@
         <div class="modal-dialog modal-full" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">{{ replyUuid ? (post.edit ? 'Edit' : 'Reply') : 'New Submission' }}</h5>
+              <h5 class="modal-title">{{ reply_uuid ? (post.edit ? 'Edit' : 'Reply') : 'New Submission' }}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div v-if="preview">
               <div class="modal-body">
-                <p class="post-content" v-html="markdownPost">
+                <p class="post-content" v-html="post_content">
 
                 </p>
               </div>
@@ -21,7 +21,7 @@
             <div v-else>
               <div class="modal-body">
                 <form>
-                  <div class="form-group row" v-if="!replyUuid || (post.edit && post.title)">
+                  <div class="form-group row" v-if="!reply_uuid || (post.edit && post.title)">
                     <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" id="inputTitle" placeholder="Title" v-model="post.title">
@@ -71,10 +71,6 @@
                           <label class="form-check-label">iframe</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="attachmentDisplay" value="img" v-model="post.attachment.display">
-                          <label class="form-check-label">image</label>
-                        </div>
-                        <div class="form-check form-check-inline">
                           <input class="form-check-input" type="radio" name="attachmentDisplay" value="mp4" v-model="post.attachment.display">
                           <label class="form-check-label">mp4</label>
                         </div>
@@ -102,7 +98,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)">post</button>
-                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true)" v-if="isAnonSub">post anon</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true)" v-if="is_anon_sub">post anon</button>
                 <button type="button" class="btn btn-outline-secondary" v-on:click="preview = true">preview</button>
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
               </div>
@@ -117,25 +113,21 @@ import { v4 as uuidv4 } from "uuid";
 import jQuery from "jquery";
 
 import { GetNovusphere } from "@/novusphere";
-import {
-  GetEOS,
-  GetScatter,
-  ScatterConfig,
-  ScatterEosOptions,
-  GetScatterIdentity
-} from "@/eos";
+import { GetEOS, GetScatter, GetScatterIdentity } from "@/eos";
 import { GetEOSService } from "@/eos-service";
 import { MarkdownParser } from "@/markdown";
+
+const FORUM_CONTRACT = "eosforumdapp";
 
 export default {
   name: "SubmitPostModal",
   props: {
-    replyAccount: {
+    reply_account: {
       type: String,
       required: false,
       default: ""
     },
-    replyUuid: {
+    reply_uuid: {
       type: String,
       required: false,
       default: ""
@@ -152,11 +144,12 @@ export default {
     }
   },
   methods: {
-    makePost: function(account) {
+    async makePost() {
       var post = this.post;
 
+      const identity = await GetScatterIdentity();
       if (post.edit) {
-        if (account != post.edit_account) {
+        if (identity.account != post.edit_account) {
           this.status = "This is not your post, you cannot edit it!";
           return;
         }
@@ -177,8 +170,8 @@ export default {
 
       var eosPost = {
         poster: account,
-        reply_to_poster: this.replyAccount,
-        reply_to_post_uuid: this.replyUuid,
+        reply_to_poster: this.reply_account,
+        reply_to_post_uuid: this.reply_uuid,
         certify: 0,
         content: post.content,
         post_uuid: uuidv4(),
@@ -202,32 +195,21 @@ export default {
       var post = this.post;
       const eosService = GetEOSService();
 
-      var eosAccount, eosAuth;
-
+      var identity = await GetScatterIdentity();
       if (anon) {
-        eosAccount = eosService.config.anonymousAccount;
-      } else {
-        //
-        // not anonymous post: so get scatter identity
-        //
-        this.status = "Getting Scatter identity...";
-
-        try {
-          var identity = await GetScatterIdentity();
-          eosAccount = identity.account;
-          eosAuth = identity.auth;
-        } catch (ex) {
-          this.status += " Failed!";
-          console.log(ex);
-          return;
-        }
+        identity = {
+          account: eosService.config.anonymousAccount,
+          auth: "active"
+        };
       }
 
       var txid;
       this.status = "Creating tx and broadcasting to EOS...";
       try {
-        var eosPost = this.makePost(eosAccount);
-        if (!eosPost) return;
+        var eosPost = this.makePost();
+        if (!eosPost) {
+          return;
+        }
 
         if (anon) {
           // use eos-service to make anonymous post
@@ -239,15 +221,14 @@ export default {
           }
         } else {
           // make scatter eos instance
-
           const eos = GetEOS(await GetScatter());
-          var eosforum = await eos.contract("eosforumdapp");
-          var eostx = await eosforum.transaction(tx => {
+          var contract = await eos.contract(FORUM_CONTRACT);
+          var eostx = await contract.transaction(tx => {
             tx.post(eosPost, {
               authorization: [
                 {
-                  actor: eosAccount,
-                  permission: eosAuth
+                  actor: identity.account,
+                  permission: identity.auth
                 }
               ]
             });
@@ -263,23 +244,22 @@ export default {
 
       this.status = "Waiting for Novusphere to index...";
 
-      var novusphere = GetNovusphere();
+      const novusphere = GetNovusphere();
       await novusphere.waitTx(txid, 500, 1000);
 
+      this.status = "";
+
       jQuery("#submitPost").modal("hide");
-      this.post.status = "";
 
       this.postContentCallback(txid);
-
-      this.status = "";
     }
   },
   computed: {
-    markdownPost: function() {
+    post_content: function() {
       var md = new MarkdownParser(this.post.content);
       return md.html;
     },
-    isAnonSub: function() {
+    is_anon_sub: function() {
       return this.sub == "anon" || this.sub.indexOf("anon-") == 0;
     }
   },

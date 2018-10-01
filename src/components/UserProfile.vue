@@ -1,6 +1,6 @@
 <template>
     <div>
-        <PostHistoryModal ref="historyModal"></PostHistoryModal>
+        <PostHistoryModal ref="history_modal"></PostHistoryModal>
         <HeaderSection :load="load">
             <span class="title mr-3"><router-link :to="'/u/' + account">{{account}}</router-link></span>
             <a class="btn btn-outline-primary ml-1" :href="'https://bloks.io/account/' + account">view on chain</a>
@@ -32,12 +32,7 @@
                 </div>
             </div>
             <div class="row mb-2" v-for="p in posts" :key="p.transaction">
-                <Post 
-                :submitModal="null" 
-                :historyModal="$refs.historyModal"
-                :post="p" 
-                :showContent="true">
-                </Post>
+              <Post :history_modal="$refs.history_modal" :post="p" :show_content="true"></Post>
             </div>
             <div class="row mb-4">
                 <div class="col-12">
