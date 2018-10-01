@@ -147,7 +147,7 @@ export default {
     async makePost(anon) {
       var post = this.post;
 
-      if (post.title.length == 0) {
+      if (!(this.reply_uuid) && post.title.length == 0) {
         this.status = "Post must have a title";
         return;
       }

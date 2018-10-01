@@ -33,7 +33,7 @@
                   </li>
                   <li class="list-inline-item"><router-link :to="thread_link">{{ new Date(post.createdAt * 1000).toLocaleString() }}</router-link></li>
                   <li class="list-inline-item">by <router-link :to="'/u/' + post.data.poster" :class="(post.data.poster == identity) ? 'text-highlight' : ''">{{ post.data.poster }}</router-link></li>
-                  <li class="list-inline-item"><a :href="'https://bloks.io/transaction/' + post.transaction">on chain</a></li>
+                  <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
                   <li v-if="history_modal && post.depth > 0" class="list-inline-item"><router-link :to="perma_link">permalink</router-link></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                 </ul>
@@ -154,7 +154,7 @@ export default {
       }
 
       if (!(title)) {
-        title = "[no title]";
+        title = "untitled";
       }
 
       if (!this.show_content && title.length > 80)

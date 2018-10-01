@@ -3,7 +3,7 @@
         <PostHistoryModal ref="history_modal"></PostHistoryModal>
         <HeaderSection :load="load">
             <span class="title mr-3"><router-link :to="'/u/' + account">{{account}}</router-link></span>
-            <a class="btn btn-outline-primary ml-1" :href="'https://bloks.io/account/' + account">view on chain</a>
+            <a class="btn btn-outline-primary ml-1" :href="'https://eosq.app/account/' + account">view on chain</a>
             <PostSorter ref="sorter" :change="load"></PostSorter>
         </HeaderSection>
         <MainSection>

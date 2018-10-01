@@ -26,7 +26,7 @@
                     <li class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + p.transaction"></a></li>
                     <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
                     <li class="list-inline-item">by <router-link :to="'/u/' + p.data.proposer" :class="(p.data.proposer == identity) ? 'text-highlight' : ''">{{ p.data.proposer }}</router-link></li>
-                    <li class="list-inline-item"><a :href="'https://bloks.io/transaction/' + p.transaction">on chain</a></li>
+                    <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + p.transaction">on chain</a></li>
                     </ul>
                 </div>
                 <div :id="'post-' + p.transaction" class="post-attachment collapse show">
