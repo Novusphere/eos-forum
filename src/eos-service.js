@@ -2,7 +2,7 @@ import jQuery from "jquery";
 
 var ServiceConfig = {
     url: 'https://eos-service.novusphere.io',
-    anonymousAccount: 'eosforumanon'
+    anon_account: 'eosforumanon'
 };
 
 class EOSService {

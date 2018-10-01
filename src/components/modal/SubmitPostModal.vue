@@ -144,15 +144,12 @@ export default {
     }
   },
   methods: {
-    async makePost() {
+    async makePost(anon) {
       var post = this.post;
 
-      const identity = await GetScatterIdentity();
-      if (post.edit) {
-        if (identity.account != post.edit_account) {
-          this.status = "This is not your post, you cannot edit it!";
-          return;
-        }
+      if (post.title.length == 0) {
+        this.status = "Post must have a title";
+        return;
       }
 
       if (post.content.length == 0) {
@@ -168,8 +165,17 @@ export default {
         return;
       }
 
+      const eosService = GetEOSService();
+      var identity = await GetScatterIdentity();
+      if (anon) {
+        identity = {
+          account: eosService.config.anon_account,
+          auth: "active"
+        };
+      }
+
       var eosPost = {
-        poster: account,
+        poster: identity.account,
         reply_to_poster: this.reply_account,
         reply_to_post_uuid: this.reply_uuid,
         certify: 0,
@@ -195,18 +201,10 @@ export default {
       var post = this.post;
       const eosService = GetEOSService();
 
-      var identity = await GetScatterIdentity();
-      if (anon) {
-        identity = {
-          account: eosService.config.anonymousAccount,
-          auth: "active"
-        };
-      }
-
       var txid;
       this.status = "Creating tx and broadcasting to EOS...";
       try {
-        var eosPost = this.makePost();
+        var eosPost = await this.makePost(anon);
         if (!eosPost) {
           return;
         }
@@ -221,6 +219,7 @@ export default {
           }
         } else {
           // make scatter eos instance
+          const identity = await GetScatterIdentity();
           const eos = GetEOS(await GetScatter());
           var contract = await eos.contract(FORUM_CONTRACT);
           var eostx = await contract.transaction(tx => {

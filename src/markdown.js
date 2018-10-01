@@ -66,7 +66,7 @@ class MarkdownParser {
             value.search(RX_VBSCRIPT) == 0 ||
             value.search(RX_DATA) == 0) {
 
-            return '';
+            return 'javascript:void(0)';
         }
 
         return value;

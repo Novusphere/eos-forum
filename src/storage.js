@@ -7,7 +7,7 @@ const DEFAULT_STORAGE = {
     subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "games", "bounties", "test"],
     new_posts: {},
     settings: {
-        theme: "/static/css/theme/night.css",
+        theme: "static/css/theme/night.css",
         novusphere_api: "https://db.novusphere.io",
         eos_api: {
             host: "eos.greymass.com", // ( or null if endorsed chainId )

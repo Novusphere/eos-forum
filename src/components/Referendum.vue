@@ -77,11 +77,8 @@
                 for and 
                 <span class="text-danger">{{ vote.against.toFixed(4) }} EOS</span> 
                 against and a total of 
-                <span class="text-primary">{{ vote.voters.length }} votes</span> 
+                <a href="javascript:void(0)" data-toggle="collapse" data-target="#voteResults" class="text-primary">{{ vote.voters.length }} votes</a> 
                 casted.
-
-                <button data-toggle="collapse" data-target="#voteResults" type="button" class="btn btn-sm btn-outline-primary mt-2 mb-2">show voters</button>
-
               </div>
               <div id="voteResults" class="collapse">
                 <ul>

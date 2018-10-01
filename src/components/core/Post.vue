@@ -144,12 +144,17 @@ export default {
     },
     title() {
       var title = this.post.data.json_metadata.title;
+
       if (
         !title &&
         this.post.parent &&
         this.post.parent.data.json_metadata.title
       ) {
         title = this.post.parent.data.json_metadata.title;
+      }
+
+      if (!(title)) {
+        title = "[no title]";
       }
 
       if (!this.show_content && title.length > 80)
