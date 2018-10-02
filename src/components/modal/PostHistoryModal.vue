@@ -51,9 +51,12 @@ export default {
         pipeline: [
           { $match: { transaction: txid } },
           { $lookup: forum.lookup_post_state()},
-          { $project: forum.project_post() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post_final(false, false) }
+          { $project: forum.project_post({
+              normalize_up: true,
+              normalize_my_vote: true
+            }) 
+          }
         ]
       })).cursor.firstBatch[0];
 

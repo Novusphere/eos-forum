@@ -1,3 +1,4 @@
+import jQuery from "jquery";
 import { GetNovusphere } from "@/novusphere";
 
 class NovusphereForum {
@@ -154,54 +155,40 @@ class NovusphereForum {
     //
     //  MONGODB PROJECTION QUERY HELPERS
     //
-    project_post() {
-        return {
-            transaction: "$transaction",
-            createdAt: "$createdAt",
-            data: "$data",
-            up: { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
-            parent: { $arrayElemAt: ["$parent", 0] },
-            __score: this.score()
-        };
-    }
-    project_post_final(recentEdit, totalReplies) {
+    project_post(opts) {
+        opts = jQuery.extend({
+
+            normalize_up: false,
+            normalize_parent: false,
+            normalize_my_vote: false,
+            recent_edit: false,
+            total_replies: false,
+            score: true
+
+        }, opts);   
+
         var query = {
             transaction: "$transaction",
             createdAt: "$createdAt",
             data: "$data",
-            up: "$up",
-            my_vote: { $arrayElemAt: ["$my_vote", 0] },
-            parent: "$parent",
-            __score: "$__score"
+            up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
+            parent: !opts.normalize_parent ? "$parent" : { $arrayElemAt: ["$parent", 0] },
+            __score: "$__score",
+            my_vote: !opts.normalize_my_vote ? "$my_vote" : { $arrayElemAt: ["$my_vote", 0] },
+            recent_edit: "$recent_edit"
         };
 
-        if (recentEdit) {
+        if (opts.score) {
+            query['__score'] = this.score();
+        }
+
+        if (opts.recent_edit) {
             query['recent_edit'] = {
-                $arrayElemAt: [
-                    {
-                        $filter: {
-                            input: "$replies",
-                            as: "reply",
-                            cond: {
-                                $and: [
-                                    { $eq: ["$$reply.data.json_metadata.edit", true] },
-                                    {
-                                        $eq: [
-                                            "$$reply.data.json_metadata.parent_uuid",
-                                            "$data.post_uuid"
-                                        ]
-                                    },
-                                    { $eq: ["$$reply.data.poster", "$data.poster"] }
-                                ]
-                            }
-                        }
-                    },
-                    -1
-                ]
+                $arrayElemAt: [ { $filter: this.recent_edit() }, -1 ]
             };
         }
 
-        if (totalReplies) {
+        if (opts.total_replies) {
             query['total_replies'] = {
                 $size: {
                     $filter: {
@@ -220,6 +207,24 @@ class NovusphereForum {
     //
     //  MONGODB PIPELINE QUERY HELPERS
     //
+    recent_edit() {
+        return {
+            input: "$replies",
+            as: "reply",
+            cond: {
+                $and: [
+                    { $eq: ["$$reply.data.json_metadata.edit", true] },
+                    {
+                        $eq: [
+                            "$$reply.data.json_metadata.parent_uuid",
+                            "$data.post_uuid"
+                        ]
+                    },
+                    { $eq: ["$$reply.data.poster", "$data.poster"] }
+                ]
+            }
+        }
+    }
     score() {
         const unix_now = new Date().getTime() / 1000;
         return {

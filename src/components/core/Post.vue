@@ -232,10 +232,11 @@ export default {
 
       // dupe existing post into submit
       $post.parent_uuid = p.data.post_uuid;
+      $post.parent_tx = p.transaction;
+      $post.parent_poster = p.data.poster;
       $post.title = p.data.json_metadata.title;
       $post.content = p.data.content;
       $post.edit = true;
-      $post.edit_account = p.data.poster;
 
       var attachment = p.o_attachment;
       if (attachment) {
@@ -253,6 +254,8 @@ export default {
     reply() {
       var $post = this.submit_modal.$data.post;
       $post.parent_uuid = this.post.data.post_uuid;
+      $post.parent_tx = this.post.transaction;
+      $post.parent_poster = this.post.data.poster;
       $post.title = "";
       //$post.content = "";
       $post.edit = false;

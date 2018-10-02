@@ -95,13 +95,22 @@ export default {
           { $match: forum.match_posts_by_tag(tag) },
           { $lookup: forum.lookup_post_state() },
           { $lookup: forum.lookup_post_parent() },
-          { $project: forum.project_post() },
+          { $project: forum.project_post({ 
+              normalize_up: true, 
+              normalize_parent: true,
+              score: true 
+            }) 
+          },
           { $sort: this.$refs.sorter.getSorter() },
           { $skip: forum.skip_page(currentPage, MAX_ITEMS_PER_PAGE) },
           { $limit: MAX_ITEMS_PER_PAGE },
           { $lookup: forum.lookup_post_replies() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post_final(true, false) },
+          { $project: forum.project_post({ 
+              normalize_my_vote: true, 
+              recent_edit: true
+            }) 
+          },
           { $match: forum.match_valid_parent() }
         ]
       });

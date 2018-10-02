@@ -4,9 +4,9 @@
         :class="this.collapse ? 'row collapse' : 'row'">
 
         <div class="col-md-12">
-            <div v-if="iframe">
+            <div v-if="iframe" class="text-center">
               <iframe :src="this.show_iframe ? attachment.value : ''" 
-                    style="width: 100%;" 
+                    style="max-width: 100%" 
                     :height="attachment.height" 
                     :width="attachment.width" 
                     frameborder="0" 
@@ -14,15 +14,15 @@
                     allowfullscreen>
               </iframe>
             </div>
-            <div v-if="img">
+            <div v-if="img" class="text-center">
                 <img :src="attachment.value">
             </div>
-            <div v-if="mp4">
+            <div v-if="mp4" class="text-center">
                 <video style="width: 100%" controls>
                     <source :src="attachment.value" type="video/mp4">
                 </video>
             </div>
-            <div v-if="mp3">
+            <div v-if="mp3" class="text-center">
                 <audio style="width: 100%" controls>
                     <source :src="attachment.value" type="audio/mpeg">
                 </audio>

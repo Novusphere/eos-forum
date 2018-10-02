@@ -112,6 +112,7 @@
 import { v4 as uuidv4 } from "uuid";
 import jQuery from "jquery";
 
+import Helpers from "@/helpers";
 import { GetNovusphere } from "@/novusphere";
 import { GetEOS, GetScatter, GetScatterIdentity } from "@/eos";
 import { GetEOSService } from "@/eos-service";
@@ -147,7 +148,7 @@ export default {
     async makePost(anon) {
       var post = this.post;
 
-      if (!(this.reply_uuid) && post.title.length == 0) {
+      if (!this.reply_uuid && post.title.length == 0) {
         this.status = "Post must have a title";
         return;
       }
@@ -218,19 +219,79 @@ export default {
             return;
           }
         } else {
-          // make scatter eos instance
           const identity = await GetScatterIdentity();
           const eos = GetEOS(await GetScatter());
-          var contract = await eos.contract(FORUM_CONTRACT);
-          var eostx = await contract.transaction(tx => {
-            tx.post(eosPost, {
-              authorization: [
+
+          var tips = [];
+          var tips_rx = eosPost.content.match(/\#tip [0-9\.]+ [A-Z]+/g);
+          var contracts = [FORUM_CONTRACT];
+
+          if (tips_rx && tips_rx.length > 0 && !this.post.edit && this.post.parent_tx) {
+            // do not tip on edits
+
+            var tokens = JSON.parse(
+              await Helpers.AsyncGet(
+                "https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/tokens.json"
+              )
+            );
+
+            tokens.splice(0, 0, {
+              name: "EOS",
+              logo: "",
+              logo_lg: "",
+              symbol: "EOS",
+              account: "eosio.token"
+            });
+
+            for (var i = 0; i < tips_rx.length; i++) {
+              var tip_args = tips_rx[i].split(" ");
+
+              const token = tokens.find(t => t.symbol == tip_args[2]);
+              if (!token) {
+                this.status =
+                  "Error: could not find contract for tip symbol " +
+                  tip_args[2];
+                return;
+              }
+
+              const stats = await eos.getCurrencyStats(token.account, token.symbol);
+              const precision = stats[token.symbol].max_supply.split(' ')[0].split('.')[1].length;
+
+              var adjusted_amount = parseFloat(tip_args[1]).toFixed(precision);
+              tips.push(adjusted_amount + ' ' + token.symbol);
+              contracts.push(token.account);
+            }
+          }
+
+          //console.log(contracts);
+          //console.log(tips);
+          //console.log(this.post.parent_poster);
+          //console.log(this.post.parent_tx);
+
+          var eostx = await eos.transaction(contracts, _contracts => {
+            var auth = {
+              authorzation: [
                 {
                   actor: identity.account,
                   permission: identity.auth
                 }
               ]
-            });
+            };
+
+            var __contracts = Object.values(_contracts); // { name: Object }
+            __contracts[0].post(eosPost, auth);
+
+            for (var i = 0; i < tips.length; i++) {
+              __contracts[1 + i].transfer(
+                {
+                  from: identity.account,
+                  to: this.post.parent_poster,
+                  quantity: tips[i],
+                  memo: "tip for " + this.post.parent_tx
+                },
+                auth
+              );
+            }
           });
         }
 
@@ -246,7 +307,12 @@ export default {
       const novusphere = GetNovusphere();
       await novusphere.waitTx(txid, 500, 1000);
 
+      // reset default
       this.status = "";
+      this.post.content = "";
+      this.post.attachment.value = "";
+      this.post.attachment.type = "";
+      this.post.attachment.display = "link";
 
       jQuery("#submitPost").modal("hide");
 
@@ -269,8 +335,8 @@ export default {
       post: {
         // for making a new post
         edit: false,
-        edit_account: "",
-
+        parent_tx: "",
+        parent_account: "",
         parent_uuid: "",
         title: "",
         content: "",

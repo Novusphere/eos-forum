@@ -38,6 +38,16 @@ function MigratePost(p) {
                     attachment.display = 'iframe';
                 }
             }
+            if (host == 'i.imgur.com') {
+                attachment.display = 'img';
+            }
+        }
+
+        if (attachment.display == 'iframe') {
+            if (!(attachment.width) && !(attachment.height)) {
+                attachment.width = 560;
+                attachment.height = 315;
+            }
         }
     }
 
