@@ -3,10 +3,11 @@ import ScatterJS from "scatter-js/dist/scatter.esm";
 
 import { storage } from '@/storage';
 
-const DEFAULT_IDENTITY = { account: '', auth: '' };
+const DEFAULT_IDENTITY = { account: '', auth: '', atmos: '0.000' };
 
 var _scatter = null;
 var _identity = DEFAULT_IDENTITY;
+var _lastIdentityUpdate = 0;
 
 const ScatterConfig = {
     blockchain: "eos",
@@ -27,14 +28,9 @@ ScatterJS.scatter.connect('eos-forum', { initTimeout: 1500 }).then(connected => 
         console.log('Scatter loaded');
         _scatter = ScatterJS.scatter;
         window.scatter = null;
-        
-        if (_scatter.identity) {
-            const identity = _scatter.identity;
 
-                _identity = { 
-                    account: identity.accounts[0].name,
-                    auth: identity.accounts[0].authority
-                };
+        if (_scatter.identity) {
+            GetScatterIdentity(true);
         }
     }
     else {
@@ -72,12 +68,26 @@ async function GetScatterIdentity(tryPull) {
                 ]
             });
 
-            _identity = { 
+            _identity = {
                 account: identity.accounts[0].name,
-                auth: identity.accounts[0].authority
+                auth: identity.accounts[0].authority,
+                atmos: '0.000'
             };
         }
     }
+
+    if (_identity.account) {
+        var now = (new Date()).getTime();
+        if (now - _lastIdentityUpdate >= 1000) {
+            const eos = GetEOS();
+            var atmos = parseFloat((await eos.getCurrencyBalance("novusphereio", _identity.account, "ATMOS"))[0]);
+            atmos = (isNaN(atmos) ? 0 : atmos).toFixed(3);
+
+            _identity.atmos = atmos;
+            _lastIdentityUpdate = now;
+        }
+    }
+
     return _identity;
 }
 
@@ -105,12 +115,12 @@ function GetEOS(scatter) {
     }
 }
 
-export { 
-    DEFAULT_IDENTITY, 
-    GetEOS, 
-    GetScatter, 
-    GetScatterIdentity, 
+export {
+    DEFAULT_IDENTITY,
+    GetEOS,
+    GetScatter,
+    GetScatterIdentity,
     ForgetScatterIdentity,
-    ScatterConfig, 
-    ScatterEosOptions 
+    ScatterConfig,
+    ScatterEosOptions
 };

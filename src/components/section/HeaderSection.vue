@@ -6,7 +6,7 @@
               <a v-on:click="login()" href="javascript:void(0)">login</a>
             </li>
             <li v-if="identity.account" class="list-inline-item">
-              <router-link :to="'/u/' + identity.account" class="text-highlight">{{ identity.account }}</router-link>
+              <router-link :to="'/u/' + identity.account" class="text-highlight">{{ identity.account }} | {{ identity.atmos }} ATMOS</router-link>
             </li>
             <li v-if="identity.account" class="list-inline-item">
               <a v-on:click="logout()" href="javascript:void(0)">logout</a>
@@ -39,7 +39,8 @@ import {
   DEFAULT_IDENTITY,
   ForgetScatterIdentity,
   GetScatterIdentity,
-  GetScatter
+  GetScatter,
+  GetEOS
 } from "@/eos";
 
 export default {
