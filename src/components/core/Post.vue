@@ -8,7 +8,7 @@
                   <!-- links to off-site content -->
                   <span v-if="post.o_attachment && post.o_attachment.type == 'url'">
                         <span class="title"><a target="_blank" :href="post.o_attachment.value">{{ title }}</a></span>
-                        <span class="text-xsmall">({{this.getHost(post.o_attachment.value)}})</span>
+                        <span class="text-xsmall">({{this.getHost(post.o_attachment.value)}} in <router-link :to="'/e/' + sub">eos.{{sub}}</router-link>)</span>
                   </span>
                   <!-- links to on site content -->
                   <span v-else>
@@ -153,7 +153,7 @@ export default {
         title = this.post.parent.data.json_metadata.title;
       }
 
-      if (!(title)) {
+      if (!title) {
         title = "untitled";
       }
 
@@ -215,12 +215,11 @@ export default {
         .show_iframe;
     },
     hasAttachment(type) {
-      if (!this.post)
-        return false;
+      if (!this.post) return false;
       if (!this.post.o_attachment || !this.post.o_attachment.value)
         return false;
 
-      return (type ? this.post.o_attachment.display == type : true);
+      return type ? this.post.o_attachment.display == type : true;
     },
     async history() {
       await this.history_modal.load(this.post.o_transaction);
@@ -270,6 +269,9 @@ export default {
     },
     async upvote() {
       if (this.post.my_vote) {
+        if (this.post.data.poster != this.identity) {
+          window._VueApp.$refs.upvote.modal(this.post);
+        }
         return;
       }
 

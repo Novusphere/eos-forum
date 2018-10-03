@@ -22,15 +22,15 @@
               <div class="modal-body">
                 <form>
                   <div class="form-group row" v-if="!reply_uuid || (post.edit && post.title)">
-                    <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
+                    <label class="col-sm-2 col-form-label">Title</label>
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" id="inputTitle" placeholder="Title" v-model="post.title">
+                      <input type="text" class="form-control" placeholder="Title" v-model="post.title">
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label for="inputContent" class="col-sm-2 col-form-label">Content</label>
+                    <label class="col-sm-2 col-form-label">Content</label>
                     <div class="col-sm-10">
-                      <textarea rows="10" class="form-control" id="inputContent" placeholder="Content" v-model="post.content"></textarea>
+                      <textarea rows="10" class="form-control" placeholder="Content" v-model="post.content"></textarea>
                     </div>
                   </div>
                   <div class="form-group row">

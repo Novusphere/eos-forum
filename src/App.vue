@@ -3,6 +3,7 @@
     <SettingsModal></SettingsModal>
     <FaqModal></FaqModal>
     <ErrorModal></ErrorModal>
+    <UpvoteModal ref="upvote"></UpvoteModal>
     
     <router-view/>
   </div>
@@ -18,20 +19,23 @@ import "@/assets/css/style.css";
 import SettingsModal from "@/components/modal/SettingsModal";
 import FaqModal from "@/components/modal/FaqModal";
 import ErrorModal from "@/components/modal/ErrorModal";
+import UpvoteModal from "@/components/modal/UpvoteModal";
 
 export default {
   name: "App",
   components: {
     SettingsModal: SettingsModal,
     FaqModal: FaqModal,
-    ErrorModal: ErrorModal
+    ErrorModal: ErrorModal,
+    UpvoteModal: UpvoteModal
   },
-  mounted() {},
+  mounted() {
+    window._VueApp = this;
+  },
   methods: {},
   computed: {},
   data() {
-    return {
-    }
+    return {};
   }
 };
 </script>

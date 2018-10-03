@@ -1,5 +1,6 @@
 import jQuery from "jquery";
 import { GetNovusphere } from "@/novusphere";
+import { storage } from "@/storage";
 
 class NovusphereForum {
     //
@@ -118,12 +119,21 @@ class NovusphereForum {
             as: "state"
         };
     }
-    lookup_post_replies() {
+    lookup_thread_replies() {
         const novusphere = GetNovusphere();
         return {
             from: novusphere.config.collection,
             localField: "data.post_uuid",
             foreignField: "data.reply_to_post_uuid",
+            as: "replies"
+        };
+    }
+    lookup_post_replies() {
+        const novusphere = GetNovusphere();
+        return {
+            from: novusphere.config.collection,
+            localField: "data.post_uuid",
+            foreignField: "data.json_metadata.parent_uuid",
             as: "replies"
         };
     }
@@ -171,7 +181,10 @@ class NovusphereForum {
             transaction: "$transaction",
             createdAt: "$createdAt",
             data: "$data",
-            up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
+            //state: "$state",
+            replies:"$replies",
+            up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },  
+            up_atmos: !opts.normalize_up ? "$up_atmos" : { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] },
             parent: !opts.normalize_parent ? "$parent" : { $arrayElemAt: ["$parent", 0] },
             __score: "$__score",
             my_vote: !opts.normalize_my_vote ? "$my_vote" : { $arrayElemAt: ["$my_vote", 0] },
@@ -227,14 +240,18 @@ class NovusphereForum {
     }
     score() {
         const unix_now = new Date().getTime() / 1000;
+
+        var adder = [1,  { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] }];
+        if (storage.settings.atmos_upvotes) {
+            // factor in up_atmos
+            adder = [{$add: adder}, { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] }];
+        }
+
         return {
             // (p+1)/(T+2)^G -- p=upvotes, T=time since post in hrs, G=1.8
             $divide: [
                 {
-                    $add: [
-                        { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
-                        1
-                    ]
+                    $add: adder
                 },
                 {
                     $pow: [

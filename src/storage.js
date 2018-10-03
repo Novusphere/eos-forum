@@ -3,10 +3,11 @@ import jQuery from "jquery";
 const MAX_TRACK_NEW_POSTS = 1000;
 
 const DEFAULT_STORAGE = {
-    version: 7,
+    version: 8,
     subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "games", "bounties", "test"],
     new_posts: {},
     settings: {
+        atmos_upvotes: true,
         theme: "static/css/theme/night.css",
         novusphere_api: "https://db.novusphere.io",
         eos_api: {
@@ -27,6 +28,9 @@ function importStorage(obj) {
         }
         else if (obj.version < 7) {
             obj.settings = storage.settings;
+        }
+        else if (obj.version < 8) {
+            obj.settings.atmos_upvotes = storage.settings.atmos_upvotes;
         }
 
         obj.version++;

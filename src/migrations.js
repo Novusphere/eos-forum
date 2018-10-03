@@ -1,9 +1,14 @@
 import jQuery from "jquery";
 import Helpers from "@/helpers";
+import { storage } from "@/storage";
 
 function MigratePost(p) {
     p.depth = 0;
     p.children = [];
+
+    if (storage.settings.atmos_upvotes) {
+        p.up = Math.floor(p.up + (p.up_atmos ? p.up_atmos : 0));
+    }
     
     p.o_transaction = p.transaction;
 
@@ -73,6 +78,7 @@ function PlaceholderPost() {
         children: [],
         data: {
             title: '',
+            poster: '',
             json_metadata: {
                 'sub': ''
             },

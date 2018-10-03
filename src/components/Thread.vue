@@ -95,6 +95,9 @@ export default {
       })).cursor.firstBatch;
 
       responses.splice(0, 0, mainPost);
+      //console.log(mainPost.__score);
+      //console.log(mainPost.up);
+      //console.log(mainPost.up_atmos);
 
       // only count non-edits for new_posts length
       var new_posts =
