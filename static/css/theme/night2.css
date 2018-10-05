@@ -11,6 +11,10 @@ body a:hover {
     color: white;
 }
 
+hr {
+    border-color: white;
+}
+
 .close, .close:hover {
     color: white;
 }
