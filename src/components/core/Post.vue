@@ -56,6 +56,7 @@
         <div class="text-xsmall">
           <ul class="list-inline">
             <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
+              <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="collapse" :data-target="'#qreply-' + post.data.post_uuid" v-on:click="showQuickReply()">quick reply</button>
               <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="reply()">reply</button>
               <button v-if="post.data.poster == identity" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="edit()">edit</button>
             </li>
@@ -68,6 +69,16 @@
                 </button>
             </li>
           </ul>
+        </div>
+
+        <div class="row collapse quick-reply" :id="'qreply-' + post.data.post_uuid">
+          <div class="col-sm-12">
+            <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
+          </div>
+          <div class="col-sm-2 mt-1 mb-2">
+            <button v-if="identity" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="quickReply(false)">post</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="quickReply(true)">post anon</button>
+          </div>
         </div>
     
                 <div v-for="child in post.children" :key="child.transaction">
@@ -250,6 +261,28 @@ export default {
 
       jQuery("#submitPost").modal();
     },
+    showQuickReply() {
+      //var qr = jQuery(".quick-reply");
+      //qr.removeClass('show');
+    },
+    async quickReply(anon) {
+      var $post = this.submit_modal.$data.post;
+      $post.parent_uuid = this.post.data.post_uuid;
+      $post.parent_tx = this.post.transaction;
+      $post.parent_poster = this.post.data.poster;
+      $post.title = "";
+      $post.content = this.quick_reply;
+      $post.edit = false;
+
+      await this.submit_modal.postContent(anon);
+
+      if (this.submit_modal.status) {
+        alert(this.submit_modal.status);
+      }
+      else {
+        jQuery('#qreply-' + this.post.data.post_uuid).removeClass('show');
+      }
+    },
     reply() {
       var $post = this.submit_modal.$data.post;
       $post.parent_uuid = this.post.data.post_uuid;
@@ -318,6 +351,7 @@ export default {
   },
   data() {
     return {
+      quick_reply: "",
       post_content: "",
       identity: ""
     };
