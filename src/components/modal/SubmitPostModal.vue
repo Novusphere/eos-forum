@@ -223,7 +223,7 @@ export default {
           const eos = GetEOS(await GetScatter());
 
           var tips = [];
-          var tips_rx = eosPost.content.match(/\#tip [0-9\.]+ [A-Z]+/g);
+          var tips_rx = eosPost.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
           var contracts = [FORUM_CONTRACT];
 
           if (tips_rx && tips_rx.length > 0 && !this.post.edit && this.post.parent_tx) {

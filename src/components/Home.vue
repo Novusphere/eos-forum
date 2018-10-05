@@ -125,7 +125,7 @@ export default {
 
       for (var i = 0; i < payload.length; i++) {
         var post = payload[i];
-        MigratePost(post);
+        await MigratePost(post);
 
         var old_replies = storage.new_posts[post.data.post_uuid];
         post.new_replies =

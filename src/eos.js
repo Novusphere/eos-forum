@@ -1,7 +1,10 @@
 import Eos from "eosjs";
-import ScatterJS from "scatter-js/dist/scatter.esm";
+import ScatterJS from 'scatterjs-core';
+import ScatterEOS from 'scatterjs-plugin-eosjs';
+ScatterJS.plugins( new ScatterEOS() );
+//import ScatterJS from "scatter-js/dist/scatter.esm";
 
-import { storage } from '@/storage';
+import { LoadStorage, storage } from '@/storage';
 
 const DEFAULT_IDENTITY = { account: '', auth: '', atmos: '0.000' };
 
@@ -22,8 +25,11 @@ const ScatterEosOptions = {
     chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906" // Or null to fetch automatically ( takes longer )
 };
 
-console.log('Trying to connect to scatter...');
-ScatterJS.scatter.connect('eos-forum', { initTimeout: 1500 }).then(connected => {
+LoadStorage();
+
+console.log('Trying to connect to scatter with timeout ' + storage.settings.scatter_timeout + 'ms...');
+
+ScatterJS.scatter.connect('eos-forum', { initTimeout: storage.settings.scatter_timeout }).then(connected => {
     if (connected) {
         console.log('Scatter loaded');
         _scatter = ScatterJS.scatter;
@@ -79,12 +85,16 @@ async function GetScatterIdentity(tryPull) {
     if (_identity.account) {
         var now = (new Date()).getTime();
         if (now - _lastIdentityUpdate >= 1000) {
+            _lastIdentityUpdate = now;
+
             const eos = GetEOS();
             var atmos = parseFloat((await eos.getCurrencyBalance("novusphereio", _identity.account, "ATMOS"))[0]);
             atmos = (isNaN(atmos) ? 0 : atmos).toFixed(3);
 
             _identity.atmos = atmos;
-            _lastIdentityUpdate = now;
+        }
+        else {
+            //console.log('skipped pulling atmos');
         }
     }
 

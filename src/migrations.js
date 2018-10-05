@@ -1,15 +1,56 @@
 import jQuery from "jquery";
+
+import { EOSBinaryReader } from "@/eosbinaryreader";
+import { GetEOS } from "@/eos";
 import Helpers from "@/helpers";
 import { storage } from "@/storage";
 
-function MigratePost(p) {
+async function GetPostDataFromBlockchain(txid) {
+    const eos = GetEOS();
+    const tx = await eos.getTransaction(txid);
+
+    var offset = 0;
+    var hex = tx.trx.trx.actions[0].data;
+    var rdr = new EOSBinaryReader(hex);
+
+    var tx_data = {
+        poster: rdr.readName(),
+        post_uuid: rdr.readString(),
+        content: rdr.readString(),
+        reply_to_poster: rdr.readName(),
+        reply_to_post_uuid: rdr.readString(),
+        certify: rdr.readVarInt(),
+        json_metadata: rdr.readString()
+    };
+
+    try {
+        tx_data.json_metadata = JSON.parse(tx_data.json_metadata);
+    } catch (ex) { 
+        // do nothing
+    }
+
+    return tx_data;
+}
+
+async function MigratePost(p) {
+    if (p.__migrated) {
+        return;
+    }
+
+    p.__migrated = true;
+
+    if (!p.data.content && !p.data.json_metadata.title) {
+        // post has been censored from nsdb api, try to get via bp api
+        p.data = await GetPostDataFromBlockchain(p.transaction);
+    }
+
     p.depth = 0;
     p.children = [];
 
     if (storage.settings.atmos_upvotes) {
         p.up = Math.floor(p.up + (p.up_atmos ? p.up_atmos : 0));
     }
-    
+
     p.o_transaction = p.transaction;
 
     var attachment = p.data.json_metadata.attachment;
@@ -30,7 +71,7 @@ function MigratePost(p) {
             var host = Helpers.GetHost(attachment.value);
             if (host == 'youtu.be') {
                 var split = attachment.value.split('/');
-                attachment.value = 'https://www.youtube.com/?v=' + split[split.length-1];
+                attachment.value = 'https://www.youtube.com/?v=' + split[split.length - 1];
                 host = 'youtube.com';
             }
             if (host == 'youtube.com' || host == 'www.youtube.com') {

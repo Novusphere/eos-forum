@@ -7,8 +7,6 @@ import App from "@/App"
 import router from '@/router'
 import { LoadStorage } from "@/storage"
 
-LoadStorage();
-
 Vue.use(BootstrapVue);
 
 Vue.config.productionTip = false;

@@ -11,7 +11,8 @@
             <div class="modal-body">
                 <div class="text-center">
                     You have already used your free upvote on this post, however, you can use your ATMOS to upvote it further.
-                    Half of the ATMOS used to upvote this post will go to the poster.
+                    Half of the ATMOS used to upvote this post will go to the poster and
+                    the other half is send to novuspheredb account as a DAO fund.
                     Enter the amount of ATMOS you would like to use below.
                 </div>
                 <form class="mt-3">

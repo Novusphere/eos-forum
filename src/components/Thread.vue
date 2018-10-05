@@ -22,10 +22,14 @@
 import { v4 as uuidv4 } from "uuid";
 import jQuery from "jquery";
 
-
-import { GetEOS, ScatterConfig, ScatterEosOptions, GetScatterIdentity } from "@/eos";
+import {
+  GetEOS,
+  ScatterConfig,
+  ScatterEosOptions,
+  GetScatterIdentity
+} from "@/eos";
 import { GetNovusphere } from "@/novusphere";
-import { forum } from "@/novusphere-forum"
+import { forum } from "@/novusphere-forum";
 import { MigratePost, PlaceholderPost, ApplyPostEdit } from "@/migrations";
 import { storage, SaveStorage } from "@/storage";
 
@@ -70,13 +74,16 @@ export default {
           { $match: forum.match_thread(this.$route.params.id) },
           { $lookup: forum.lookup_post_state() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post({ 
+          {
+            $project: forum.project_post({
               normalize_up: true,
               normalize_my_vote: true
-            }) 
-          },
+            })
+          }
         ]
       })).cursor.firstBatch[0];
+
+      await MigratePost(mainPost);
 
       var responses = (await novusphere.api({
         aggregate: novusphere.config.collection,
@@ -86,11 +93,12 @@ export default {
           { $match: forum.match_thread_replies(mainPost.data.post_uuid) },
           { $lookup: forum.lookup_post_state() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post({ 
+          {
+            $project: forum.project_post({
               normalize_up: true,
               normalize_my_vote: true
-            }) 
-          },
+            })
+          }
         ]
       })).cursor.firstBatch;
 
@@ -99,16 +107,11 @@ export default {
       //console.log(mainPost.up);
       //console.log(mainPost.up_atmos);
 
-      // only count non-edits for new_posts length
-      var new_posts =
-        responses.filter(r => !r.data.json_metadata.edit).length - 1;
-      storage.new_posts[mainPost.data.post_uuid] = new_posts;
-      SaveStorage();
-
       var commentMap = {};
+      var new_posts = 0;
       for (var i = 0; i < responses.length; i++) {
         var p = responses[i];
-        MigratePost(p);
+        await MigratePost(p);
 
         p.thread_transaction = mainPost.transaction;
         commentMap[p.data.post_uuid] = p;
@@ -133,6 +136,7 @@ export default {
               ApplyPostEdit(parent, p);
             }
           } else {
+            new_posts++;
             p.depth = parent.depth + 1;
             parent.children.push(p);
           }
@@ -140,8 +144,12 @@ export default {
       }
 
       for (var i = 0; i < responses.length; i++) {
-         responses[i].children.sort((a,b) => b.__score - a.__score);
+        responses[i].children.sort((a, b) => b.__score - a.__score);
       }
+
+      // only count non-edits for new_posts length
+      storage.new_posts[mainPost.data.post_uuid] = new_posts;
+      SaveStorage();
 
       // permalink child
       if (this.$route.params.child_id) {

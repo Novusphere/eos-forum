@@ -119,10 +119,10 @@ export default {
 
       for (var i = 0; i < posts.length; i++) {
         var p = posts[i];
-        MigratePost(p);
+        await MigratePost(p);
 
         if (p.parent) {
-          MigratePost(p.parent);
+          await MigratePost(p.parent);
 
           if (p.parent.data.json_metadata) {
             const title = p.parent.data.json_metadata.title;

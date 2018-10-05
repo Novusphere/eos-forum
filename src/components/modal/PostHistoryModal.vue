@@ -69,7 +69,7 @@ export default {
 
       for (var i = 0; i < edits.length; i++) {
         var p = edits[i];
-        MigratePost(p);
+        await MigratePost(p);
 
         p.depth = 1;
         p.parent = mainPost;
@@ -77,7 +77,7 @@ export default {
         p.my_vote = mainPost.my_vote;
       }
 
-      MigratePost(mainPost);
+      await MigratePost(mainPost);
       mainPost.children = edits;
 
       this.mainPost = mainPost;
