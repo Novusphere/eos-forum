@@ -3,6 +3,7 @@
     <SettingsModal></SettingsModal>
     <FaqModal></FaqModal>
     <ErrorModal></ErrorModal>
+    <ConfirmModal></ConfirmModal>
     <UpvoteModal ref="upvote"></UpvoteModal>
     
     <router-view/>
@@ -19,6 +20,7 @@ import "@/assets/css/style.css";
 import SettingsModal from "@/components/modal/SettingsModal";
 import FaqModal from "@/components/modal/FaqModal";
 import ErrorModal from "@/components/modal/ErrorModal";
+import ConfirmModal from "@/components/modal/ConfirmModal";
 import UpvoteModal from "@/components/modal/UpvoteModal";
 
 export default {
@@ -27,6 +29,7 @@ export default {
     SettingsModal: SettingsModal,
     FaqModal: FaqModal,
     ErrorModal: ErrorModal,
+    ConfirmModal: ConfirmModal,
     UpvoteModal: UpvoteModal
   },
   mounted() {

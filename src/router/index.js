@@ -23,7 +23,7 @@ export default new Router({
       component: Home
     },
     {
-      path: '/e/:sub/:id/:child_id?',
+      path: '/e/:sub/:id/:title?/:child_id?',
       name: 'Thread',
       component: Thread
     },

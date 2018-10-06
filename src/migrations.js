@@ -4,6 +4,7 @@ import { EOSBinaryReader } from "@/eosbinaryreader";
 import { GetEOS } from "@/eos";
 import Helpers from "@/helpers";
 import { storage } from "@/storage";
+import { moderation } from "@/moderation";
 
 async function GetPostDataFromBlockchain(txid) {
     const eos = GetEOS();
@@ -39,6 +40,8 @@ async function MigratePost(p) {
 
     p.__migrated = true;
 
+    await moderation.getCacheSet(p.createdAt);
+
     if (!p.data.content && !p.data.json_metadata.title) {
         // post has been censored from nsdb api, try to get via bp api
         p.data = await GetPostDataFromBlockchain(p.transaction);
@@ -52,6 +55,7 @@ async function MigratePost(p) {
     }
 
     p.o_transaction = p.transaction;
+    p.o_id = p.id;
 
     var attachment = p.data.json_metadata.attachment;
     p.o_attachment = jQuery.extend(true, {}, attachment);
@@ -112,6 +116,7 @@ function ApplyPostEdit(parent, p) {
     parent.data.json_metadata = p.data.json_metadata;
     parent.createdAt = p.createdAt;
     parent.transaction = p.transaction;
+    parent.id = p.id;
 }
 
 function PlaceholderPost() {

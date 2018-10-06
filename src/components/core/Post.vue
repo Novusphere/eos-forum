@@ -36,12 +36,13 @@
                   <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
                   <li v-if="history_modal && post.depth > 0" class="list-inline-item"><router-link :to="perma_link">permalink</router-link></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
+                  <li v-if="is_moderated" class="list-inline-item"><span class="badge badge-warning text-xsmall">spam</span></li>
                 </ul>
             </div>
         </div>
       </div>
 
-      <div :id="'post-' + post.transaction" class="post-attachment collapse show" v-if="show_content">
+      <div :id="'post-' + post.transaction" :class="'post-attachment collapse ' + ((is_moderated && is_child) ? '' : 'show')" v-if="show_content">
         
         <!-- attached content -->
         <PostAttachment
@@ -106,6 +107,9 @@ import {
   ScatterEosOptions,
   GetScatterIdentity
 } from "@/eos";
+
+import { storage } from "@/storage";
+import { moderation } from "@/moderation";
 
 import PostAttachment from "@/components/core/PostAttachment.vue";
 
@@ -173,6 +177,11 @@ export default {
 
       return title;
     },
+    friendly_title() {
+      var friendly = this.title.replace(/[^a-zA-Z0-9 ]/g, '');
+      friendly = friendly.replace(/ /g, '_');
+      return friendly;
+    },
     sub() {
       return this.post.data.json_metadata.sub;
     },
@@ -182,16 +191,17 @@ export default {
     perma_link() {
       var path = "/e/" + this.sub + "/";
       if (this.post.parent) {
-        path += this.post.parent.o_transaction + "/";
+        path += this.post.parent.o_id + "/";
       }
-      path += this.post.transaction;
+      path += this.friendly_title + "/" + this.post.id;
       return path;
     },
     thread_link() {
       var txid = this.post.parent
-        ? this.post.parent.o_transaction
-        : this.post.o_transaction;
-      return "/e/" + this.sub + "/" + txid;
+        ? this.post.parent.o_id
+        : this.post.o_id;
+
+      return "/e/" + this.sub + "/" + txid + "/" + this.friendly_title;
     }
   },
   methods: {
@@ -199,25 +209,24 @@ export default {
       const identity = await GetScatterIdentity();
       this.identity = identity.account;
 
+      this.is_moderated = await moderation.isBlocked(
+        this.post.createdAt,
+        this.post.transaction,
+        this.post.data.poster
+      );
+
       if (this.show_content) {
-        // md parse
         var md = new MarkdownParser(
           this.post.data.content,
           this.post.createdAt
         );
+
         this.post_content = md.html;
 
         // only allow one attachment through
         if (md.attachments.length > 0) {
           this.post.data.json_metadata.attachment = md.attachments[0];
         }
-
-        /*if (this.hasAttachment("iframe")) {
-          // only load iframe automatically if p.depth == 0 (start of thread)
-          if (this.post.depth == 0) {
-            this.$refs.post_attachment.show_iframe = true;
-          }
-        }*/
       }
     },
     showAttachment() {
@@ -274,13 +283,18 @@ export default {
       $post.content = this.quick_reply;
       $post.edit = false;
 
+      if (anon) {
+        if (!await confirm("Are you sure you want to post this?")) {
+          return;
+        }
+      }
+
       await this.submit_modal.postContent(anon);
 
       if (this.submit_modal.status) {
         alert(this.submit_modal.status);
-      }
-      else {
-        jQuery('#qreply-' + this.post.data.post_uuid).removeClass('show');
+      } else {
+        jQuery("#qreply-" + this.post.data.post_uuid).removeClass("show");
       }
     },
     reply() {
@@ -353,7 +367,8 @@ export default {
     return {
       quick_reply: "",
       post_content: "",
-      identity: ""
+      identity: "",
+      is_moderated: false
     };
   }
 };

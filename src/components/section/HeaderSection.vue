@@ -14,7 +14,7 @@
             <li class="list-inline-item">
               <a href="#settings" data-toggle="modal">settings</a>
             </li>
-            <li class="list-inline-item">
+            <li v-if="eos_referendum" class="list-inline-item">
               <router-link :to="'/referendum'" class="text-highlight">eos-referendum</router-link>
             </li>
             <li class="list-inline-item">
@@ -79,7 +79,8 @@ export default {
   },
   data() {
     return {
-      identity: DEFAULT_IDENTITY
+      identity: DEFAULT_IDENTITY,
+      eos_referendum: storage.eos_referendum
     };
   }
 };

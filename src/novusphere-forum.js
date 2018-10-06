@@ -25,9 +25,16 @@ class NovusphereForum {
     //
     //  MONGODB MATCH QUERY HELPERS
     //
-    match_thread(txid) {
-        return {
-            transaction: txid
+    match_thread(id) {
+        if (id.length == 64) {
+            return {
+                transaction: id
+            };
+        }
+        else {
+            return {
+                id: parseInt(id)
+            }
         }
     }
     match_thread_replies(uuid) {
@@ -178,6 +185,7 @@ class NovusphereForum {
         }, opts);   
 
         var query = {
+            id: "$id",
             transaction: "$transaction",
             createdAt: "$createdAt",
             data: "$data",

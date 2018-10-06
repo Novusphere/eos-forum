@@ -2,10 +2,16 @@ import jQuery from "jquery";
 
 const MAX_TRACK_NEW_POSTS = 1000;
 
-const DEFAULT_STORAGE = {
-    version: 11,
-    subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "games", "bounties", "test"],
+var DEFAULT_STORAGE = {
+    version: 13,
+    eos_referendum: true,
+    subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "anon-pol-econ", "bounties", "test"],
     new_posts: {},
+    moderation: {
+        mods: [],
+        accounts: [],
+        transactions: []
+    },
     settings: {
         atmos_upvotes: true,
         scatter_timeout: 1500,
@@ -18,6 +24,28 @@ const DEFAULT_STORAGE = {
         }
     }
 };
+
+window.__PRESETS__ = window.localStorage.getItem('presets');
+if (window.__PRESETS__) {
+    console.log('Found presets');
+
+    try {
+        window.__PRESETS__ = JSON.parse(window.__PRESETS__);
+        console.log('Loaded presets');
+    }
+    catch (ex) {
+        window.__PRESETS__ = null;
+        console.log('Failed to load presets');
+        console.log(ex);
+    }
+
+    if (window.__PRESETS__.storage) {
+        DEFAULT_STORAGE = jQuery.extend(true, DEFAULT_STORAGE, window.__PRESETS__.storage);
+        if (window.__PRESETS__.storage.subscribed_subs) {
+            DEFAULT_STORAGE.subscribed_subs = window.__PRESETS__.storage.subscribed_subs;
+        }
+    }
+}
 
 var storage = jQuery.extend(true, {}, DEFAULT_STORAGE);
 
@@ -39,13 +67,19 @@ function importStorage(obj) {
         else if (obj.version < 11) {
             obj.settings.theme = storage.settings.theme;
         }
+        else if (obj.version < 12) {
+            obj.eos_referendum = storage.eos_referendum;
+        }
+        else if (obj.version < 13) {
+            obj.moderation = storage.moderation;
+        }
 
         obj.version++;
     }
 
     if (obj.version >= storage.version) {
         storage = obj;
-        console.log('Loaded storage');
+        console.log('Loaded storage version ' + storage.version);
         //console.log(storage);
         return true;
     }

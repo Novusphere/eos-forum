@@ -153,8 +153,15 @@ export default {
 
       // permalink child
       if (this.$route.params.child_id) {
-        var childTxId = this.$route.params.child_id;
-        var childPost = responses.find(p => p.transaction == childTxId);
+        var childId = this.$route.params.child_id;
+        var childPost;
+        if (childId.length == 64) {
+          childPost = responses.find(p => p.transaction == childTxId);
+        }
+        else {
+          childId = parseInt(childId);
+          childPost = responses.find(p => p.id == childId);
+        }
 
         childPost.depth = 0;
         childPost.data.json_metadata.title = mainPost.data.json_metadata.title;
