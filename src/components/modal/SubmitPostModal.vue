@@ -149,20 +149,21 @@ export default {
       var post = this.post;
 
       if (!this.reply_uuid && post.title.length == 0) {
-        this.status = "Post must have a title";
+        this.setStatus("Post must have a title");
         return;
       }
 
       if (post.content.length == 0) {
-        this.status = "Post must have at least 1 character of content";
+        this.setStatus("Post must have at least 1 character of content");
         return;
       }
 
       if (post.content.length > 1024 * 10) {
-        this.status =
+        this.setStatus(
           "Post is too long, over limit by " +
-          (1024 * 10 - post.content.length) +
-          " characters";
+            (1024 * 10 - post.content.length) +
+            " characters"
+        );
         return;
       }
 
@@ -198,25 +199,31 @@ export default {
 
       return eosPost;
     },
+    setStatus(text) {
+      this.status = text;
+      if (this.set_status) {
+        this.set_status(text);
+      }
+    },
     async postContent(anon) {
       var post = this.post;
       const eosService = GetEOSService();
 
       var txid;
-      this.status = "Creating tx and broadcasting to EOS...";
+      this.setStatus("Creating tx and broadcasting to EOS...");
       try {
         var eosPost = await this.makePost(anon);
         if (!eosPost) {
-          return;
+          return false;
         }
 
         if (anon) {
           // use eos-service to make anonymous post
           var eostx = await eosService.anonymousPost(eosPost);
           if (eostx.error) {
-            this.status = "Error: " + eostx.error;
+            this.setStatus("Error: " + eostx.error);
             console.log(eostx.error);
-            return;
+            return false;
           }
         } else {
           const identity = await GetScatterIdentity();
@@ -226,7 +233,12 @@ export default {
           var tips_rx = eosPost.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
           var contracts = [FORUM_CONTRACT];
 
-          if (tips_rx && tips_rx.length > 0 && !this.post.edit && this.post.parent_tx) {
+          if (
+            tips_rx &&
+            tips_rx.length > 0 &&
+            !this.post.edit &&
+            this.post.parent_tx
+          ) {
             // do not tip on edits
 
             var tokens = JSON.parse(
@@ -248,17 +260,22 @@ export default {
 
               const token = tokens.find(t => t.symbol == tip_args[2]);
               if (!token) {
-                this.status =
-                  "Error: could not find contract for tip symbol " +
-                  tip_args[2];
-                return;
+                this.setStatus(
+                  "Error: could not find contract for tip symbol " + tip_args[2]
+                );
+                return false;
               }
 
-              const stats = await eos.getCurrencyStats(token.account, token.symbol);
-              const precision = stats[token.symbol].max_supply.split(' ')[0].split('.')[1].length;
+              const stats = await eos.getCurrencyStats(
+                token.account,
+                token.symbol
+              );
+              const precision = stats[token.symbol].max_supply
+                .split(" ")[0]
+                .split(".")[1].length;
 
               var adjusted_amount = parseFloat(tip_args[1]).toFixed(precision);
-              tips.push(adjusted_amount + ' ' + token.symbol);
+              tips.push(adjusted_amount + " " + token.symbol);
               contracts.push(token.account);
             }
           }
@@ -297,18 +314,18 @@ export default {
 
         txid = eostx.transaction_id;
       } catch (ex) {
-        this.status += " Failed!";
+        this.setStatus("Creating tx and broadcasting to EOS... Failed!");
         console.log(ex);
-        return;
+        return false;
       }
 
-      this.status = "Waiting for Novusphere to index...";
+      this.setStatus("Waiting for Novusphere to index...");
 
       const novusphere = GetNovusphere();
       await novusphere.waitTx(txid, 500, 1000);
 
       // reset default
-      this.status = "";
+      this.setStatus("");
       this.post.content = "";
       this.post.attachment.value = "";
       this.post.attachment.type = "";
@@ -317,6 +334,7 @@ export default {
       jQuery("#submitPost").modal("hide");
 
       this.postContentCallback(txid);
+      return true;
     }
   },
   computed: {
@@ -331,6 +349,7 @@ export default {
   data() {
     return {
       status: "",
+      set_status: null,
       preview: false,
       post: {
         // for making a new post

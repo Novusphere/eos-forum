@@ -178,8 +178,8 @@ export default {
       return title;
     },
     friendly_title() {
-      var friendly = this.title.replace(/[^a-zA-Z0-9 ]/g, '');
-      friendly = friendly.replace(/ /g, '_');
+      var friendly = this.title.replace(/[^a-zA-Z0-9 ]/g, "");
+      friendly = friendly.replace(/ /g, "_");
       return friendly;
     },
     sub() {
@@ -197,9 +197,7 @@ export default {
       return path;
     },
     thread_link() {
-      var txid = this.post.parent
-        ? this.post.parent.o_id
-        : this.post.o_id;
+      var txid = this.post.parent ? this.post.parent.o_id : this.post.o_id;
 
       return "/e/" + this.sub + "/" + txid + "/" + this.friendly_title;
     }
@@ -284,16 +282,25 @@ export default {
       $post.edit = false;
 
       if (anon) {
-        if (!await confirm("Are you sure you want to post this?")) {
+        if (
+          !await confirm(
+            "Are you sure you want to post this?",
+            ss => (this.submit_modal.set_status = ss),
+            async () => await this.submit_modal.postContent(anon)
+          )
+        ) {
           return;
         }
       }
+      else {
+        await this.submit_modal.postContent(anon);
+        if (this.submit_modal.status) {
+          alert(this.submit_modal.status);
+        }
+      }
 
-      await this.submit_modal.postContent(anon);
-
-      if (this.submit_modal.status) {
-        alert(this.submit_modal.status);
-      } else {
+      if (!this.submit_modal.status) { // sucessful
+        this.quick_reply = "";
         jQuery("#qreply-" + this.post.data.post_uuid).removeClass("show");
       }
     },

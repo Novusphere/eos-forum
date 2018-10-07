@@ -14,8 +14,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-dismiss="modal" v-on:click="resolve(true)">ok</button>
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" v-on:click="resolve(false)">cancel</button>
+                <button type="button" class="btn btn-outline-success" v-on:click="resolve(true)">ok</button>
+                <button type="button" class="btn btn-outline-danger" v-on:click="resolve(false)">cancel</button>
             </div>
           </div>
         </div>
@@ -28,24 +28,54 @@ import jQuery from "jquery";
 export default {
   name: "ConfirmModal",
   async mounted() {
-      //
-      // override alert
-      //
-      var _this = this;
-      window.confirm = function(message, args) {
-          return new Promise((resolve) => {
-                _this.text = message;
-                _this.resolve = resolve;
-                args = jQuery.extend(args ? args : {}, {backdrop: 'static', keyboard: false});
-                jQuery("#confirmModal").modal(args);
-          });
-      };
+    //
+    // override alert
+    //
+    var _this = this;
+    window.confirm = async function(message, setStatus, okCallback) {
+      if (setStatus) {
+        setStatus(_this.setStatus);
+      }
+
+      var success = true;
+      var click_ok;
+      _this.text = message;
+      jQuery("#confirmModal").modal({ backdrop: "static", keyboard: false });
+
+      for (;;) {
+        click_ok = await new Promise(resolve => {
+          _this.resolve = resolve;
+        });
+
+        if (click_ok && okCallback) {
+          success = await okCallback();
+          if (success) {
+            break;
+          }
+        }
+        else {
+          break;
+        }
+      }
+
+      jQuery("#confirmModal").modal("hide");
+
+      if (setStatus) {
+        setStatus(null);
+      }
+
+      return click_ok;
+    };
   },
-  methods: {},
+  methods: {
+    setStatus(text) {
+      this.text = text;
+    }
+  },
   data() {
     return {
-        resolve: null,
-        text: ''
+      resolve: null,
+      text: ""
     };
   }
 };
