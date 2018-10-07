@@ -39,6 +39,7 @@ import { GetNovusphere } from "@/novusphere";
 import { forum } from "@/novusphere-forum";
 import { MigratePost, ApplyPostEdit } from "@/migrations";
 import { storage, SaveStorage } from "@/storage";
+import { moderation } from "@/moderation";
 
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
@@ -49,7 +50,6 @@ import HeaderSection from "@/components/section/HeaderSection";
 import MainSection from "@/components/section/MainSection";
 
 const MAX_ITEMS_PER_PAGE = 25;
-const DEFAULT_SUB = "all";
 
 export default {
   name: "Home",
@@ -77,6 +77,11 @@ export default {
         this.$route.query.page ? this.$route.query.page : 1
       );
 
+      var DEFAULT_SUB = "all";
+      if (window.__PRESETS__ && window.__PRESETS__.default_sub) {
+        DEFAULT_SUB = window.__PRESETS__.default_sub;
+      }
+
       var sub = (this.$route.params.sub
         ? this.$route.params.sub
         : DEFAULT_SUB
@@ -84,11 +89,13 @@ export default {
 
       var novusphere = GetNovusphere();
       var apiResult;
+      var blocked_accounts = await moderation.getBlockedAccounts();
+      //console.log(blocked_accounts);
 
       apiResult = await novusphere.api({
         count: novusphere.config.collection,
         maxTimeMS: 1000,
-        query: forum.match_threads(sub)
+        query: forum.match_threads(sub, blocked_accounts)
       });
 
       var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
@@ -99,7 +106,7 @@ export default {
         maxTimeMS: 1000,
         cursor: {},
         pipeline: [
-          { $match: forum.match_threads(sub) },
+          { $match: forum.match_threads(sub, blocked_accounts) },
           { $lookup: forum.lookup_post_state() },
           { $project: forum.project_post({ 
               normalize_up: true, 

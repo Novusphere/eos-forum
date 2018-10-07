@@ -44,6 +44,23 @@ class Moderation {
         return data;
     }
 
+    async getBlockedAccounts() {
+        // only returns blocked accounts for this month/last month
+        var now = new Date();
+        var set1 = await this.getCacheSet(now.getTime() / 1000);
+        var set2 = await this.getCacheSet((now.getTime() - (1000 * 60 * 60 * 24 * 31)) / 1000);
+
+        var accounts = [];
+        for (var i = 0; i < set1.accounts.length; i++) {
+            accounts.push(set1.accounts[i]);
+        }
+        for (var i = 0; i < set2.accounts.length; i++) {
+            accounts.push(set2.accounts[i]);
+        }
+        
+        return accounts;
+    }
+
     async isBlocked(createdAt, txid, account) {
         if (storage.moderation.accounts.includes(account)) {
             return true;

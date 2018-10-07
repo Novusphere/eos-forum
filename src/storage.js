@@ -8,7 +8,7 @@ var DEFAULT_STORAGE = {
     subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "anon-pol-econ", "bounties", "test"],
     new_posts: {},
     moderation: {
-        mods: [],
+        mods: [ "Novusphere/eos-forum-mod" ],
         accounts: [],
         transactions: []
     },

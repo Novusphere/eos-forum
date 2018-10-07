@@ -18,7 +18,7 @@
     "readable-stream": "^3.0.6",
     "scatter-js": "^2.5.2",
     "scatterjs-core": "^2.3.0",
-    "scatterjs-plugin-eosjs": "^1.2.0",
+    "scatterjs-plugin-eosjs": "^1.3.0",
     "sha256": "^0.2.0",
     "showdown": "^1.8.6",
     "uuid": "^3.3.2",

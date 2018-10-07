@@ -40,7 +40,7 @@ class NovusphereForum {
     match_thread_replies(uuid) {
         return { "data.reply_to_post_uuid": uuid };
     }
-    match_threads(sub) {
+    match_threads(sub, ignoreAccounts) {
         var query = {
             "data.json_metadata.sub": sub,
             "data.reply_to_post_uuid": "",
@@ -51,6 +51,13 @@ class NovusphereForum {
 
         if (sub == "all") {
             query["data.json_metadata.sub"] = { $exists: true, $ne: "" };
+        }
+        else if (sub == "anon") {
+            query["data.json_metadata.sub"] = { $regex: "(^anon$|^anon-)", $options: 'i'  };
+        }
+
+        if (ignoreAccounts && ignoreAccounts.length > 0) {
+            query["data.poster"] = { $nin: ignoreAccounts };
         }
 
         return query;
