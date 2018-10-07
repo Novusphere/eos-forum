@@ -57,19 +57,26 @@ class Moderation {
         for (var i = 0; i < set2.accounts.length; i++) {
             accounts.push(set2.accounts[i]);
         }
-        
+
         return accounts;
     }
 
     async isBlocked(createdAt, txid, account) {
-        if (storage.moderation.accounts.includes(account)) {
+        if (account && storage.moderation.accounts.includes(account)) {
             return true;
         }
-        if (storage.moderation.transactions.includes(txid)) {
+        
+        if (txid && storage.moderation.transactions.includes(txid)) {
             return true;
         }
+        
+        if (!createdAt) {
+            return false;
+        }
+
         var set = await this.getCacheSet(createdAt);
-        return set.accounts.includes(account) || set.transactions.includes(txid);
+        return (account && set.accounts.includes(account)) || 
+            (txid && set.transactions.includes(txid));
     }
 };
 

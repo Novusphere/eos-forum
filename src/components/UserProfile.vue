@@ -3,8 +3,9 @@
         <PostHistoryModal ref="history_modal"></PostHistoryModal>
         <HeaderSection :load="load">
             <span class="title mr-3"><router-link :to="'/u/' + account">{{account}}</router-link></span>
-            <a class="btn btn-outline-primary ml-1" :href="'https://eosq.app/account/' + account">view on chain</a>
+            <a target="_blank" class="btn btn-outline-primary ml-1" :href="'https://eosq.app/account/' + account">view on chain</a>
             <PostSorter ref="sorter" :change="load"></PostSorter>
+            <button class="btn btn-outline-warning ml-1" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
         </HeaderSection>
         <MainSection>
         <div>
@@ -57,6 +58,8 @@ import {
 } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { forum } from "@/novusphere-forum";
+import { storage, SaveStorage } from "@/storage";
+import { moderation } from "@/moderation";
 import { MigratePost, ApplyPostEdit } from "@/migrations";
 
 import Post from "@/components/core/Post";
@@ -87,8 +90,10 @@ export default {
     }
   },
   async mounted() {
-    this.$refs.sorter.by = 'time';
+    this.$refs.sorter.by = "time";
     this.load();
+  },
+  computed: {
   },
   methods: {
     async load() {
@@ -96,6 +101,7 @@ export default {
         this.$route.query.page ? this.$route.query.page : 1
       );
       this.account = this.$route.params.account;
+      this.is_blocked = await moderation.isBlocked(0, null, this.account);
 
       const eos = GetEOS();
       const novusphere = GetNovusphere();
@@ -132,21 +138,23 @@ export default {
           { $match: forum.match_posts_by_account(this.account, false) },
           { $lookup: forum.lookup_post_state() },
           { $lookup: forum.lookup_post_parent() },
-          { $project: forum.project_post({ 
-              normalize_up: true, 
+          {
+            $project: forum.project_post({
+              normalize_up: true,
               normalize_parent: true,
-              score: true 
-            }) 
+              score: true
+            })
           },
           { $sort: this.$refs.sorter.getSorter() },
           { $skip: forum.skip_page(this.currentPage, MAX_ITEMS_PER_PAGE) },
           { $limit: MAX_ITEMS_PER_PAGE },
           { $lookup: forum.lookup_post_replies() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post({ 
-              normalize_my_vote: true, 
+          {
+            $project: forum.project_post({
+              normalize_my_vote: true,
               recent_edit: true
-            }) 
+            })
           },
           { $match: forum.match_valid_parent() }
         ]
@@ -176,10 +184,23 @@ export default {
           : "N/A";
       this.posts = posts;
       this.pages = pages;
+    },
+    async toggleBlock() {
+      if (this.is_blocked) {
+        var i = storage.moderation.accounts.indexOf(this.account);
+        if (i > -1) {
+          storage.moderation.accounts.splice(i, 1);
+        }
+      } else {
+        storage.moderation.accounts.push(this.account);
+      }
+      SaveStorage();
+      await this.load();
     }
   },
   data() {
     return {
+      is_blocked: false,
       account: "",
       balances: {
         atmos: 0

@@ -89,7 +89,10 @@ export default {
 
       var novusphere = GetNovusphere();
       var apiResult;
-      var blocked_accounts = await moderation.getBlockedAccounts();
+      var blocked_accounts = storage.moderation.hide_spam_threads
+        ? await moderation.getBlockedAccounts()
+        : [];
+
       //console.log(blocked_accounts);
 
       apiResult = await novusphere.api({
@@ -108,23 +111,25 @@ export default {
         pipeline: [
           { $match: forum.match_threads(sub, blocked_accounts) },
           { $lookup: forum.lookup_post_state() },
-          { $project: forum.project_post({ 
-              normalize_up: true, 
+          {
+            $project: forum.project_post({
+              normalize_up: true,
               normalize_parent: true,
-              score: true 
-            }) 
+              score: true
+            })
           },
           { $sort: this.$refs.sorter.getSorter() },
           { $skip: forum.skip_page(currentPage, MAX_ITEMS_PER_PAGE) },
           { $limit: MAX_ITEMS_PER_PAGE },
           { $lookup: forum.lookup_thread_replies() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post({ 
-              normalize_my_vote: true, 
+          {
+            $project: forum.project_post({
+              normalize_my_vote: true,
               recent_edit: true,
-              total_replies: true 
-            }) 
-          },
+              total_replies: true
+            })
+          }
         ]
       });
 

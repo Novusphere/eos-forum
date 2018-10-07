@@ -12,21 +12,13 @@
               </button>
             </div>
             <div class="modal-body">
-              <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                  <a class="nav-link active" data-toggle="tab" href="#settings-theme" role="tab">Theme</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="tab" href="#settings-api" role="tab">Raw</a>
+                  <a class="nav-link active" data-toggle="tab" href="#settings-api" role="tab">Raw</a>
                 </li>
               </ul>
-              <div class="tab-content mt-2" id="myTabContent">
-                <div class="tab-pane fade show active" id="settings-theme" role="tabpanel">
-                  <div class="text-center">
-                    <h2>Coming soon, easy to set custom themes!</h2>
-                  </div>
-                </div>
-                <div class="tab-pane fade" id="settings-api" role="tabpanel">
+              <div class="tab-content mt-2">
+                <div class="tab-pane fade show active" id="settings-api" role="tabpanel">
                   <div class="text-center">
                       <p class="text-alert">
                           <strong>Warning:</strong> You should not modify these settings unless you know what you're doing! 
@@ -40,7 +32,8 @@
                   </div>
                   <div class="text-center">
                     <button type="button" class="btn btn-outline-primary" data-dismiss="modal" v-on:click="save()">save</button>
-                    <button type="button" class="btn btn-outline-secondary  " v-on:click="reset()">reset</button>
+                    <button type="button" class="btn btn-outline-secondary" v-on:click="reset()">reset</button>
+                    <button type="button" class="btn btn-outline-danger" v-on:click="forgetAll()">forget all</button>
                   </div>
                 </div>
               </div>
@@ -75,6 +68,9 @@ export default {
       storage.settings = JSON.parse(this.settings);
       this.theme = storage.settings.theme;
       SaveStorage();
+    },
+    forgetAll() {
+      window.__forgetStorage();
     }
   },
   data() {

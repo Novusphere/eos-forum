@@ -3,12 +3,13 @@ import jQuery from "jquery";
 const MAX_TRACK_NEW_POSTS = 1000;
 
 var DEFAULT_STORAGE = {
-    version: 13,
+    version: 14,
     eos_referendum: true,
     subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "anon-pol-econ", "bounties", "test"],
     new_posts: {},
     moderation: {
-        mods: [ "Novusphere/eos-forum-mod" ],
+        hide_spam_threads: true,
+        mods: [],
         accounts: [],
         transactions: []
     },
@@ -72,6 +73,9 @@ function importStorage(obj) {
         }
         else if (obj.version < 13) {
             obj.moderation = storage.moderation;
+        }
+        else if (obj.version < 14) {
+            obj.moderation.hide_spam_threads = storage.moderation.hide_spam_threads;
         }
 
         obj.version++;
