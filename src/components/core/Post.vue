@@ -32,7 +32,10 @@
                     <router-link :to="thread_link">{{ post.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item"><router-link :to="thread_link">{{ new Date(post.createdAt * 1000).toLocaleString() }}</router-link></li>
-                  <li class="list-inline-item">by <router-link :to="'/u/' + post.data.poster" :class="(post.data.poster == identity) ? 'text-highlight' : ''">{{ post.data.poster }}</router-link></li>
+                  <li class="list-inline-item">
+                    by <router-link :to="'/u/' + post.data.poster" :class="(post.data.poster == identity) ? 'text-highlight' : ''">{{ post.data.poster }}</router-link>
+                    <span v-if="op != 'eosforumanon' && post.data.poster == op" class="badge badge-success">op</span>
+                  </li>
                   <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
                   <li v-if="history_modal && post.depth > 0" class="list-inline-item"><router-link :to="perma_link">permalink</router-link></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
@@ -82,16 +85,17 @@
           </div>
         </div>
     
-                <div v-for="child in post.children" :key="child.transaction">
+        <div v-for="child in post.children" :key="child.transaction">
                     <div v-if="!(child.hide)">
                         <Post :submit_modal="submit_modal"
                             :history_modal="history_modal" 
-                            :post="child" 
+                            :post="child"
+                            :op="op"
                             :show_content="true">
                         </Post>
                     </div>
-                </div>
         </div>
+      </div>
     </div>  
 </template>
 
@@ -122,6 +126,11 @@ export default {
     post: {
       type: Object,
       required: true
+    },
+    op: {
+      type: String,
+      required: false,
+      default: ""
     },
     show_content: {
       type: Boolean,
@@ -291,15 +300,15 @@ export default {
         ) {
           return;
         }
-      }
-      else {
+      } else {
         await this.submit_modal.postContent(anon);
         if (this.submit_modal.status) {
           alert(this.submit_modal.status);
         }
       }
 
-      if (!this.submit_modal.status) { // sucessful
+      if (!this.submit_modal.status) {
+        // sucessful
         this.quick_reply = "";
         jQuery("#qreply-" + this.post.data.post_uuid).removeClass("show");
       }

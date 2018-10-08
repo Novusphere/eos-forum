@@ -544,7 +544,7 @@ export default {
           voter =>
             new Promise(async resolve => {
               var account = await eos.getAccount(voter);
-              var staked = account.voter_info.staked / 10000;
+              var staked = (account.voter_info) ? (account.voter_info.staked / 10000) : 0;
               var vr = voteResult[voter];
               vr.staked = staked;
               resolve();

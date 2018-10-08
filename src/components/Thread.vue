@@ -9,7 +9,8 @@
       <div class="thread">
         <Post :submit_modal="$refs.submit_modal"
           :history_modal="$refs.history_modal"
-          :post="mainPost" 
+          :post="mainPost"
+          :op="mainPost.data.poster" 
           :show_content="true" 
           v-bind="mainPost">
         </Post>

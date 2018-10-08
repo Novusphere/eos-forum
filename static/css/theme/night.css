@@ -61,6 +61,11 @@ hr {
     background-color: red;
 }
 
+.badge-success {
+    color: black;
+    background-color: lime !important;   
+}
+
 .btn:hover, .btn:focus, .btn:active, .btn:active:focus, .btn.active, .open>.dropdown-toggle.btn {
     color: #fff !important;
     background-color: gray !important;

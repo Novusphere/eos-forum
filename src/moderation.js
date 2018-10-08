@@ -17,9 +17,17 @@ class Moderation {
 
             for (var i = 0; i < storage.moderation.mods.length; i++) {
                 try {
-                    var endpoint = 'https://raw.githubusercontent.com/' + storage.moderation.mods[i] + '/master/' + key + '.json';
+                    var mod_value = storage.moderation.mods[i];
+                    var endpoint;
+                    if (mod_value.indexOf('https:') == 0) {
+                        endpoint = mod_value;
+                    }
+                    else {
+                        endpoint = 'https://raw.githubusercontent.com/' + mod_value + '/master';
+                    }
+
+                    endpoint = endpoint + '/' + key + '.json';
                     var json = JSON.parse(await Helpers.AsyncGet(endpoint));
-                    //console.log(json);
 
                     if (json.accounts) {
                         for (var j = 0; j < json.accounts.length; j++) {
@@ -56,6 +64,9 @@ class Moderation {
         }
         for (var i = 0; i < set2.accounts.length; i++) {
             accounts.push(set2.accounts[i]);
+        }
+        for (var i = 0; i < storage.moderation.accounts.length; i++) {
+            accounts.push(storage.moderation.accounts[i]);
         }
 
         return accounts;
