@@ -12,7 +12,7 @@
             <h1>No posts with #{{ tag }} found!</h1>
           </div>
         </div>
-        <div class="row mb-2" v-for="p in posts" :key="p.transaction">
+        <div class="row mb-2" v-for="p in posts" :key="p.o_id">
           <Post :history_modal="$refs.history_modal" :post="p" :show_content="true"></Post>
         </div>
         <div class="row mb-4">
@@ -107,7 +107,7 @@ export default {
           { $lookup: forum.lookup_post_replies() },
           { $lookup: forum.lookup_post_my_vote(identity.account) },
           { $project: forum.project_post({ 
-              normalize_my_vote: true, 
+              normalize_my_vote: true,
               recent_edit: true
             }) 
           },

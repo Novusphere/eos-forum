@@ -74,14 +74,14 @@ class NovusphereForum {
         };
     }
     match_posts_by_tag(tag) {
-        //
-        //  NOTE & TO-DO:
-        //  this is very inefficient using regex, build an index with novusphere-db
-        //  and use $in on the pre-processed hashtag array
-        //
+        if ((typeof tag) == "string") {
+            tag = [ tag ]; // turn into array
+        }
+
         return {
             "data.json_metadata.edit": false,
-            "data.content": { $regex: ".*#" + tag + ".*", $options: 'i' },
+            "data.tags": { $in: tag },
+            //"data.content": { $regex: ".*#" + tag + ".*", $options: 'i' },
             createdAt: {
                 $gte: 1531434299
             } /* Last eosforumtest contract redeploy */

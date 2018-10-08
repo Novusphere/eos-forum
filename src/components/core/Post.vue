@@ -85,7 +85,7 @@
           </div>
         </div>
     
-        <div v-for="child in post.children" :key="child.transaction">
+        <div v-for="child in post.children" :key="child.o_id">
                     <div v-if="!(child.hide)">
                         <Post :submit_modal="submit_modal"
                             :history_modal="history_modal" 
