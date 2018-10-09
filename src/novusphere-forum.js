@@ -78,6 +78,10 @@ class NovusphereForum {
             tag = [ tag ]; // turn into array
         }
 
+        for (var i = 0; i < tag.length; i++) {
+            tag[i] = tag[i].toLowerCase();
+        }
+
         return {
             "data.json_metadata.edit": false,
             "data.tags": { $in: tag },
@@ -281,7 +285,7 @@ class NovusphereForum {
                                 2
                             ]
                         },
-                        1.8
+                        1.1
                     ]
                 }
             ]
