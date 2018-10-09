@@ -26,7 +26,7 @@ async function GetPostDataFromBlockchain(txid) {
 
     try {
         tx_data.json_metadata = JSON.parse(tx_data.json_metadata);
-    } catch (ex) { 
+    } catch (ex) {
         // do nothing
     }
 
@@ -91,6 +91,12 @@ async function MigratePost(p) {
             if (host == 'i.imgur.com') {
                 attachment.display = 'img';
             }
+            if (host == 'twitter.com') {
+                attachment.value = 'https://twitframe.com/show?url=' + attachment.value;
+                attachment.width = 560;
+                attachment.height = 400;
+                attachment.display = 'iframe';
+            }
         }
 
         if (attachment.display == 'iframe') {
@@ -98,6 +104,15 @@ async function MigratePost(p) {
                 attachment.width = 560;
                 attachment.height = 315;
             }
+        }
+    }
+
+    if (p.parent) {
+        await MigratePost(p.parent);
+
+        if (p.parent.data.json_metadata) {
+            const title = p.parent.data.json_metadata.title;
+            p.data.json_metadata.title = title;
         }
     }
 

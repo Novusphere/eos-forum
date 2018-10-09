@@ -10,9 +10,10 @@
             </div>
             <div class="modal-body">
                 <div class="text-center">
-                    You have already used your free upvote on this post, however, you can use your ATMOS to upvote it further.
-                    Half of the ATMOS used to upvote this post will go to the poster and
+                    You have already used your free up vote on this post, however, you can use your ATMOS to up vote it further.
+                    Half of the ATMOS used to up vote this post will go to the poster and
                     the other half is send to novuspheredb account as a DAO fund.
+                    If you are up voting your own post, the entire amount will be sent to the DAO fund.
                     Enter the amount of ATMOS you would like to use below.
                 </div>
                 <form class="mt-3">
@@ -69,20 +70,26 @@ export default {
       ];
 
       const memo = "upvote for " + this.post.o_transaction;
-      const quantity = (parseFloat(this.atmos) / 2).toFixed(3) + " ATMOS";
+      const quantity =
+        (
+          parseFloat(this.atmos) /
+          (identity.account == this.post.data.poster ? 1 : 2)
+        ).toFixed(3) + " ATMOS";
 
       try {
         var contract = await eos.contract("novusphereio");
         var eostx = await contract.transaction(tx => {
-          tx.transfer(
-            {
-              from: identity.account,
-              to: this.post.data.poster,
-              quantity: quantity,
-              memo: memo
-            },
-            auth
-          );
+          if (identity.account != this.post.data.poster) {
+            tx.transfer(
+              {
+                from: identity.account,
+                to: this.post.data.poster,
+                quantity: quantity,
+                memo: memo
+              },
+              auth
+            );
+          }
           tx.transfer(
             {
               from: identity.account,

@@ -332,9 +332,9 @@ export default {
     },
     async upvote() {
       if (this.post.my_vote) {
-        if (this.post.data.poster != this.identity) {
+        //if (this.post.data.poster != this.identity) {
           window._VueApp.$refs.upvote.modal(this.post);
-        }
+        //}
         return;
       }
 

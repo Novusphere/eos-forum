@@ -6,11 +6,11 @@ ScatterJS.plugins( new ScatterEOS() );
 
 import { LoadStorage, storage } from '@/storage';
 
-const DEFAULT_IDENTITY = { account: '', auth: '', atmos: '0.000' };
+const DEFAULT_IDENTITY = { account: '', auth: '', atmos: '0.000', notifications: 0 };
 
 var _scatter = null;
 var _identity = DEFAULT_IDENTITY;
-var _lastIdentityUpdate = 0;
+var _onIdentityUpdate = null;
 
 const ScatterConfig = {
     blockchain: "eos",
@@ -45,6 +45,10 @@ ScatterJS.scatter.connect('eos-forum', { initTimeout: storage.settings.scatter_t
     }
 });
 
+function SetOnIdentityUpdate(cb) {
+    _onIdentityUpdate = cb;
+}
+
 function GetScatter() {
     return new Promise((resolve, reject) => {
 
@@ -77,24 +81,15 @@ async function GetScatterIdentity(tryPull) {
             _identity = {
                 account: identity.accounts[0].name,
                 auth: identity.accounts[0].authority,
-                atmos: '0.000'
+                atmos: '0.000',
+                notifications: 0
             };
         }
     }
 
     if (_identity.account) {
-        var now = (new Date()).getTime();
-        if (now - _lastIdentityUpdate >= 1000) {
-            _lastIdentityUpdate = now;
-
-            const eos = GetEOS();
-            var atmos = parseFloat((await eos.getCurrencyBalance("novusphereio", _identity.account, "ATMOS"))[0]);
-            atmos = (isNaN(atmos) ? 0 : atmos).toFixed(3);
-
-            _identity.atmos = atmos;
-        }
-        else {
-            //console.log('skipped pulling atmos');
+        if (_onIdentityUpdate) {
+            _onIdentityUpdate(_identity);
         }
     }
 
@@ -130,6 +125,7 @@ export {
     GetEOS,
     GetScatter,
     GetScatterIdentity,
+    SetOnIdentityUpdate,
     ForgetScatterIdentity,
     ScatterConfig,
     ScatterEosOptions

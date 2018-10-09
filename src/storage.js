@@ -7,6 +7,7 @@ var DEFAULT_STORAGE = {
     eos_referendum: true,
     subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "anon-pol-econ", "bounties", "test"],
     new_posts: {},
+    last_notification: 0,
     moderation: {
         hide_spam_threads: true,
         mods: [],

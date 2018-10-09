@@ -188,6 +188,7 @@ export default {
           type: "novusphere-forum",
           sub: this.sub,
           parent_uuid: post.parent_uuid,
+          parent_poster: post.parent_poster,
           edit: post.edit,
           attachment: {
             value: post.attachment.value.trim(),
@@ -355,7 +356,7 @@ export default {
         // for making a new post
         edit: false,
         parent_tx: "",
-        parent_account: "",
+        parent_poster: "",
         parent_uuid: "",
         title: "",
         content: "",

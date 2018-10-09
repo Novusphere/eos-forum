@@ -233,7 +233,8 @@ export default {
       const novusphere = GetNovusphere();
 
       var MATCH_QUERY = {
-        name: "propose"
+        name: "propose",
+        createdAt: { $gte: 1537221139 }
       };
 
       var apiResult = await novusphere.api({

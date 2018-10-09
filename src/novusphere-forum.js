@@ -25,6 +25,21 @@ class NovusphereForum {
     //
     //  MONGODB MATCH QUERY HELPERS
     //
+    match_notifications(account, last_notification) {
+        if (!last_notification) {
+            last_notification = 1539100000; // when notifications got introduced
+        }
+
+        return {
+            "createdAt": { $gt: last_notification },
+            "data.json_metadata.sub": { $exists: true, $ne: "" },
+            "data.poster": { $ne: account },
+            $or: [
+                { "data.reply_to_poster": account },
+                { "data.json_metadata.parent_poster": account }
+            ]
+        };
+    }
     match_thread(id) {
         if (id.length == 64) {
             return {

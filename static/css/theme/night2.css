@@ -37,6 +37,7 @@ hr {
 
 .post {
     border: 1px solid #f0b90b;
+    /*border-bottom: 1px solid #1f2833;*/
     background-color: #1f2833;
 }
 
