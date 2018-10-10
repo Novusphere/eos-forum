@@ -98,7 +98,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)">post</button>
-                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true)" v-if="is_anon_sub">post anon</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true, true)" v-if="is_anon_sub">post anon</button>
                 <button type="button" class="btn btn-outline-secondary" v-on:click="preview = true">preview</button>
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
               </div>
@@ -206,9 +206,10 @@ export default {
         this.set_status(text);
       }
     },
-    async postContent(anon) {
+    async postContent(anon, warnAnon) {
       var post = this.post;
       const eosService = GetEOSService();
+      const identity = await GetScatterIdentity();
 
       var txid;
       this.setStatus("Creating tx and broadcasting to EOS...");
@@ -219,7 +220,17 @@ export default {
         }
 
         if (anon) {
+
           // use eos-service to make anonymous post
+          if (warnAnon)  {
+            jQuery("#submitPost").modal("hide");
+            if (!(await confirm('Are you sure you want to post this anonymously?'))) {
+              this.setStatus("Error: post canceled");
+              return false;
+            }
+            jQuery("#submitPost").modal();
+          }
+
           var eostx = await eosService.anonymousPost(eosPost);
           if (eostx.error) {
             this.setStatus("Error: " + eostx.error);
@@ -227,7 +238,6 @@ export default {
             return false;
           }
         } else {
-          const identity = await GetScatterIdentity();
           const eos = GetEOS(await GetScatter());
 
           var tips = [];
