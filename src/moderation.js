@@ -3,50 +3,69 @@ import Helpers from "@/helpers";
 
 class Moderation {
     constructor() {
+        this.resetCache();
+    }
+
+    resetCache() {
         this.cache = {};
     }
-    
+
+    async resolve(value, key) {
+        var endpoint = value;
+        if ((endpoint.indexOf('https:') == 0) || (endpoint.indexOf('http:') == 0)) {
+            // pass do nothing
+        }
+        else if (endpoint.indexOf('/') > -1) { // github
+            endpoint = 'https://raw.githubusercontent.com/' + endpoint + '/master';
+        }
+        else { // eos account
+            // TO-DO: resolve eos account to URL ep
+            return null;
+        }
+
+        try {
+            endpoint = endpoint + '/' + key + '.json';
+            var json = JSON.parse(await Helpers.AsyncGet(endpoint));
+            return json;
+        }
+        catch (ex) {
+            // failed to parse
+            return null;
+        }
+    }
+
+    dateToKey(date) {
+        var key = (date.getUTCFullYear() * 100) + (date.getUTCMonth() + 1);
+        return key;
+    }
+
     async getCacheSet(createdAt) {
         var now = new Date().getTime();
         var date = new Date(createdAt * 1000);
-        var key = (date.getUTCFullYear() * 100) + (date.getUTCMonth() + 1); 
+        var key = this.dateToKey(date);
         var data = this.cache[key];
         if (data == null || (now - data.last_updated) >= 1000 * 60 * 10) { // update cache every 10 min
 
             data = { last_updated: now, accounts: [], transactions: [] };
 
             for (var i = 0; i < storage.moderation.mods.length; i++) {
-                try {
-                    var mod_value = storage.moderation.mods[i];
-                    var endpoint;
-                    if (mod_value.indexOf('https:') == 0) {
-                        endpoint = mod_value;
-                    }
-                    else {
-                        endpoint = 'https://raw.githubusercontent.com/' + mod_value + '/master';
-                    }
+                var json = await this.resolve(storage.moderation.mods[i], key);
+                if (json == null) { // failed to resolve
+                    continue;
+                }
 
-                    endpoint = endpoint + '/' + key + '.json';
-                    var json = JSON.parse(await Helpers.AsyncGet(endpoint));
-
-                    if (json.accounts) {
-                        for (var j = 0; j < json.accounts.length; j++) {
-                            data.accounts.push(json.accounts[j]);
-                        }
-                    }
-                    if (json.transactions) {
-                        for (var j = 0; j < json.transactions.length; j++) {
-                            data.transactions.push(json.transactions[j]);
-                        }
+                if (json.accounts) {
+                    for (var j = 0; j < json.accounts.length; j++) {
+                        data.accounts.push(json.accounts[j]);
                     }
                 }
-                catch (ex) {
-                    // pass
-                    //console.log(ex);
+                if (json.transactions) {
+                    for (var j = 0; j < json.transactions.length; j++) {
+                        data.transactions.push(json.transactions[j]);
+                    }
                 }
             }
 
-            //console.log(data);
             this.cache[key] = data;
         }
         return data;
@@ -76,17 +95,17 @@ class Moderation {
         if (account && storage.moderation.accounts.includes(account)) {
             return true;
         }
-        
+
         if (txid && storage.moderation.transactions.includes(txid)) {
             return true;
         }
-        
+
         if (!createdAt) {
             return false;
         }
 
         var set = await this.getCacheSet(createdAt);
-        return (account && set.accounts.includes(account)) || 
+        return (account && set.accounts.includes(account)) ||
             (txid && set.transactions.includes(txid));
     }
 };

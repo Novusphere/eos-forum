@@ -8,12 +8,12 @@
                   <!-- links to off-site content -->
                   <span v-if="post.o_attachment && post.o_attachment.type == 'url'">
                         <span class="title"><a target="_blank" :href="post.o_attachment.value">{{ title }}</a></span>
-                        <span class="text-xsmall">({{this.getHost(post.o_attachment.value)}} in <router-link :to="'/e/' + sub">eos.{{sub}}</router-link>)</span>
+                        <span class="text-xsmall">(<span class="text-highlight">{{this.getHost(post.o_attachment.value)}}</span> in <router-link :to="'/e/' + sub">self.{{sub}}</router-link>)</span>
                   </span>
                   <!-- links to on site content -->
                   <span v-else>
                         <span class="title"><router-link :to="thread_link">{{ title }}</router-link></span>
-                        <span v-if="sub" class="text-xsmall"><router-link :to="'/e/' + sub">(eos.{{sub}})</router-link></span>
+                        <span v-if="sub" class="text-xsmall"><router-link :to="'/e/' + sub">(self.{{sub}})</router-link></span>
                   </span>
                     
                   <span v-if="post.new_replies" class="badge badge-danger text-xsmall">new ({{post.new_replies}})</span>

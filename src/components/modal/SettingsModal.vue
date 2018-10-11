@@ -14,11 +14,14 @@
             <div class="modal-body">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                  <a class="nav-link active" data-toggle="tab" href="#settings-api" role="tab">Raw</a>
+                  <a class="nav-link active" data-toggle="tab" href="#settings-mod" role="tab">Delegated Moderation</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="tab" href="#settings-api" role="tab">Raw</a>
                 </li>
               </ul>
               <div class="tab-content mt-2">
-                <div class="tab-pane fade show active" id="settings-api" role="tabpanel">
+                <div class="tab-pane fade" id="settings-api" role="tabpanel">
                   <div class="text-center">
                       <p class="text-alert">
                           <strong>Warning:</strong> You should not modify these settings unless you know what you're doing! 
@@ -36,6 +39,33 @@
                     <button type="button" class="btn btn-outline-danger" v-on:click="forgetAll()">forget all</button>
                   </div>
                 </div>
+                <div class="tab-pane fade show active" id="settings-mod" role="tabpanel">
+                  <div class="text-center">
+                      <p class="text-highlight">
+                          Use this panel to control your delegated moderation settings. 
+                      </p>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Endpoint</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" v-model="new_mod" placeholder="ex: Novusphere/eos-forum-mod">
+                    </div>
+                    <div class="col-sm-2">
+                      <button type="button" class="btn btn-outline-primary" v-on:click="addMod()">add</button>
+                    </div>
+                  </div>
+                  <div v-for="(mod, index) in mods" :key="index" class="form-group row">
+                    <label class="col-sm-2 col-form-label"></label>
+                    <div class="col-sm-8">
+                      <input type="text" readonly class="form-control" :value="mod">
+                    </div>
+                    <div class="col-sm-2">
+                      <button type="button" class="btn btn-outline-danger" v-on:click="removeMod(index)">
+                        <font-awesome-icon :icon="['fas', 'times']" ></font-awesome-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="modal-footer">
@@ -51,6 +81,7 @@
 import { GetNovusphere } from "@/novusphere";
 import { GetEOS, ScatterConfig, ScatterEosOptions } from "@/eos";
 import { storage, DEFAULT_STORAGE, SaveStorage } from "@/storage";
+import { moderation } from "@/moderation";
 
 export default {
   name: "SettingsModal",
@@ -60,6 +91,7 @@ export default {
   methods: {
     async load(txid) {
       this.settings = JSON.stringify(storage.settings, null, 2);
+      this.mods = storage.moderation.mods;
     },
     reset() {
       this.settings = JSON.stringify(DEFAULT_STORAGE.settings, null, 2);
@@ -67,16 +99,45 @@ export default {
     save() {
       storage.settings = JSON.parse(this.settings);
       this.theme = storage.settings.theme;
+      this.mods = storage.moderation.mods;
       SaveStorage();
     },
     forgetAll() {
       window.__forgetStorage();
+    },
+    async addMod() {
+      if (storage.moderation.mods.includes(this.new_mod)) {
+        return;
+      }
+      
+      var key = moderation.dateToKey(new Date());
+      if ((await moderation.resolve(this.new_mod, key)) == null) {
+        if (!(await confirm('"' + this.new_mod + '" does not seem like a valid moderation endpoint, are you sure you want to add it?'))) {
+          return;
+        }
+      }
+
+      storage.moderation.mods.push(this.new_mod);
+      moderation.resetCache();
+      SaveStorage();
+
+      this.mods = storage.moderation.mods;
+      this.neW_mod = '';
+    },
+    removeMod(index) {
+      storage.moderation.mods.splice(index, 1);
+      moderation.resetCache();
+      SaveStorage();
+
+      this.mods = storage.moderation.mods;
     }
   },
   data() {
     return {
       settings: "",
-      theme: storage.settings.theme
+      theme: storage.settings.theme,
+      mods: [],
+      new_mod: ''
     };
   }
 };

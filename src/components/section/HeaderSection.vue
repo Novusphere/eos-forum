@@ -6,8 +6,13 @@
               <a v-on:click="login()" href="javascript:void(0)">login</a>
             </li>
             <li v-if="identity.account" class="list-inline-item">
-              <router-link :to="'/notifications'" class="text-highlight">
+              <router-link :to="'/u/' + identity.account" class="text-highlight">
                 {{ identity.account }} | {{ identity.atmos }} ATMOS
+              </router-link>
+            </li>
+            <li v-if="identity.account" class="list-inline-item">
+              <router-link :to="'/notifications'">
+                <font-awesome-icon :icon="['fas', 'bell']" ></font-awesome-icon>
                 <span v-if="identity.notifications" class="badge badge-danger">{{ identity.notifications }}</span>
               </router-link>
             </li>

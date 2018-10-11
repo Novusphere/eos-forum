@@ -223,12 +223,12 @@ export default {
 
           // use eos-service to make anonymous post
           if (warnAnon)  {
-            jQuery("#submitPost").modal("hide");
+
             if (!(await confirm('Are you sure you want to post this anonymously?'))) {
               this.setStatus("Error: post canceled");
               return false;
             }
-            jQuery("#submitPost").modal();
+            
           }
 
           var eostx = await eosService.anonymousPost(eosPost);

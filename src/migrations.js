@@ -97,6 +97,24 @@ async function MigratePost(p) {
                 attachment.height = 400;
                 attachment.display = 'iframe';
             }
+            if (host == 'soundcloud.com') {
+                try {
+                    var sc_json = await Helpers.AsyncGet('https://soundcloud.com/oembed?format=json&url=' + attachment.value);
+                    var sc_src = sc_json.html.match(/src=\".+\"/);
+                    if (sc_src.length > 0) {
+                        var sc_iframe = sc_src[0].substring(5);
+                        sc_iframe = sc_iframe.substring(0, sc_iframe.length - 1);
+
+                        attachment.value = sc_iframe;
+                        attachment.width = 560;
+                        attachment.height = 300;
+                        attachment.display = 'iframe';
+                    }
+                }
+                catch (sc_ex) {
+                    // pass
+                }
+            }
         }
 
         if (attachment.display == 'iframe') {

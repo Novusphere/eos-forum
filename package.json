@@ -11,6 +11,10 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.5",
+    "@fortawesome/free-brands-svg-icons": "^5.4.0",
+    "@fortawesome/free-solid-svg-icons": "^5.4.0",
+    "@fortawesome/vue-fontawesome": "^0.1.1",
     "bootstrap-vue": "^2.0.0-rc.11",
     "eosjs": "^15.0.6",
     "gh-pages": "^1.2.0",

@@ -40,6 +40,10 @@ export default {
       var success = true;
       var click_ok;
       _this.text = message;
+      
+      var oldModal = jQuery('.modal.show');
+      oldModal.modal("hide");
+
       jQuery("#confirmModal").modal({ backdrop: "static", keyboard: false });
 
       for (;;) {
@@ -59,6 +63,7 @@ export default {
       }
 
       jQuery("#confirmModal").modal("hide");
+      oldModal.modal();
 
       if (setStatus) {
         setStatus(null);
