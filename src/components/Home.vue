@@ -95,16 +95,16 @@ export default {
 
       //console.log(blocked_accounts);
 
-      apiResult = await novusphere.api({
+      var n_posts = (await novusphere.api({
         count: novusphere.config.collection,
         maxTimeMS: 1000,
         query: forum.match_threads(sub, blocked_accounts)
-      });
+      })).n;
 
-      var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
+      var numPages = Math.ceil(n_posts / MAX_ITEMS_PER_PAGE);
       const identity = await GetScatterIdentity();
 
-      apiResult = await novusphere.api({
+      var threads = (await novusphere.api({
         aggregate: novusphere.config.collection,
         maxTimeMS: 1000,
         cursor: {},
@@ -131,17 +131,48 @@ export default {
             })
           }
         ]
-      });
+      })).cursor.firstBatch;
 
-      var payload = apiResult.cursor.firstBatch;
+      var pinned_threads = (await novusphere.api({
+        aggregate: novusphere.config.collection,
+        maxTimeMS: 1000,
+        cursor: {},
+        pipeline: [
+          { $match: forum.match_thread_txids(await moderation.getPinned(sub)) },
+          { $lookup: forum.lookup_post_state() },
+          {
+            $project: forum.project_post({
+              normalize_up: true,
+              normalize_parent: true
+            })
+          },
+          { $lookup: forum.lookup_thread_replies() },
+          { $lookup: forum.lookup_post_my_vote(identity.account) },
+          {
+            $project: forum.project_post({
+              normalize_my_vote: true,
+              recent_edit: true,
+              total_replies: true
+            })
+          }
+        ]
+      })).cursor.firstBatch;
 
-      for (var i = 0; i < payload.length; i++) {
-        var post = payload[i];
+      threads = Array.concat(
+        pinned_threads,
+        threads.filter(t => !pinned_threads.find(t2 => t2.id == t.id))
+      );
+
+      for (var i = 0; i < threads.length; i++) {
+        var post = threads[i];
+        if (i < pinned_threads.length) {
+          post.is_pinned = true;
+        }
         await MigratePost(post);
 
         var old_replies = storage.new_posts[post.data.post_uuid];
         if (old_replies && isNaN(old_replies)) {
-          old_replies = old_replies.replies // migration to new format
+          old_replies = old_replies.replies; // migration to new format
         }
         post.new_replies =
           old_replies == undefined
@@ -152,7 +183,7 @@ export default {
 
       // push data to this
       this.isSubscribed = storage.subscribed_subs.includes(sub);
-      this.posts = payload;
+      this.posts = threads;
       this.pages = numPages;
       this.currentPage = currentPage;
       this.sub = sub;

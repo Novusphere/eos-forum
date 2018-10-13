@@ -52,6 +52,11 @@ class NovusphereForum {
             }
         }
     }
+    match_thread_txids(ids) {
+        return {
+            transaction: { $in: ids }
+        };
+    }
     match_thread_replies(uuid) {
         return { "data.reply_to_post_uuid": uuid };
     }
@@ -68,7 +73,7 @@ class NovusphereForum {
             query["data.json_metadata.sub"] = { $exists: true, $ne: "" };
         }
         else if (sub == "anon") {
-            query["data.json_metadata.sub"] = { $regex: "(^anon$|^anon-)", $options: 'i'  };
+            query["data.json_metadata.sub"] = { $regex: "(^anon$|^anon-)", $options: 'i' };
         }
 
         if (ignoreAccounts && ignoreAccounts.length > 0) {
@@ -90,7 +95,7 @@ class NovusphereForum {
     }
     match_posts_by_tag(tag) {
         if ((typeof tag) == "string") {
-            tag = [ tag ]; // turn into array
+            tag = [tag]; // turn into array
         }
 
         for (var i = 0; i < tag.length; i++) {
@@ -208,7 +213,7 @@ class NovusphereForum {
             total_replies: false,
             score: true
 
-        }, opts);   
+        }, opts);
 
         var query = {
             id: "$id",
@@ -216,8 +221,8 @@ class NovusphereForum {
             createdAt: "$createdAt",
             data: "$data",
             //state: "$state",
-            replies:"$replies",
-            up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },  
+            replies: "$replies",
+            up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
             up_atmos: !opts.normalize_up ? "$up_atmos" : { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] },
             parent: !opts.normalize_parent ? "$parent" : { $arrayElemAt: ["$parent", 0] },
             __score: "$__score",
@@ -231,7 +236,7 @@ class NovusphereForum {
 
         if (opts.recent_edit) {
             query['recent_edit'] = {
-                $arrayElemAt: [ { $filter: this.recent_edit() }, -1 ]
+                $arrayElemAt: [{ $filter: this.recent_edit() }, -1]
             };
         }
 
@@ -275,10 +280,10 @@ class NovusphereForum {
     score() {
         const unix_now = new Date().getTime() / 1000;
 
-        var adder = [1,  { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] }];
+        var adder = [1, { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] }];
         if (storage.settings.atmos_upvotes) {
             // factor in up_atmos
-            adder = [{$add: adder}, { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] }];
+            adder = [{ $add: adder }, { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] }];
         }
 
         return {

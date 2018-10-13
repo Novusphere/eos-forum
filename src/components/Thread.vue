@@ -168,7 +168,17 @@ export default {
 
         childPost.depth = 0;
         childPost.data.json_metadata.title = mainPost.data.json_metadata.title;
-        this.mainPost = childPost;
+
+        function updateChildDepth(p) {
+          for (var j = 0; j < p.children.length; j++) {
+            var child = p.children[j];
+            child.depth = p.depth + 1;
+            updateChildDepth(child);
+          }
+          return p;
+        }
+
+        this.mainPost = updateChildDepth(childPost);
       } else {
         this.mainPost = mainPost;
       }

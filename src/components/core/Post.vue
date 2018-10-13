@@ -40,6 +40,8 @@
                   <li v-if="history_modal && post.depth > 0" class="list-inline-item"><router-link :to="perma_link">permalink</router-link></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                   <li v-if="is_moderated" class="list-inline-item"><span class="badge badge-warning text-xsmall">spam</span></li>
+                  <li v-if="is_nsfw" class="list-inline-item"><span class="badge badge-nsfw text-xsmall">nsfw</span></li>
+                  <li v-if="post.is_pinned" class="list-inline-item"><span class="badge badge-pinned text-xsmall">pinned</span></li>
                   <li v-if="is_new" class="list-inline-item"><span class="badge badge-warning text-xsmall">new</span></li>
                 </ul>
             </div>
@@ -195,7 +197,11 @@ export default {
     },
     is_max_depth() {
       var depth_lim = Math.floor(window.innerWidth / 65);
-      return this.post.depth >= depth_lim;
+      var depth = this.post.depth;
+      if (this.post.parent) {
+        depth = depth - this.post.parent.depth; // relative deth
+      }
+      return depth >= depth_lim;
     },
     is_new() {
       if (!this.post.parent) {
@@ -233,9 +239,13 @@ export default {
 
       this.is_moderated = await moderation.isBlocked(
         this.post.createdAt,
-        this.post.transaction,
+        this.post.o_transaction,
         this.post.data.poster
       );
+
+      this.is_nsfw = 
+        (this.post.data.tags && this.post.data.tags.includes('nsfw')) ||
+        ((this.post.depth == 0) && (await moderation.isNsfw(this.post.createdAt, this.post.o_transaction)));
 
       if (this.show_content) {
         var md = new MarkdownParser(
@@ -399,7 +409,8 @@ export default {
       quick_reply: "",
       post_content: "",
       identity: "",
-      is_moderated: false
+      is_moderated: false,
+      is_nsfw: false
     };
   }
 };
