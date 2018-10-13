@@ -46,6 +46,16 @@
                       </p>
                   </div>
                   <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Known</label>
+                    <div class="col-sm-8">
+                      <select class="form-control" v-model="mod_list_value" @change="modListChange()">
+                        <option v-for="e in mod_list" :key="e.name" :value="e.endpoint">{{ e.name }}</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                  </div>
+                  <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Endpoint</label>
                     <div class="col-sm-8">
                       <input type="text" class="form-control" v-model="new_mod" placeholder="ex: Novusphere/eos-forum-mod">
@@ -82,6 +92,7 @@ import { GetNovusphere } from "@/novusphere";
 import { GetEOS, ScatterConfig, ScatterEosOptions } from "@/eos";
 import { storage, DEFAULT_STORAGE, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
+import Helpers from "@/helpers";
 
 export default {
   name: "SettingsModal",
@@ -92,6 +103,16 @@ export default {
     async load(txid) {
       this.settings = JSON.stringify(storage.settings, null, 2);
       this.mods = storage.moderation.mods;
+      await this.loadReccomendedMods();
+    },
+    async loadReccomendedMods() {
+      var git = JSON.parse(await Helpers.AsyncGet(
+        "https://raw.githubusercontent.com/Novusphere/eos-forum-mod-list/master/list.json"
+      )); 
+      this.mod_list = git.list;
+    },
+    modListChange() {
+      this.new_mod = this.mod_list_value;
     },
     reset() {
       this.settings = JSON.stringify(DEFAULT_STORAGE.settings, null, 2);
@@ -109,10 +130,16 @@ export default {
       if (storage.moderation.mods.includes(this.new_mod)) {
         return;
       }
-      
+
       var key = moderation.dateToKey(new Date());
       if ((await moderation.resolve(this.new_mod, key)) == null) {
-        if (!(await confirm('"' + this.new_mod + '" does not seem like a valid moderation endpoint, are you sure you want to add it?'))) {
+        if (
+          !await confirm(
+            '"' +
+              this.new_mod +
+              '" does not seem like a valid moderation endpoint, are you sure you want to add it?'
+          )
+        ) {
           return;
         }
       }
@@ -122,7 +149,7 @@ export default {
       SaveStorage();
 
       this.mods = storage.moderation.mods;
-      this.neW_mod = '';
+      this.new_mod = "";
     },
     removeMod(index) {
       storage.moderation.mods.splice(index, 1);
@@ -137,7 +164,9 @@ export default {
       settings: "",
       theme: storage.settings.theme,
       mods: [],
-      new_mod: ''
+      mod_list: [],
+      mod_list_value: "",
+      new_mod: ""
     };
   }
 };
