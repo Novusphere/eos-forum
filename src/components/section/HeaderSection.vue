@@ -34,6 +34,9 @@
           </ul>
       </div>
       <div class="header-second mb-3">
+        <div class="text-center ml-1 mr-1" v-html="random_header">
+            Did you know that the Novusphere team runs a moderated version of the forum at forum.novusphere.io?
+        </div>
         <div class="ml-3">
           <slot></slot>
         </div>
@@ -42,6 +45,19 @@
 </template>
 
 <script>
+var HEADER_TEXTS = [
+  'Did you know you in your **settings** you can set delegated moderators to help filter spam?',
+  'Did you know you can block users who post spam by clicking their name to visit their profile and then clicking block?',
+  'Did you know you can post without an account in any of the **anon-** subs?'
+];
+
+if (window.__PRESETS__) {
+  if (window.__PRESETS__.header_texts) {
+    HEADER_TEXTS = window.__PRESETS__.header_texts;
+  }
+}
+
+import { MarkdownParser } from "@/markdown";
 import { storage } from "@/storage";
 import {
   DEFAULT_IDENTITY,
@@ -78,12 +94,17 @@ SetOnIdentityUpdate(async function(_identity) {
       maxTimeMS: 1000,
       cursor: {},
       pipeline: [
-        { $match: forum.match_notifications(_identity.account, storage.last_notification) },
+        {
+          $match: forum.match_notifications(
+            _identity.account,
+            storage.last_notification
+          )
+        },
         { $count: "n" }
       ]
     })).cursor.firstBatch;
 
-    _identity.notifications = (notifications.length>0) ? notifications[0].n : 0;
+    _identity.notifications = notifications.length > 0 ? notifications[0].n : 0;
   }
 });
 
@@ -96,11 +117,14 @@ export default {
     }
   },
   async mounted() {
+    var header_text = HEADER_TEXTS[Math.floor(Math.random() * HEADER_TEXTS.length)];
+    this.random_header = new MarkdownParser(header_text).html;
+
     await this.setIdentity();
-    window.addEventListener('identity', this.setIdentity);
+    window.addEventListener("identity", this.setIdentity);
   },
   async beforeDestroy() {
-    window.removeEventListener('identity', this.setIdentity);
+    window.removeEventListener("identity", this.setIdentity);
   },
   methods: {
     async setIdentity(wait) {
@@ -133,7 +157,8 @@ export default {
   data() {
     return {
       identity: DEFAULT_IDENTITY,
-      eos_referendum: storage.eos_referendum
+      eos_referendum: storage.eos_referendum,
+      random_header: ''
     };
   }
 };

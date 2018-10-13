@@ -64,6 +64,7 @@
               <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="collapse" :data-target="'#qreply-' + post.data.post_uuid" v-on:click="showQuickReply()">quick reply</button>
               <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="reply()">reply</button>
               <button v-if="post.data.poster == identity" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="edit()">edit</button>
+              <router-link :to="perma_link" v-if="is_max_depth && post.children.length>0" class="btn btn-sm btn-outline-primary">view replies</router-link>
             </li>
             <li class="list-inline-item" v-if="(is_child || (!submit_modal && this.hasAttachment('iframe'))) && post.o_attachment && post.o_attachment.value">
                 <button 
@@ -86,15 +87,15 @@
           </div>
         </div>
     
-        <div v-for="child in post.children" :key="child.o_id">
-                    <div v-if="!(child.hide)">
+        <div v-if="!is_max_depth" v-for="child in post.children" :key="child.o_id">
+          <div v-if="!(child.hide)">
                         <Post :submit_modal="submit_modal"
                             :history_modal="history_modal" 
                             :post="child"
                             :op="op"
                             :show_content="true">
                         </Post>
-                    </div>
+          </div>
         </div>
       </div>
     </div>  
@@ -192,6 +193,10 @@ export default {
       friendly = friendly.replace(/ /g, "_");
       return friendly;
     },
+    is_max_depth() {
+      var depth_lim = Math.floor(window.innerWidth / 65);
+      return this.post.depth >= depth_lim;
+    },
     is_new() {
       if (!this.post.parent) {
         return false;
@@ -218,7 +223,6 @@ export default {
     },
     thread_link() {
       var txid = this.post.parent ? this.post.parent.o_id : this.post.o_id;
-
       return "/e/" + this.sub + "/" + txid + "/" + this.friendly_title;
     }
   },
@@ -344,7 +348,7 @@ export default {
     async upvote() {
       if (this.post.my_vote) {
         //if (this.post.data.poster != this.identity) {
-          window._VueApp.$refs.upvote.modal(this.post);
+        window._VueApp.$refs.upvote.modal(this.post);
         //}
         return;
       }

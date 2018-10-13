@@ -46,30 +46,30 @@
                       </p>
                   </div>
                   <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Known</label>
-                    <div class="col-sm-8">
+                    <label class="col-2 col-form-label">Known</label>
+                    <div class="col-8">
                       <select class="form-control" v-model="mod_list_value" @change="modListChange()">
                         <option v-for="e in mod_list" :key="e.name" :value="e.endpoint">{{ e.name }}</option>
                       </select>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-2">
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Endpoint</label>
-                    <div class="col-sm-8">
-                      <input type="text" class="form-control" v-model="new_mod" placeholder="ex: Novusphere/eos-forum-mod">
+                    <label class="col-2 col-form-label"></label>
+                    <div class="col-8">
+                      <input type="text" class="form-control" v-model="new_mod" placeholder="endpoint">
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-2">
                       <button type="button" class="btn btn-outline-primary" v-on:click="addMod()">add</button>
                     </div>
                   </div>
                   <div v-for="(mod, index) in mods" :key="index" class="form-group row">
-                    <label class="col-sm-2 col-form-label"></label>
-                    <div class="col-sm-8">
+                    <label class="col-2 col-form-label"></label>
+                    <div class="col-8">
                       <input type="text" readonly class="form-control" :value="mod">
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-2">
                       <button type="button" class="btn btn-outline-danger" v-on:click="removeMod(index)">
                         <font-awesome-icon :icon="['fas', 'times']" ></font-awesome-icon>
                       </button>
