@@ -40,6 +40,7 @@
                   <li v-if="history_modal && post.depth > 0" class="list-inline-item"><router-link :to="perma_link">permalink</router-link></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                   <li v-if="is_moderated" class="list-inline-item"><span class="badge badge-warning text-xsmall">spam</span></li>
+                  <li v-if="is_new" class="list-inline-item"><span class="badge badge-warning text-xsmall">new</span></li>
                 </ul>
             </div>
         </div>
@@ -190,6 +191,16 @@ export default {
       var friendly = this.title.replace(/[^a-zA-Z0-9 ]/g, "");
       friendly = friendly.replace(/ /g, "_");
       return friendly;
+    },
+    is_new() {
+      if (!this.post.parent) {
+        return false;
+      }
+      var seen = this.post.parent.__seen;
+      if (!seen) {
+        return false;
+      }
+      return this.post.createdAt > seen;
     },
     sub() {
       return this.post.data.json_metadata.sub;

@@ -84,6 +84,8 @@ async function GetScatterIdentity(tryPull) {
                 atmos: '0.000',
                 notifications: 0
             };
+
+            window.dispatchEvent(new Event('identity'));
         }
     }
 
@@ -101,6 +103,8 @@ async function ForgetScatterIdentity() {
     scatter.forgetIdentity();
 
     _identity = DEFAULT_IDENTITY;
+    //window.dispatchEvent(new Event('identity'));
+
     return _identity;
 }
 

@@ -96,11 +96,18 @@ export default {
     }
   },
   async mounted() {
-    this.identity = await GetScatterIdentity();
+    await this.setIdentity();
+    window.addEventListener('identity', this.setIdentity);
+  },
+  async beforeDestroy() {
+    window.removeEventListener('identity', this.setIdentity);
   },
   methods: {
+    async setIdentity(wait) {
+      this.identity = await GetScatterIdentity(wait);
+    },
     async login() {
-      this.identity = await GetScatterIdentity(true);
+      await this.setIdentity(true);
       if (this.identity.account) {
         if (this.load) {
           this.load();

@@ -86,6 +86,9 @@ export default {
 
       await MigratePost(mainPost);
 
+      var mp_np = storage.new_posts[mainPost.data.post_uuid];
+      mainPost.__seen = (mp_np) ? mp_np.seen : ((new Date().getTime()) / 1000);
+
       var responses = (await novusphere.api({
         aggregate: novusphere.config.collection,
         maxTimeMS: 1000,
@@ -104,9 +107,6 @@ export default {
       })).cursor.firstBatch;
 
       responses.splice(0, 0, mainPost);
-      //console.log(mainPost.__score);
-      //console.log(mainPost.up);
-      //console.log(mainPost.up_atmos);
 
       var commentMap = {};
       var new_posts = 0;
@@ -149,7 +149,10 @@ export default {
       }
 
       // only count non-edits for new_posts length
-      storage.new_posts[mainPost.data.post_uuid] = new_posts;
+      storage.new_posts[mainPost.data.post_uuid] = {
+        replies: new_posts,
+        seen: new Date().getTime() / 1000
+      };
       SaveStorage();
 
       // permalink child
@@ -158,8 +161,7 @@ export default {
         var childPost;
         if (childId.length == 64) {
           childPost = responses.find(p => p.transaction == childTxId);
-        }
-        else {
+        } else {
           childId = parseInt(childId);
           childPost = responses.find(p => p.id == childId);
         }

@@ -140,6 +140,9 @@ export default {
         await MigratePost(post);
 
         var old_replies = storage.new_posts[post.data.post_uuid];
+        if (old_replies && isNaN(old_replies)) {
+          old_replies = old_replies.replies // migration to new format
+        }
         post.new_replies =
           old_replies == undefined
             ? post.total_replies + 1
