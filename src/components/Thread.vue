@@ -160,10 +160,10 @@ export default {
         var childId = this.$route.params.child_id;
         var childPost;
         if (childId.length == 64) {
-          childPost = responses.find(p => p.transaction == childTxId);
+          childPost = responses.find(p => p.transaction == childId);
         } else {
           childId = parseInt(childId);
-          childPost = responses.find(p => p.id == childId);
+          childPost = responses.find(p => p.o_id == childId);
         }
 
         childPost.depth = 0;

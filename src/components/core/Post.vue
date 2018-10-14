@@ -223,7 +223,7 @@ export default {
       if (this.post.parent) {
         path += this.post.parent.o_id + "/";
       }
-      path += this.friendly_title + "/" + this.post.id;
+      path += this.friendly_title + "/" + this.post.o_id;
       return path;
     },
     thread_link() {
