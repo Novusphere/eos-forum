@@ -42,7 +42,8 @@
                 <div class="tab-pane fade show active" id="settings-mod" role="tabpanel">
                   <div class="text-center">
                       <p class="text-highlight">
-                          Use this panel to control your delegated moderation settings. 
+                          Use this panel to control your delegated moderation settings.
+                          <a target="_blank" href="https://github.com/Novusphere/eos-forum-mod-list">Click here to learn more</a>.
                       </p>
                   </div>
                   <div class="form-group row">

@@ -79,8 +79,7 @@ async function MigratePost(p) {
                 host = 'youtube.com';
             }
             if (host == 'youtube.com' || host == 'www.youtube.com') {
-                var rx = /v\=[A-Za-z0-9_\-]+/;
-                var vid = attachment.value.match(rx);
+                var vid = attachment.value.match(/v\=[A-Za-z0-9_\-]+/);
                 if (vid && vid.length > 0) {
                     attachment.width = 560;
                     attachment.height = 315;
@@ -113,6 +112,15 @@ async function MigratePost(p) {
                 }
                 catch (sc_ex) {
                     // pass
+                }
+            }
+            if (host == 'bitchute.com' || host == 'www.bitchute.com') {
+                var vid = attachment.value.match(/video\/[a-zA-Z0-9]+/);
+                if (vid && vid.length > 0) {
+                    attachment.width = 560;
+                    attachment.height = 315;
+                    attachment.value = 'https://www.bitchute.com/embed/' + vid[0].substring(6);
+                    attachment.display = 'iframe';
                 }
             }
         }

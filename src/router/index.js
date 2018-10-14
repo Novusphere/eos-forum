@@ -6,8 +6,9 @@ import Test from '@/components/Test';
 import Thread from '@/components/Thread';
 import UserProfile from '@/components/UserProfile';
 import UserNotifications from "@/components/UserNotifications";
-import Referendum from '@/components/Referendum';
-import Tag from "@/components/Tag";
+import Referendum from '@/components/Referendum'
+import Tag from "@/components/Tag";;
+import Search from "@/components/Search";
 
 Vue.use(Router)
 
@@ -37,6 +38,11 @@ export default new Router({
       path: '/tag/:tag',
       name: "Tag",
       component: Tag
+    },
+    {
+      path: '/search',
+      name: "Search",
+      component: Search
     },
     {
       path: '/notifications',

@@ -19,7 +19,6 @@
                   <span v-if="post.new_replies" class="badge badge-danger text-xsmall">new ({{post.new_replies}})</span>
                 </div>
           </span>
-
           <div class="text-xsmall">
                 <ul class="list-inline">
                   <li v-if="show_content" class="list-inline-item">
