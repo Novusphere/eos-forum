@@ -6,7 +6,7 @@
               <a v-on:click="login()" href="javascript:void(0)">login</a>
             </li>
             <li v-if="identity.account" class="list-inline-item">
-              <router-link :to="'/u/' + identity.account" class="text-highlight">
+              <router-link :to="'/u/' + identity.account" class="text-mine">
                 {{ identity.account }} | {{ identity.atmos }} ATMOS
               </router-link>
             </li>
@@ -23,7 +23,7 @@
               <a href="#settings" data-toggle="modal">settings</a>
             </li>
             <li v-if="eos_referendum" class="list-inline-item">
-              <router-link :to="'/referendum'" class="text-highlight">eos-referendum</router-link>
+              <router-link :to="'/referendum'">eos-referendum</router-link>
             </li>
             <li class="list-inline-item">
               <a href="#faq" data-toggle="modal">faq/help</a>
@@ -32,23 +32,27 @@
           <ul class="list-inline">
             <li v-for="sub in subs" :key="sub" class="list-inline-item"><router-link :to="'/e/' + sub">{{sub}}</router-link></li>
           </ul>
-      </div>
-      <div class="header-second mb-3">
-        <div class="text-center ml-1 mr-1" v-html="random_header">
+          <div class="text-center ml-1 mr-1" v-html="random_header">
             Did you know that the Novusphere team runs a moderated version of the forum at forum.novusphere.io?
-        </div>
+          </div>
+      </div>
+      <div class="header-second">
         <div class="ml-3">
           <slot></slot>
+          <div class="mt-1"></div>
         </div>
       </div>
     </div>
 </template>
 
 <script>
+import { MarkdownParser } from "@/markdown";
+
 var HEADER_TEXTS = [
-  'Did you know you in your **settings** you can set delegated moderators to help filter spam?',
-  'Did you know you can block users who post spam by clicking their name to visit their profile and then clicking block?',
-  'Did you know you can post without an account in any of the **anon-** subs?'
+  "Did you know you in your **settings** you can toggle between a day and night theme?",
+  "Did you know you in your **settings** you can set delegated moderators to help filter spam?",
+  "Did you know you can block users who post spam by clicking their name to visit their profile and then clicking block?",
+  "Did you know you can post without an account in any of the **anon-** subs?"
 ];
 
 if (window.__PRESETS__) {
@@ -57,7 +61,6 @@ if (window.__PRESETS__) {
   }
 }
 
-import { MarkdownParser } from "@/markdown";
 import { storage } from "@/storage";
 import {
   DEFAULT_IDENTITY,
@@ -117,7 +120,8 @@ export default {
     }
   },
   async mounted() {
-    var header_text = HEADER_TEXTS[Math.floor(Math.random() * HEADER_TEXTS.length)];
+    var header_text =
+      HEADER_TEXTS[Math.floor(Math.random() * HEADER_TEXTS.length)];
     this.random_header = new MarkdownParser(header_text).html;
 
     await this.setIdentity();
@@ -158,7 +162,7 @@ export default {
     return {
       identity: DEFAULT_IDENTITY,
       eos_referendum: storage.eos_referendum,
-      random_header: ''
+      random_header: ""
     };
   }
 };

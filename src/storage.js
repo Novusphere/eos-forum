@@ -17,7 +17,7 @@ var DEFAULT_STORAGE = {
     settings: {
         atmos_upvotes: true,
         scatter_timeout: 1500,
-        theme: "https://eos-forum.org/static/css/theme/night.css",
+        theme: "https://eos-forum.org/static/css/theme/day.css",
         novusphere_api: "https://db.novusphere.io",
         eos_api: {
             host: "eos.greymass.com", // ( or null if endorsed chainId )

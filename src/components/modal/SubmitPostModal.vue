@@ -99,7 +99,7 @@
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)">post</button>
                 <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true, true)" v-if="is_anon_sub">post anon</button>
-                <button type="button" class="btn btn-outline-secondary" v-on:click="preview = true">preview</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="preview = true">preview</button>
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
               </div>
             </div>

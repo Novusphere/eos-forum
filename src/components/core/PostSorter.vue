@@ -1,6 +1,6 @@
 <template>
       <div class="dropdown d-inline-block">
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
           {{ by }}
         </button>
         <div class="dropdown-menu">

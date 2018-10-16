@@ -3,9 +3,9 @@
     <SubmitPostModal ref="submit_modal" :sub="sub" :postContentCallback="postContent"></SubmitPostModal>
     <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
-      <button v-if="!isSubscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-outline-primary ml-1">subscribe</button>
-      <button v-if="isSubscribed" v-on:click="subscribe(false)" type="button" class="btn btn-outline-danger ml-1">unsubscribe</button>
-      <button type="button" class="btn btn-outline-primary" v-on:click="newPost()">new</button>
+      <button v-if="!isSubscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary ml-1">subscribe</button>
+      <button v-if="isSubscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger ml-1">unsubscribe</button>
+      <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="newPost()">new</button>
       <PostSorter ref="sorter" :change="load"></PostSorter>
     </HeaderSection>
     <MainSection>
@@ -15,9 +15,15 @@
                 <h1>There doesn't seem to be any posts here! Why not make one?</h1>
               </div>
         </div>
-        <div class="row mb-2" v-for="p in posts" :key="p.transaction">
-          <Post :submit_modal="$refs.submit_modal" :post="p" :show_content="false"></Post>
-        </div>
+     
+          <Post 
+            v-for="p in posts" 
+            :key="p.transaction" 
+            :submit_modal="$refs.submit_modal" 
+            :post="p" 
+            :show_content="false">
+          </Post>
+     
         <div class="row mb-4">
             <div class="col-12">
               <div class="float-right">

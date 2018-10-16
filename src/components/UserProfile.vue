@@ -3,9 +3,9 @@
         <PostHistoryModal ref="history_modal"></PostHistoryModal>
         <HeaderSection :load="load">
             <span class="title mr-3"><router-link :to="'/u/' + account">{{account}}</router-link></span>
-            <a target="_blank" class="btn btn-outline-primary ml-1" :href="'https://eosq.app/account/' + account">view on chain</a>
+            <a target="_blank" class="btn btn-sm btn-outline-primary ml-1" :href="'https://eosq.app/account/' + account">view on chain</a>
             <PostSorter ref="sorter" :change="load"></PostSorter>
-            <button class="btn btn-outline-warning ml-1" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
+            <button class="btn btn-sm btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
         </HeaderSection>
         <MainSection>
         <div>

@@ -12,9 +12,15 @@
             <h1>No posts with #{{ tag }} found!</h1>
           </div>
         </div>
-        <div class="row mb-2" v-for="p in posts" :key="p.o_id">
-          <Post :history_modal="$refs.history_modal" :post="p" :show_content="true"></Post>
-        </div>
+
+          <Post 
+            v-for="p in posts" 
+            :key="p.o_id" 
+            :history_modal="$refs.history_modal" 
+            :post="p" 
+            :show_content="true">
+          </Post>
+
         <div class="row mb-4">
             <div class="col-12">
               <div class="float-right">

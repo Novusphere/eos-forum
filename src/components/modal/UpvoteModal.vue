@@ -34,7 +34,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary" v-on:click="upvote()">upvote</button>
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">close</button>
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
             </div>
           </div>
         </div>

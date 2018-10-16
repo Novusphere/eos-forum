@@ -2,7 +2,7 @@
   <div>
     <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/referendum'">EOS Referendum</router-link></span>
-      <button type="button" class="btn btn-outline-secondary ml-1" v-on:click="newProposal()">new</button>
+      <button type="button" class="btn btn-outline-primary ml-1" v-on:click="newProposal()">new</button>
     </HeaderSection>
     <MainSection>
       <div>
@@ -25,7 +25,7 @@
                     <ul class="list-inline">
                     <li class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + p.transaction"></a></li>
                     <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
-                    <li class="list-inline-item">by <router-link :to="'/u/' + p.data.proposer" :class="(p.data.proposer == identity) ? 'text-highlight' : ''">{{ p.data.proposer }}</router-link></li>
+                    <li class="list-inline-item">by <router-link :to="'/u/' + p.data.proposer" :class="(p.data.proposer == identity) ? 'text-mine' : ''">{{ p.data.proposer }}</router-link></li>
                     <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + p.transaction">on chain</a></li>
                     </ul>
                 </div>
@@ -36,7 +36,7 @@
                         <ul class="list-inline">
                             <li class="list-inline-item">
                                 <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="proposalStatus(p.transaction)">{{ p.expired ? ' results' : 'status' }}</button>
-                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="castVote(p.transaction, 1)">vote for</button>
+                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-primary" v-on:click="castVote(p.transaction, 1)">vote for</button>
                                 <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-danger" v-on:click="castVote(p.transaction, 0)">vote against</button>
                             </li>
                             <li v-if="p.data.proposer == identity" class="list-inline-item">
@@ -151,7 +151,7 @@
             <div class="modal-footer">
                 <div v-if="!post.preview">
                     <button type="button" class="btn btn-outline-primary" v-on:click="submitProposal()">post</button>
-                    <button type="button" class="btn btn-outline-secondary" v-on:click="post.preview = true">preview</button>
+                    <button type="button" class="btn btn-outline-primary" v-on:click="post.preview = true">preview</button>
                     <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
                 </div>
                 <div v-else>

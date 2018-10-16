@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-3 mr-3">
+    <div class="container-fluid main-section">
       <div class="row">
         <div class="col-md-12">
           <div class="ml-2 mr-2">
@@ -17,8 +17,8 @@
                 </p> 
                 <p class="text-center">
                   This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub Pages</a> and is fully <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
-                  Developers of take no responsibility for the content displayed.
-                  No images, files or media are hosted by eos-forum, please contact the respective site owners hosting content in breach of DMCA.
+                  The developers of this software take no responsibility for the content displayed.
+                  No images, files or media are hosted by the forum, please contact the respective site owners hosting content in breach of DMCA.
                 </p>
               <div class="row">
                   <div class="col-12">
@@ -36,12 +36,17 @@
 </template>
 
 <script>
+import { MarkdownParser } from "@/markdown";
+
 export default {
   name: "MainSection",
-  async mounted() {},
+  async mounted() {
+  },
   methods: {},
   data() {
-    return {};
+    return {
+      random_header: ""
+    };
   }
 };
 </script>

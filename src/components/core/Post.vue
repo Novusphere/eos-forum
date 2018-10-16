@@ -1,5 +1,5 @@
 <template>
-    <div :class="'col-md-12 mb-3 post ' + (((post.depth%2)==1) ? 'post-odd' : '')">
+    <div :class="'col-md-12 mb-3 post ' + ((post.depth>0) ? 'post-child' : '')">
       <div class="row">
         <div class="col-md-12">
           <!-- title -->
@@ -8,35 +8,37 @@
                   <!-- links to off-site content -->
                   <span v-if="post.o_attachment && post.o_attachment.type == 'url'">
                         <span class="title"><a target="_blank" :href="post.o_attachment.value">{{ title }}</a></span>
-                        <span class="text-xsmall">(<span class="text-highlight">{{this.getHost(post.o_attachment.value)}}</span> in <router-link :to="'/e/' + sub">self.{{sub}}</router-link>)</span>
+                        <span class="text-xsmall domain">(<span class="domain-offsite">{{this.getHost(post.o_attachment.value)}}</span> in <router-link :to="'/e/' + sub">self.{{sub}}</router-link>)</span>
                   </span>
                   <!-- links to on site content -->
                   <span v-else>
                         <span class="title"><router-link :to="thread_link">{{ title }}</router-link></span>
-                        <span v-if="sub" class="text-xsmall"><router-link :to="'/e/' + sub">(self.{{sub}})</router-link></span>
+                        <span v-if="sub" class="text-xsmall domain"><router-link :to="'/e/' + sub">(self.{{sub}})</router-link></span>
                   </span>
                     
                   <span v-if="post.new_replies" class="badge badge-danger text-xsmall">new ({{post.new_replies}})</span>
                 </div>
           </span>
-          <div class="text-xsmall">
+          <div class="text-xsmall post-buttons">
                 <ul class="list-inline">
                   <li v-if="show_content" class="list-inline-item">
                     <a class="post-collapse" data-toggle="collapse" :href="'#post-' + post.transaction"></a>
                   </li>
                   <li class="list-inline-item">
-                    <a :class="(post.my_vote ? 'text-highlight': '')" href="javascript:void(0)" v-on:click="upvote()">▲ {{post.up}} upvotes</a>
+                    <a :class="(post.my_vote ? 'text-mine': '')" href="javascript:void(0)" v-on:click="upvote()">
+                      <font-awesome-icon :icon="['fas', 'arrow-up']" ></font-awesome-icon> 
+                      {{post.up}} upvotes
+                    </a>
                   </li>
                   <li class="list-inline-item" v-if="!show_content">
                     <router-link :to="thread_link">{{ post.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item"><router-link :to="thread_link">{{ new Date(post.createdAt * 1000).toLocaleString() }}</router-link></li>
                   <li class="list-inline-item">
-                    by <router-link :to="'/u/' + post.data.poster" :class="(post.data.poster == identity) ? 'text-highlight' : ''">{{ post.data.poster }}</router-link>
+                    by <router-link :to="'/u/' + post.data.poster" :class="((post.data.poster == identity) ? 'text-mine' : 'author')">{{ post.data.poster }}</router-link>
                     <span v-if="op != 'eosforumanon' && post.data.poster == op" class="badge badge-success">op</span>
                   </li>
                   <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
-                  <li v-if="history_modal && post.depth > 0" class="list-inline-item"><router-link :to="perma_link">permalink</router-link></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                   <li v-if="is_moderated" class="list-inline-item"><span class="badge badge-warning text-xsmall">spam</span></li>
                   <li v-if="is_nsfw" class="list-inline-item"><span class="badge badge-nsfw text-xsmall">nsfw</span></li>
@@ -59,21 +61,29 @@
                 
         <p class="post-content" v-html="post_content"></p>
 
-        <div class="text-xsmall">
+        <div class="text-xsmall post-buttons-bottom">
           <ul class="list-inline">
+            <li class="list-inline-item" v-if="history_modal && post.depth > 0">
+              <router-link :to="perma_link">permalink</router-link>
+            </li>
+            <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub) && (post.data.poster == identity)">
+              <a href="javascript:void(0)" v-on:click="edit()">edit</a>
+            </li>
             <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
-              <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="collapse" :data-target="'#qreply-' + post.data.post_uuid" v-on:click="showQuickReply()">quick reply</button>
-              <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="reply()">reply</button>
-              <button v-if="post.data.poster == identity" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="edit()">edit</button>
-              <router-link :to="perma_link" v-if="is_max_depth && post.children.length>0" class="btn btn-sm btn-outline-primary">view replies</router-link>
+              <a href="javascript:void(0)" class="highlight" data-toggle="collapse" :data-target="'#qreply-' + post.data.post_uuid" v-on:click="showQuickReply()">quick-reply</a>
+            </li>
+            <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
+              <a href="javascript:void(0)" class="highlight" v-on:click="reply()">reply</a>
+            </li>
+            <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
+              <router-link :to="perma_link" class="highlight" v-if="is_max_depth && post.children.length>0">view replies</router-link>
             </li>
             <li class="list-inline-item" v-if="(is_child || (!submit_modal && this.hasAttachment('iframe'))) && post.o_attachment && post.o_attachment.value">
-                <button 
+                <a href="javascript:void(0)" class="highlight"
                   v-on:click="showAttachment()"
-                  data-toggle="collapse" :data-target="'#content-' + post.data.post_uuid"
-                  type="button" class="btn btn-sm btn-outline-danger">
+                  data-toggle="collapse" :data-target="'#content-' + post.data.post_uuid">
                     show attachment
-                </button>
+                </a>
             </li>
           </ul>
         </div>
@@ -83,8 +93,8 @@
             <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
           </div>
           <div class="col-sm-2 mt-1 mb-2">
-            <button v-if="identity" type="button" class="btn btn-sm btn-outline-secondary" v-on:click="quickReply(false)">post</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="quickReply(true)">post anon</button>
+            <button v-if="identity" type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(false)">post</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(true)">post anon</button>
           </div>
         </div>
     
@@ -256,6 +266,7 @@ export default {
 
         // only allow one attachment through
         if (md.attachments.length > 0) {
+          this.post.o_attachment = md.attachments[0];
           this.post.data.json_metadata.attachment = md.attachments[0];
         }
       }
