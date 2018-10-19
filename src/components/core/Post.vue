@@ -34,11 +34,15 @@
                     <router-link :to="thread_link">{{ post.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item"><router-link :to="thread_link">{{ new Date(post.createdAt * 1000).toLocaleString() }}</router-link></li>
-                  <li class="list-inline-item">
+                  <li v-if="!reddit" class="list-inline-item">
                     by <router-link :to="'/u/' + post.data.poster" :class="((post.data.poster == identity) ? 'text-mine' : 'author')">{{ post.data.poster }}</router-link>
                     <span v-if="op != 'eosforumanon' && post.data.poster == op" class="badge badge-success">op</span>
                   </li>
+                  <li v-else class="list-inline-item">
+                    by <a :href="'https://www.reddit.com/user/' + reddit.author" class="author">{{ reddit.author }}[reddit]</a>
+                  </li>
                   <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
+                  <li v-if="reddit" class="list-inline-item"><a :href="'https://reddit.com' + reddit.permalink">on reddit</a></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                   <li v-if="is_moderated" class="list-inline-item"><span class="badge badge-warning text-xsmall">spam</span></li>
                   <li v-if="is_nsfw" class="list-inline-item"><span class="badge badge-nsfw text-xsmall">nsfw</span></li>
@@ -165,6 +169,9 @@ export default {
     this.load();
   },
   computed: {
+    reddit() {
+      return this.post.data.json_metadata.reddit;
+    },
     is_show_title() {
       if (!this.post.data.reply_to_post_uuid) return true; // top level post
 
