@@ -73,10 +73,12 @@ class NovusphereForum {
         // NOTE: temporary patch to disable anon-r-* from shownig up and isolate it
         //
         if (sub == "all") {
-            query["data.json_metadata.sub"] = { $regex: "^(?!anon-r).*", $options: 'i' };
+            query["data.json_metadata.sub"] = { $exists: true, $ne: "" }; 
+            //{ $regex: "^(?!anon-r).*", $options: 'i' };
         }
         else if (sub == "anon") {
-            query["data.json_metadata.sub"] = { $regex: "(^anon$|^anon-)(?!r-)", $options: 'i' };
+            query["data.json_metadata.sub"] = { $regex: "(^anon$|^anon-)", $options: 'i' };
+            //{ $regex: "(^anon$|^anon-)(?!r-)", $options: 'i' };
         }
 
         if (ignoreAccounts && ignoreAccounts.length > 0) {
@@ -308,7 +310,7 @@ class NovusphereForum {
                                 2
                             ]
                         },
-                        1.1
+                        0.70
                     ]
                 }
             ]

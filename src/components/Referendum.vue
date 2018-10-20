@@ -534,8 +534,13 @@ export default {
       for (var i = 0; i < pv.unvotes.length; i++) {
         var uv = pv.unvotes[i];
         var vr = voteResult[uv.data.voter];
-        if (vr.time < uv.createdAt) {
-          delete voteResult[uv.data.voter];
+        if (vr) {
+          if (vr.time < uv.createdAt) {
+            delete voteResult[uv.data.voter];
+          }
+        }
+        else {
+          console.log('no vote found for ' + uv.data.voter);
         }
       }
 
@@ -545,7 +550,10 @@ export default {
           voter =>
             new Promise(async resolve => {
               var account = await eos.getAccount(voter);
-              var staked = (account.voter_info) ? (account.voter_info.staked / 10000) : 0;
+              //var staked = (account.voter_info) ? (account.voter_info.staked / 10000) : 0;
+              //var staked = (account.cpu_weight + account.net_weight) / 10000;
+              var staked = (parseFloat(account.self_delegated_bandwidth.cpu_weight) +
+                parseFloat(account.self_delegated_bandwidth.net_weight));
               var vr = voteResult[voter];
               vr.staked = staked;
               resolve();

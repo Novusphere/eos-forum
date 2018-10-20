@@ -5,7 +5,7 @@ const MAX_TRACK_NEW_POSTS = 1000;
 var DEFAULT_STORAGE = {
     version: 14,
     eos_referendum: true,
-    subscribed_subs: ["all", "novusphere", "eos", "anon", "movies", "music", "anon-pol-econ", "bounties", "test"],
+    subscribed_subs: ["all", "novusphere", "eos", "anon", "anon-r-eos", "anon-pol-econ", "music", "bounties"],
     new_posts: {},
     last_notification: 0,
     moderation: {

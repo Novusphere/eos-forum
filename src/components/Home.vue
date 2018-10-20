@@ -201,6 +201,12 @@ export default {
         this.sub == "anon" ||
         this.sub.indexOf("anon-") == 0
       ) {
+
+        if (this.sub == 'anon-r-eos') {
+          alert("You cannot make new threads in this sub from eos-forum");
+          return;
+        }
+
         jQuery("#submitPost").modal();
       } else {
         alert("You must be logged in to post a new thread here!");
