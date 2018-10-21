@@ -11,13 +11,13 @@ export default function (makeUser, makeTag) {
             // @username syntax
             {
                 type: 'lang',
-                regex: '\\B(\\\\)?@([\\S]+)\\b',
+                regex: '\\s([@][\\w_-]+)', //'\\B(\\\\)?@([\\w_-]+)\\b',
                 replace: function (match, leadingSlash, username) {
                     // Check if we matched the leading \ and return nothing changed if so
                     if (leadingSlash === '\\') {
                         return match;
                     } else {
-                        return makeUser(username);
+                        return makeUser(match);
                     }
                 }
             },

@@ -96,6 +96,13 @@ async function MigratePost(p) {
                 attachment.height = 400;
                 attachment.display = 'iframe';
             }
+            if (host == 'd.tube') {
+                var vid = attachment.value.indexOf('v/') + 2;
+                attachment.value = 'https://emb.d.tube/#!/' + attachment.value.substring(vid);
+                attachment.width = 560;
+                attachment.height = 400;
+                attachment.display = 'iframe';
+            }
             if (host == 'soundcloud.com') {
                 try {
                     var sc_json = await Helpers.AsyncGet('https://soundcloud.com/oembed?format=json&url=' + attachment.value);

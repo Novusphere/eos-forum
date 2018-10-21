@@ -84,7 +84,7 @@
                 <ul>
                   <li v-for="voter in vote.voters" :key="voter.account">
                     <span :class="voter.vote ? 'text-success' : 'text-danger'">
-                      {{ voter.account }} - {{ voter.staked }} EOS ({{ voter.vote ? 'for' : 'against'}})
+                      {{ voter.account }} - {{ voter.staked.toFixed(4) }} EOS ({{ voter.vote ? 'for' : 'against'}})
                     </span>
                   </li>
                 </ul>
@@ -287,8 +287,8 @@ export default {
       var payload = apiResult.cursor.firstBatch;
       for (var i = 0; i < payload.length; i++) {
         var p = payload[i];
-        p.expired = (p.expired.length > 0); 
-        
+        p.expired = p.expired.length > 0;
+
         if (unixNow > new Date(p.data.expires_at)) {
           p.expired = true;
         }
@@ -538,9 +538,8 @@ export default {
           if (vr.time < uv.createdAt) {
             delete voteResult[uv.data.voter];
           }
-        }
-        else {
-          console.log('no vote found for ' + uv.data.voter);
+        } else {
+          console.log("no vote found for " + uv.data.voter);
         }
       }
 
@@ -552,8 +551,10 @@ export default {
               var account = await eos.getAccount(voter);
               //var staked = (account.voter_info) ? (account.voter_info.staked / 10000) : 0;
               //var staked = (account.cpu_weight + account.net_weight) / 10000;
-              var staked = (parseFloat(account.self_delegated_bandwidth.cpu_weight) +
-                parseFloat(account.self_delegated_bandwidth.net_weight));
+              var staked = account.self_delegated_bandwidth
+                ? parseFloat(account.self_delegated_bandwidth.cpu_weight) +
+                  parseFloat(account.self_delegated_bandwidth.net_weight)
+                : 0;
               var vr = voteResult[voter];
               vr.staked = staked;
               resolve();
@@ -576,7 +577,9 @@ export default {
       this.vote.against = voteResult_against;
       this.vote.approval =
         voteResult_for / Math.max(voteResult_for + voteResult_against, 1);
-      this.vote.voters = Object.values(voteResult).sort((v1, v2) => v2.staked - v1.staked);
+      this.vote.voters = Object.values(voteResult).sort(
+        (v1, v2) => v2.staked - v1.staked
+      );
 
       jQuery("#voteResult").modal();
     }

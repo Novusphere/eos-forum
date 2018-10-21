@@ -38,7 +38,9 @@ class MarkdownParser {
             // but hey, at least it works
             //
             extensions.push(twitter(
-                (username) => '<a href="\\#/u/' + username + '">@' + username + '</a>',
+                (username) => { 
+                    return '<a href="\\#/u/' + username.trim().substring(1) + '">' + username + '</a>';
+                },
                 //(tag) => '<a href="">#' + tag + '</a>'
                 (tag) => '<a href="\\#/tag/' + tag + '">#' + tag + '</a>'
             ));
