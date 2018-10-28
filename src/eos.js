@@ -30,13 +30,15 @@ const DEFAULT_IDENTITY = {
 
 const WALLET_TYPE_NONE = 0;
 const WALLET_TYPE_SCATTER = 1;
-const WALLET_TYPE_LYNX = 2; // to-do
+const WALLET_TYPE_LYNX_MOBILE = 2;
 
 var g_wallet_type = WALLET_TYPE_NONE;
 var g_wallet_interface = null;
 
 const UPDATE_IDENTITY_SPEED = 5000;
 var g_identity = Object.assign({}, DEFAULT_IDENTITY);
+
+var scatter_timeout = storage.settings.scatter_timeout;
 
 LoadStorage();
 UpdateIdentity();
@@ -56,9 +58,16 @@ async function DetectWallet() {
             GetIdentity(true);
         }
     }
+    else if (window.lynxMobile) {
+        console.log('Lynx loaded (mobile)');
+
+        g_wallet_interface = window.lynxMobile;
+        g_wallet_type = WALLET_TYPE_LYNX_MOBILE;
+        window.lynxMobile = null;
+    }
     else {
-        console.log('Trying to connect to scatter with timeout ' + storage.settings.scatter_timeout + 'ms...');
-        var connected = await ScatterJS.scatter.connect('eos-forum', { initTimeout: storage.settings.scatter_timeout });
+        console.log('Trying to connect to scatter with timeout ' + scatter_timeout + 'ms...');
+        var connected = await ScatterJS.scatter.connect('eos-forum', { initTimeout: scatter_timeout });
         if (connected) {
             console.log('Scatter loaded (desktop)');
             g_wallet_interface = ScatterJS.scatter;
@@ -71,6 +80,7 @@ async function DetectWallet() {
         }
         else {
             console.log('Scatter could not be loaded');
+            scatter_timeout = Math.min(10000, scatter_timeout + 1500);
         }
     }
 
@@ -137,11 +147,20 @@ async function GetIdentity(pull) {
             g_identity.notifications = 0;
 
             UpdateIdentity(true);
-
-            // event for identity changing
             window.dispatchEvent(new Event('identity'));
         }
+        else if (g_wallet_type == WALLET_TYPE_LYNX_MOBILE) {
+            const lynx = g_wallet_interface;
+            const identity = await lynx.requestSetAccountName();
 
+            g_identity.account = identity;
+            g_identity.auth = 'active'; // assume
+            g_identity.atmos = '0.000';
+            g_identity.notifications = 0;
+
+            UpdateIdentity(true);
+            window.dispatchEvent(new Event('identity'));
+        }
     }
 
     return g_identity;
@@ -186,17 +205,17 @@ async function ExecuteEOSActions(actions) {
         actions = [actions]; // single action
     }
 
-    if (g_wallet_type == WALLET_TYPE_SCATTER) {
-        const identity = await GetIdentity();
-        const auth = {
-            authorzation: [
-                {
-                    actor: identity.account,
-                    permission: identity.auth
-                }
-            ]
-        };
-        
+    const identity = await GetIdentity();
+    const auth = {
+        authorzation: [
+            {
+                actor: identity.account,
+                permission: identity.auth
+            }
+        ]
+    };
+
+    if (g_wallet_type == WALLET_TYPE_SCATTER) {        
         const eos = GetEOS();
 
         var eostx = await eos.transaction(actions.map(a => a.contract), _contracts => {
@@ -207,6 +226,22 @@ async function ExecuteEOSActions(actions) {
             }
         });
     
+        return eostx.transaction_id;
+    }
+    else if (g_wallet_type == WALLET_TYPE_LYNX_MOBILE) {
+        const lynx = g_wallet_interface;
+
+        var lynx_actions = actions.map(function (a) {
+            return {
+                account: a.contract,
+                name: a.name,
+                data: a.data,
+                authorzation: auth.authorzation
+            };
+        });
+
+        var eostx = await lynx.transact(lynx_actions);
+
         return eostx.transaction_id;
     }
 
