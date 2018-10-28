@@ -11,6 +11,10 @@ class Moderation {
     }
 
     async resolve(value, key) {
+        if (key == '197001') {
+            return null;
+        }
+
         var endpoint = value;
         if ((endpoint.indexOf('https:') == 0) || (endpoint.indexOf('http:') == 0)) {
             // pass do nothing
@@ -108,7 +112,7 @@ class Moderation {
         return data;
     }
 
-    async getCurrentSet() {        
+    async getCurrentSet() {
         var now = new Date();
         var set1 = await this.getCacheSet(now.getTime() / 1000);
         return set1;
@@ -137,7 +141,7 @@ class Moderation {
     async getPinned(sub) {
         var set1 = await this.getCurrentSet();
         var result = [];
-        
+
         var all = set1.pinned["all"];
         if (all) {
             result = Array.concat(result, all);

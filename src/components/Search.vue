@@ -22,11 +22,7 @@
 <script>
 import jQuery from "jquery";
 
-import { GetScatter, GetScatterIdentity } from "@/eos";
-import { GetNovusphere } from "@/novusphere";
-import { forum } from "@/novusphere-forum";
-import { MigratePost, ApplyPostEdit } from "@/migrations";
-import { storage, SaveStorage } from "@/storage";
+import ui from "@/ui";
 
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
@@ -53,33 +49,9 @@ export default {
   },
   methods: {
     async load() {
-      const novusphere = GetNovusphere();
-      var subs = (await novusphere.api({
-        aggregate: novusphere.config.collection,
-        maxTimeMS: 1000,
-        cursor: {},
-        pipeline: [
-          {
-            $match: {
-                "data.json_metadata.sub": { $exists: true, $ne: "" },
-                "data.json_metadata.edit": false
-            }
-          },
-          {
-            $group: {
-                _id: "$data.json_metadata.sub",
-                count: { $sum: 1 }
-            }
-          },
-          {
-              $sort: {
-                  count: -1
-              }
-          }
-        ]
-      })).cursor.firstBatch;
+      var search = ui.Search();
 
-      this.subs = subs;
+      this.subs = search.subs;
     }
   },
   data() {

@@ -44,75 +44,28 @@
 <script>
 import jQuery from "jquery";
 
-import { PlaceholderPost } from "@/migrations";
-import { GetEOS, GetScatter, GetScatterIdentity } from "@/eos";
-
-const UPVOTE_ATMOS_RATE = 10; // 1 upvote in ATMOS
+import ui from "@/ui";
 
 export default {
   name: "UpvoteModal",
   async mounted() {},
   computed: {
     upvotes() {
-      // current rate of ATMOS --> upvotes
-      return this.atmos / UPVOTE_ATMOS_RATE;
+      return ui.AtmosToUpvotes(this.atmos);
     }
   },
   methods: {
     async upvote() {
-      const eos = GetEOS(await GetScatter());
-      const identity = await GetScatterIdentity();
-      const auth = [
-        {
-          actor: identity.account,
-          permission: identity.auth
-        }
-      ];
-
-      const memo = "upvote for " + this.post.o_transaction;
-      const quantity =
-        (
-          parseFloat(this.atmos) /
-          (identity.account == this.post.data.poster ? 1 : 2)
-        ).toFixed(3) + " ATMOS";
-
       try {
-        var contract = await eos.contract("novusphereio");
-        var eostx = await contract.transaction(tx => {
-          if (identity.account != this.post.data.poster) {
-            tx.transfer(
-              {
-                from: identity.account,
-                to: this.post.data.poster,
-                quantity: quantity,
-                memo: memo
-              },
-              auth
-            );
-          }
-          tx.transfer(
-            {
-              from: identity.account,
-              to: "novuspheredb",
-              quantity: quantity,
-              memo: memo
-            },
-            auth
-          );
-        });
-      } catch (ex) {
-        this.error = "Error: upvote transaction failed!";
-        return;
+        this.post.up = await ui.Upvote(this.post, this.atmos);
+        jQuery("#upvoteModal").modal("hide");
+      } catch (reason) {
+        this.error = reason;
       }
-
-      var new_upvotes = Math.floor(parseFloat(this.atmos) / UPVOTE_ATMOS_RATE);
-      this.post.up = parseInt(this.post.up) + new_upvotes;
-      jQuery("#upvoteModal").modal("hide");
     },
     modal(post) {
       this.post = post;
-      // reset
-      this.atmos = UPVOTE_ATMOS_RATE;
+      this.atmos = ui.UpvotesToAtmos(1);
       this.error = "";
       jQuery("#upvoteModal").modal();
     }
@@ -121,7 +74,7 @@ export default {
     return {
       error: "",
       atmos: 10,
-      post: PlaceholderPost()
+      post: ui.PlaceholderPost()
     };
   }
 };

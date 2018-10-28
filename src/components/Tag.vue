@@ -24,8 +24,8 @@
         <div class="row mb-4">
             <div class="col-12">
               <div class="float-right">
-                  <router-link v-if="currentPage>1" class="btn btn-outline-primary" :to="'/tag/' + tag + '?page=' + (currentPage-1)">&larr; prev</router-link>
-                  <router-link v-if="currentPage<pages" class="btn btn-outline-primary" :to="'/tag/' + tag + '?page=' + (currentPage+1)">next &rarr;</router-link>
+                  <router-link v-if="current_page>1" class="btn btn-outline-primary" :to="'/tag/' + tag + '?page=' + (current_page-1)">&larr; prev</router-link>
+                  <router-link v-if="current_page<pages" class="btn btn-outline-primary" :to="'/tag/' + tag + '?page=' + (current_page+1)">next &rarr;</router-link>
               </div>
             </div>
         </div>
@@ -37,11 +37,7 @@
 <script>
 import jQuery from "jquery";
 
-import { GetScatter, GetScatterIdentity } from "@/eos";
-import { GetNovusphere } from "@/novusphere";
-import { forum } from "@/novusphere-forum";
-import { MigratePost, ApplyPostEdit } from "@/migrations";
-import { storage, SaveStorage } from "@/storage";
+import ui from "@/ui";
 
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
@@ -50,8 +46,6 @@ import PostHistoryModal from "@/components/modal/PostHistoryModal";
 
 import HeaderSection from "@/components/section/HeaderSection";
 import MainSection from "@/components/section/MainSection";
-
-const MAX_ITEMS_PER_PAGE = 25;
 
 export default {
   name: "Tag",
@@ -75,78 +69,18 @@ export default {
   },
   methods: {
     async load() {
-      var currentPage = parseInt(
-        this.$route.query.page ? this.$route.query.page : 1
-      );
-
-      var tag = (this.$route.params.tag).toLowerCase();
-
-      var novusphere = GetNovusphere();
-      var apiResult;
-
-      apiResult = await novusphere.api({
-        count: novusphere.config.collection,
-        maxTimeMS: 1000,
-        query: forum.match_posts_by_tag(tag)
-      });
-
-      var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
-      const identity = await GetScatterIdentity();
-
-      apiResult = await novusphere.api({
-        aggregate: novusphere.config.collection,
-        maxTimeMS: 1000,
-        cursor: {},
-        pipeline: [
-          { $match: forum.match_posts_by_tag(tag) },
-          { $lookup: forum.lookup_post_state() },
-          { $lookup: forum.lookup_post_parent() },
-          { $project: forum.project_post({ 
-              normalize_up: true, 
-              normalize_parent: true,
-              score: true 
-            }) 
-          },
-          { $sort: this.$refs.sorter.getSorter() },
-          { $skip: forum.skip_page(currentPage, MAX_ITEMS_PER_PAGE) },
-          { $limit: MAX_ITEMS_PER_PAGE },
-          { $lookup: forum.lookup_post_replies() },
-          { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post({ 
-              normalize_my_vote: true,
-              recent_edit: true
-            }) 
-          },
-          { $match: forum.match_valid_parent() }
-        ]
-      });
-
-      var posts = apiResult.cursor.firstBatch;
-
-      for (var i = 0; i < posts.length; i++) {
-        var p = posts[i];
-        await MigratePost(p);
-
-        if (p.parent) {
-          await MigratePost(p.parent);
-
-          if (p.parent.data.json_metadata) {
-            const title = p.parent.data.json_metadata.title;
-            p.data.json_metadata.title = title;
-          }
-        }
-      }
+      var tag = await ui.Tag(this.$route.query.page, this.$route.params.tag, this.$refs.sorter.getSorter());
 
       // push data to this
-      this.posts = posts;
-      this.pages = numPages;
-      this.currentPage = currentPage;
-      this.tag = tag;
+      this.posts = tag.posts;
+      this.pages = tag.pages;
+      this.current_page = tag.current_page;
+      this.tag = tag.tag;
     },
   },
   data() {
     return {
-      currentPage: 0,
+      current_page: 0,
       pages: 0,
       tag: "",
       posts: [] // for posts being displayed

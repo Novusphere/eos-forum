@@ -109,16 +109,9 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from "uuid";
 import jQuery from "jquery";
 
-import Helpers from "@/helpers";
-import { GetNovusphere } from "@/novusphere";
-import { GetEOS, GetScatter, GetScatterIdentity } from "@/eos";
-import { GetEOSService } from "@/eos-service";
-import { MarkdownParser } from "@/markdown";
-
-const FORUM_CONTRACT = "eosforumdapp";
+import ui from "@/ui";
 
 export default {
   name: "SubmitPostModal",
@@ -138,7 +131,7 @@ export default {
       required: true,
       default: ""
     },
-    postContentCallback: {
+    post_content_callback: {
       type: Function,
       required: false,
       default: () => {}
@@ -167,22 +160,13 @@ export default {
         return;
       }
 
-      const eosService = GetEOSService();
-      var identity = await GetScatterIdentity();
-      if (anon) {
-        identity = {
-          account: eosService.config.anon_account,
-          auth: "active"
-        };
-      }
-
-      var eosPost = {
-        poster: identity.account,
+      var eos_post = {
+        poster: "", // ui will fill this in
         reply_to_poster: this.reply_account,
         reply_to_post_uuid: this.reply_uuid,
         certify: 0,
         content: post.content,
-        post_uuid: uuidv4(),
+        post_uuid: ui.GeneratePostUuid(),
         json_metadata: JSON.stringify({
           title: post.title,
           type: "novusphere-forum",
@@ -198,7 +182,7 @@ export default {
         })
       };
 
-      return eosPost;
+      return eos_post;
     },
     setStatus(text) {
       this.status = text;
@@ -206,137 +190,19 @@ export default {
         this.set_status(text);
       }
     },
-    async postContent(anon, warnAnon) {
-      var post = this.post;
-      const eosService = GetEOSService();
-      const identity = await GetScatterIdentity();
-
-      var txid;
+    async postContent(anon, warn_anon) {
+      
       this.setStatus("Creating tx and broadcasting to EOS...");
-      try {
-        var eosPost = await this.makePost(anon);
-        if (!eosPost) {
-          return false;
-        }
-
-        if (anon) {
-
-          // use eos-service to make anonymous post
-          if (warnAnon)  {
-
-            if (!(await confirm('Are you sure you want to post this anonymously?'))) {
-              this.setStatus("Error: post canceled");
-              return false;
-            }
-            
-          }
-
-          var eostx = await eosService.anonymousPost(eosPost);
-          if (eostx.error) {
-            this.setStatus("Error: " + eostx.error);
-            console.log(eostx.error);
-            return false;
-          }
-        } else {
-          const eos = GetEOS(await GetScatter());
-
-          var tips = [];
-          var tips_rx = eosPost.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
-          var contracts = [FORUM_CONTRACT];
-
-          if (
-            tips_rx &&
-            tips_rx.length > 0 &&
-            !this.post.edit &&
-            this.post.parent_tx
-          ) {
-            // do not tip on edits
-
-            var tokens = JSON.parse(
-              await Helpers.AsyncGet(
-                "https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/tokens.json"
-              )
-            );
-
-            tokens.splice(0, 0, {
-              name: "EOS",
-              logo: "",
-              logo_lg: "",
-              symbol: "EOS",
-              account: "eosio.token"
-            });
-
-            for (var i = 0; i < tips_rx.length; i++) {
-              var tip_args = tips_rx[i].split(" ");
-
-              const token = tokens.find(t => t.symbol == tip_args[2]);
-              if (!token) {
-                this.setStatus(
-                  "Error: could not find contract for tip symbol " + tip_args[2]
-                );
-                return false;
-              }
-
-              const stats = await eos.getCurrencyStats(
-                token.account,
-                token.symbol
-              );
-              const precision = stats[token.symbol].max_supply
-                .split(" ")[0]
-                .split(".")[1].length;
-
-              var adjusted_amount = parseFloat(tip_args[1]).toFixed(precision);
-              tips.push(adjusted_amount + " " + token.symbol);
-              contracts.push(token.account);
-            }
-          }
-
-          //console.log(contracts);
-          //console.log(tips);
-          //console.log(this.post.parent_poster);
-          //console.log(this.post.parent_tx);
-
-          var eostx = await eos.transaction(contracts, _contracts => {
-            var auth = {
-              authorzation: [
-                {
-                  actor: identity.account,
-                  permission: identity.auth
-                }
-              ]
-            };
-
-            var __contracts = Object.values(_contracts); // { name: Object }
-            __contracts[0].post(eosPost, auth);
-
-            for (var i = 0; i < tips.length; i++) {
-              __contracts[1 + i].transfer(
-                {
-                  from: identity.account,
-                  to: this.post.parent_poster,
-                  quantity: tips[i],
-                  memo: "tip for " + this.post.parent_tx
-                },
-                auth
-              );
-            }
-          });
-        }
-
-        txid = eostx.transaction_id;
-      } catch (ex) {
-        this.setStatus("Creating tx and broadcasting to EOS... Failed!");
-        console.log(ex);
+      var eos_post = await this.makePost(anon);
+      if (!eos_post) {
         return false;
       }
 
-      this.setStatus("Waiting for Novusphere to index...");
+      var txid = await ui.PushNewPost(eos_post, this.post.parent_tx, anon, warn_anon, this.setStatus);
+      if (!txid) {
+        return false;
+      }
 
-      const novusphere = GetNovusphere();
-      await novusphere.waitTx(txid, 500, 1000);
-
-      // reset default
-      this.setStatus("");
       this.post.content = "";
       this.post.attachment.value = "";
       this.post.attachment.type = "";
@@ -344,17 +210,18 @@ export default {
 
       jQuery("#submitPost").modal("hide");
 
-      this.postContentCallback(txid);
+      this.post_content_callback(txid);
+
       return true;
     }
   },
   computed: {
     post_content: function() {
-      var md = new MarkdownParser(this.post.content);
+      var md = ui.ParseMarkdown(this.post.content);
       return md.html;
     },
     is_anon_sub: function() {
-      return this.sub == "anon" || this.sub.indexOf("anon-") == 0;
+      return ui.IsAnonSub(this.sub);
     }
   },
   data() {

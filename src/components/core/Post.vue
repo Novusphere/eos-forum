@@ -34,7 +34,7 @@
                     <router-link :to="thread_link">{{ post.total_replies }} comments</router-link>
                   </li>
                   <li class="list-inline-item"><router-link :to="thread_link">{{ new Date(post.createdAt * 1000).toLocaleString() }}</router-link></li>
-                  <li v-if="!reddit" class="list-inline-item">
+                  <li v-if="!reddit.author" class="list-inline-item">
                     by <router-link :to="'/u/' + post.data.poster" :class="((post.data.poster == identity) ? 'text-mine' : 'author')">{{ post.data.poster }}</router-link>
                     <span v-if="op != 'eosforumanon' && post.data.poster == op" class="badge badge-success">op</span>
                   </li>
@@ -42,7 +42,7 @@
                     by <a :href="'https://www.reddit.com/user/' + reddit.author" class="author">{{ reddit.author }}[reddit]</a>
                   </li>
                   <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
-                  <li v-if="reddit" class="list-inline-item"><a :href="'https://reddit.com' + reddit.permalink">on reddit</a></li>
+                  <li v-if="reddit.author" class="list-inline-item"><a :href="'https://reddit.com' + reddit.permalink">on reddit</a></li>
                   <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
                   <li v-if="is_moderated" class="list-inline-item"><span class="badge badge-warning text-xsmall">spam</span></li>
                   <li v-if="is_nsfw" class="list-inline-item"><span class="badge badge-nsfw text-xsmall">nsfw</span></li>
@@ -119,17 +119,11 @@
 <script>
 import jQuery from "jquery";
 
+import ui from "@/ui";
+
 import Helpers from "@/helpers";
 import { MarkdownParser } from "@/markdown";
-import {
-  GetEOS,
-  GetScatter,
-  ScatterConfig,
-  ScatterEosOptions,
-  GetScatterIdentity
-} from "@/eos";
-
-import { storage } from "@/storage";
+import { GetIdentity } from "@/eos";
 import { moderation } from "@/moderation";
 
 import PostAttachment from "@/components/core/PostAttachment.vue";
@@ -187,29 +181,11 @@ export default {
       return sub == "anon" || sub.indexOf("anon-") == 0;
     },
     title() {
-      var title = this.post.data.json_metadata.title;
-
-      if (
-        !title &&
-        this.post.parent &&
-        this.post.parent.data.json_metadata.title
-      ) {
-        title = this.post.parent.data.json_metadata.title;
-      }
-
-      if (!title) {
-        title = "untitled";
-      }
-
+      var title = this.post.getTitle();
       if (!this.show_content && title.length > 80)
         return title.substring(0, 80) + "...";
 
       return title;
-    },
-    friendly_title() {
-      var friendly = this.title.replace(/[^a-zA-Z0-9 ]/g, "");
-      friendly = friendly.replace(/ /g, "_");
-      return friendly;
     },
     is_max_depth() {
       var depth_lim = Math.floor(window.innerWidth / 65);
@@ -240,17 +216,17 @@ export default {
       if (this.post.parent) {
         path += this.post.parent.o_id + "/";
       }
-      path += this.friendly_title + "/" + this.post.o_id;
+      path += this.post.getUrlTitle() + "/" + this.post.o_id;
       return path;
     },
     thread_link() {
       var txid = this.post.parent ? this.post.parent.o_id : this.post.o_id;
-      return "/e/" + this.sub + "/" + txid + "/" + this.friendly_title;
+      return "/e/" + this.sub + "/" + txid + "/" + this.post.getUrlTitle();
     }
   },
   methods: {
     async load() {
-      const identity = await GetScatterIdentity();
+      const identity = await GetIdentity();
       this.identity = identity.account;
 
       this.is_moderated = await moderation.isBlocked(
@@ -374,46 +350,16 @@ export default {
     },
     async upvote() {
       if (this.post.my_vote) {
-        //if (this.post.data.poster != this.identity) {
         window._VueApp.$refs.upvote.modal(this.post);
-        //}
         return;
       }
-
-      const identity = await GetScatterIdentity();
-      if (!identity.account) {
-        alert("You must be logged in to upvote comments!");
-        return;
+      try {
+        this.post.up = await ui.UpvoteFree(this.post);
       }
-
-      const eos = GetEOS(await GetScatter());
-      var contract = await eos.contract("novuspheredb");
-      var eostxArg = {
-        account: identity.account,
-        json: JSON.stringify({
-          protocol: "novusphere",
-          method: "forum_vote",
-          data: {
-            txid: this.post.o_transaction
-          }
-        })
-      };
-      var eostx = await contract.transaction(tx => {
-        tx.push(eostxArg, {
-          authorization: [
-            {
-              actor: identity.account,
-              permission: identity.auth
-            }
-          ]
-        });
-      });
-
-      this.post.my_vote = {
-        account: identity.account,
-        txid: this.post.o_transaction
-      };
-      this.post.up = (this.post.up ? this.post.up : 0) + 1;
+      catch (reason) {
+        console.log(reason);
+        alert(reason);
+      }
     }
   },
   watch: {

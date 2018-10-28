@@ -14,7 +14,7 @@ class NovusphereForum {
     //
     sort_by_score(asc) {
         return {
-            __score: asc ? 1 : -1
+            score: asc ? 1 : -1
         };
     }
     sort_by_time(asc) {
@@ -230,13 +230,13 @@ class NovusphereForum {
             up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
             up_atmos: !opts.normalize_up ? "$up_atmos" : { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] },
             parent: !opts.normalize_parent ? "$parent" : { $arrayElemAt: ["$parent", 0] },
-            __score: "$__score",
+            score: "$score",
             my_vote: !opts.normalize_my_vote ? "$my_vote" : { $arrayElemAt: ["$my_vote", 0] },
             recent_edit: "$recent_edit"
         };
 
         if (opts.score) {
-            query['__score'] = this.score();
+            query['score'] = this.score();
         }
 
         if (opts.recent_edit) {

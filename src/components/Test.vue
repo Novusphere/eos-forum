@@ -5,7 +5,7 @@
 
 <script>
 import { GetNovusphere } from "../novusphere";
-import { GetEOS, ScatterConfig, ScatterEosOptions } from "../eos";
+import { GetEOS } from "../eos";
 //import IPFS from "ipfs";
 //import render from "render-media";
 

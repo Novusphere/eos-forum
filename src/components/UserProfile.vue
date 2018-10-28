@@ -25,7 +25,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-5">Last Activity</div>
-                        <div class="col-md-6 col-7">{{ lastActivity }}</div>
+                        <div class="col-md-6 col-7">{{ last_activity }}</div>
                     </div>
                 </div>
                 <div class="col-md-6 col-12">
@@ -38,8 +38,8 @@
             <div class="row mb-4">
                 <div class="col-12">
                   <div class="float-right">
-                      <router-link v-if="currentPage>1" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (currentPage-1)">&larr; prev</router-link>
-                      <router-link v-if="currentPage<pages" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (currentPage+1)">next &rarr;</router-link>
+                      <router-link v-if="current_page>1" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (current_page-1)">&larr; prev</router-link>
+                      <router-link v-if="current_page<pages" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (current_page+1)">next &rarr;</router-link>
                   </div>
                 </div>
             </div>
@@ -49,18 +49,17 @@
 </template>
 
 <script>
+import ui from "@/ui";
+
 import {
   GetEOS,
-  GetScatter,
-  GetScatterIdentity,
-  ScatterConfig,
+  GetIdentity,
   ScatterEosOptions
 } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { forum } from "@/novusphere-forum";
 import { storage, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
-import { MigratePost, ApplyPostEdit } from "@/migrations";
 
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
@@ -97,95 +96,21 @@ export default {
   },
   methods: {
     async load() {
-      this.currentPage = parseInt(
-        this.$route.query.page ? this.$route.query.page : 1
-      );
-      this.account = this.$route.params.account;
-      this.is_blocked = await moderation.isBlocked(0, null, this.account);
-
-      const eos = GetEOS();
-      const novusphere = GetNovusphere();
-
-      var balanceAtmos;
-      var comments, threads, pages, posts;
-
-      balanceAtmos = parseFloat(
-        (await eos.getCurrencyBalance("novusphereio", this.account, "ATMOS"))[0]
-      );
-      balanceAtmos = (isNaN(balanceAtmos) ? 0 : balanceAtmos).toFixed(3);
-
-      comments = (await novusphere.api({
-        count: novusphere.config.collection,
-        maxTimeMS: 1000,
-        query: forum.match_posts_by_account(this.account, true)
-      })).n;
-
-      threads = (await novusphere.api({
-        count: novusphere.config.collection,
-        maxTimeMS: 1000,
-        query: forum.match_threads_by_account(this.account)
-      })).n;
-
-      pages = Math.ceil((comments + threads) / MAX_ITEMS_PER_PAGE);
-
-      const identity = await GetScatterIdentity();
-
-      posts = (await novusphere.api({
-        aggregate: novusphere.config.collection,
-        maxTimeMS: 1000,
-        cursor: {},
-        pipeline: [
-          { $match: forum.match_posts_by_account(this.account, false) },
-          { $lookup: forum.lookup_post_state() },
-          { $lookup: forum.lookup_post_parent() },
-          {
-            $project: forum.project_post({
-              normalize_up: true,
-              normalize_parent: true,
-              score: true
-            })
-          },
-          { $sort: this.$refs.sorter.getSorter() },
-          { $skip: forum.skip_page(this.currentPage, MAX_ITEMS_PER_PAGE) },
-          { $limit: MAX_ITEMS_PER_PAGE },
-          { $lookup: forum.lookup_post_replies() },
-          { $lookup: forum.lookup_post_my_vote(identity.account) },
-          {
-            $project: forum.project_post({
-              normalize_my_vote: true,
-              recent_edit: true
-            })
-          },
-          { $match: forum.match_valid_parent() }
-        ]
-      })).cursor.firstBatch;
-
-      for (var i = 0; i < posts.length; i++) {
-        var p = posts[i];
-        await MigratePost(p);
-      }
-
-      // push data to this
-      this.balances.atmos = balanceAtmos;
-      this.comments = comments;
-      this.threads = threads;
-      this.lastActivity =
-        posts.length > 0
-          ? new Date(posts[0].createdAt * 1000).toLocaleString()
-          : "N/A";
-      this.posts = posts;
-      this.pages = pages;
+      var profile = await ui.UserProfile(this.$route.query.page, this.$route.params.account, this.$refs.sorter.getSorter());
+      
+      this.current_page = profile.current_page;
+      this.account = profile.account;
+    
+      this.is_blocked = profile.is_blocked;
+      this.balances.atmos = profile.balance_atmos;
+      this.comments = profile.n_comments;
+      this.threads = profile.n_threads;
+      this.last_activity = profile.last_activity;
+      this.posts = profile.posts;
+      this.pages = profile.pages;
     },
     async toggleBlock() {
-      if (this.is_blocked) {
-        var i = storage.moderation.accounts.indexOf(this.account);
-        if (i > -1) {
-          storage.moderation.accounts.splice(i, 1);
-        }
-      } else {
-        storage.moderation.accounts.push(this.account);
-      }
-      SaveStorage();
+      await ui.ToggleBlockUser(this.account, this.is_blocked);
       await this.load();
     }
   },
@@ -198,9 +123,9 @@ export default {
       },
       comments: 0,
       threads: 0,
-      lastActivity: "",
+      last_activity: "",
       posts: [],
-      currentPage: 1,
+      current_page: 1,
       pages: 0
     };
   }

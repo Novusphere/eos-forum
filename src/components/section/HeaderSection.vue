@@ -46,70 +46,14 @@
 </template>
 
 <script>
+import ui from "@/ui";
+
 import { MarkdownParser } from "@/markdown";
 
-var HEADER_TEXTS = [
-  "Did you know you in your **settings** you can toggle between a day and night theme?",
-  "Did you know you in your **settings** you can set delegated moderators to help filter spam?",
-  "Did you know you can block users who post spam by clicking their name to visit their profile and then clicking block?",
-  "Did you know you can post without an account in any of the **anon-** subs?"
-];
-
-if (window.__PRESETS__) {
-  if (window.__PRESETS__.header_texts) {
-    HEADER_TEXTS = window.__PRESETS__.header_texts;
-  }
-}
-
 import { storage } from "@/storage";
-import {
-  DEFAULT_IDENTITY,
-  ForgetScatterIdentity,
-  GetScatterIdentity,
-  GetScatter,
-  GetEOS,
-  SetOnIdentityUpdate
-} from "@/eos";
+import { DEFAULT_IDENTITY, ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { forum } from "@/novusphere-forum";
-
-var _lastIdentityUpdate = 0;
-SetOnIdentityUpdate(async function(_identity) {
-  var now = new Date().getTime();
-  if (now - _lastIdentityUpdate >= 1000) {
-    _lastIdentityUpdate = now;
-
-    const eos = GetEOS();
-    var atmos = parseFloat(
-      (await eos.getCurrencyBalance(
-        "novusphereio",
-        _identity.account,
-        "ATMOS"
-      ))[0]
-    );
-    atmos = (isNaN(atmos) ? 0 : atmos).toFixed(3);
-
-    _identity.atmos = atmos;
-
-    const novusphere = GetNovusphere();
-    const notifications = (await novusphere.api({
-      aggregate: novusphere.config.collection,
-      maxTimeMS: 1000,
-      cursor: {},
-      pipeline: [
-        {
-          $match: forum.match_notifications(
-            _identity.account,
-            storage.last_notification
-          )
-        },
-        { $count: "n" }
-      ]
-    })).cursor.firstBatch;
-
-    _identity.notifications = notifications.length > 0 ? notifications[0].n : 0;
-  }
-});
 
 export default {
   name: "HeaderSection",
@@ -120,37 +64,35 @@ export default {
     }
   },
   async mounted() {
-    var header_text =
-      HEADER_TEXTS[Math.floor(Math.random() * HEADER_TEXTS.length)];
+    var header_text = ui.GetRandomHeaderText();
     this.random_header = new MarkdownParser(header_text).html;
 
-    await this.setIdentity();
-    window.addEventListener("identity", this.setIdentity);
+    this.identity = await GetIdentity();
+    window.addEventListener("identity", this.updateIdentity);
   },
   async beforeDestroy() {
-    window.removeEventListener("identity", this.setIdentity);
+    window.removeEventListener("identity", this.updateIdentity);
   },
   methods: {
+    async updateIdentity() {
+      this.identity = await GetIdentity();
+      if (this.load) {
+        this.load();
+      }
+    },
     async setIdentity(wait) {
-      this.identity = await GetScatterIdentity(wait);
+      this.identity = await GetIdentity(wait);
     },
     async login() {
-      await this.setIdentity(true);
-      if (this.identity.account) {
-        if (this.load) {
-          this.load();
-        }
-      } else {
+      this.identity = await GetIdentity(true);
+      if (!this.identity.account) {
         alert(
           "Failed to find Scatter or get Scatter identity! Please see our FAQ!"
         );
       }
     },
     async logout() {
-      this.identity = await ForgetScatterIdentity();
-      if (this.load) {
-        this.load();
-      }
+      await ForgetIdentity();
     }
   },
   computed: {

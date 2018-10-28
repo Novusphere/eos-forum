@@ -170,10 +170,8 @@ import sha256 from "sha256";
 
 import {
   GetEOS,
-  GetScatter,
-  ScatterConfig,
   ScatterEosOptions,
-  GetScatterIdentity
+  GetIdentity
 } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { forum } from "@/novusphere-forum";
@@ -223,7 +221,7 @@ export default {
       return name;
     },
     async load() {
-      const identity = await GetScatterIdentity();
+      const identity = await GetIdentity();
       this.identity = identity.account;
 
       var currentPage = parseInt(
@@ -300,7 +298,7 @@ export default {
       this.currentPage = currentPage;
     },
     async newProposal() {
-      const identity = await GetScatterIdentity();
+      const identity = await GetIdentity();
       if (identity.account) {
         jQuery("#submitProposal").modal();
       } else {
@@ -324,7 +322,7 @@ export default {
         return;
       }
 
-      const identity = await GetScatterIdentity();
+      const identity = await GetIdentity();
 
       var eostxArg = {
         proposer: identity.account,
@@ -339,7 +337,7 @@ export default {
 
       var txid;
       try {
-        const eos = GetEOS(await GetScatter());
+        const eos = GetEOS();
         var contract = await eos.contract(REFERENDUM_CONTRACT);
         var eostx = await contract.transaction(tx => {
           tx.propose(eostxArg, {
@@ -413,9 +411,9 @@ export default {
     },
     async cleanProposal(propTxid) {
       const novusphere = GetNovusphere();
-      const identity = await GetScatterIdentity();
+      const identity = await GetIdentity();
 
-      const eos = GetEOS(await GetScatter());
+      const eos = GetEOS();
       const prop = await this.getProposal(propTxid);
 
       var eostxArg = {
@@ -436,9 +434,9 @@ export default {
     },
     async expire(propTxid) {
       const novusphere = GetNovusphere();
-      const identity = await GetScatterIdentity();
+      const identity = await GetIdentity();
 
-      const eos = GetEOS(await GetScatter());
+      const eos = GetEOS();
       const prop = await this.getProposal(propTxid);
 
       var eostxArg = {
@@ -467,14 +465,14 @@ export default {
     },
     async castVote(propTxid, vote) {
       const novusphere = GetNovusphere();
-      const identity = await GetScatterIdentity();
+      const identity = await GetIdentity();
 
       if (!identity.account) {
         alert("You must be logged in to vote!");
         return;
       }
 
-      const eos = GetEOS(await GetScatter());
+      const eos = GetEOS();
       const prop = await this.getProposal(propTxid);
 
       // NOTE & TO-DO: "vote" is changing to "vote_value"
@@ -506,7 +504,7 @@ export default {
       await this.proposalStatus(prop.transaction);
     },
     async proposalStatus(txid) {
-      var eos = GetEOS(await GetScatter());
+      var eos = GetEOS();
       var prop = await this.getProposal(txid);
       var pv = await this.getProposalVotes(prop);
 

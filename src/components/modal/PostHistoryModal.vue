@@ -9,7 +9,7 @@
               </button>
             </div>
             <div class="modal-body">
-                <Post :post="mainPost" :show_content="true" v-bind="mainPost"></post>
+                <Post :post="main_post" :show_content="true" v-bind="main_post"></post>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal" v-on:click="resetPost()">close</button>
@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import { GetEOS, GetScatterIdentity } from "@/eos";
+import ui from "@/ui";
+import { GetEOS, GetIdentity } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { forum } from "@/novusphere-forum";
-import { MigratePost, PlaceholderPost } from "@/migrations";
 
 import Post from "@/components/core/Post";
 
@@ -38,54 +38,16 @@ export default {
   methods: {
     resetPost() {
       // stop any attachments from playing, etc.
-      this.mainPost = PlaceholderPost();
+      this.main_post = ui.PlaceholderPost();
     },
     async load(txid) {
-      const novusphere = GetNovusphere();
-      const identity = await GetScatterIdentity();
-
-      var mainPost = (await novusphere.api({
-        aggregate: novusphere.config.collection,
-        maxTimeMS: 1000,
-        cursor: {},
-        pipeline: [
-          { $match: { transaction: txid } },
-          { $lookup: forum.lookup_post_state()},
-          { $lookup: forum.lookup_post_my_vote(identity.account) },
-          { $project: forum.project_post({
-              normalize_up: true,
-              normalize_my_vote: true
-            }) 
-          }
-        ]
-      })).cursor.firstBatch[0];
-
-      var edits = (await novusphere.api({
-        find: novusphere.config.collection,
-        maxTimeMS: 1000,
-        filter: forum.match_post_edits(mainPost.data.poster, mainPost.data.post_uuid),
-        sort: forum.sort_by_time(true)
-      })).cursor.firstBatch;
-
-      for (var i = 0; i < edits.length; i++) {
-        var p = edits[i];
-        await MigratePost(p);
-
-        p.depth = 1;
-        p.parent = mainPost;
-        p.up = mainPost.up;
-        p.my_vote = mainPost.my_vote;
-      }
-
-      await MigratePost(mainPost);
-      mainPost.children = edits;
-
-      this.mainPost = mainPost;
+      var history = await ui.PostHistory(txid);
+      this.main_post = history.main_post;
     }
   },
   data() {
     return {
-      mainPost: PlaceholderPost()
+      main_post: ui.PlaceholderPost()
     };
   }
 };

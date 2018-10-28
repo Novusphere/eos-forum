@@ -124,8 +124,7 @@
 </template>
 
 <script>
-import { GetNovusphere } from "@/novusphere";
-import { GetEOS, ScatterConfig, ScatterEosOptions } from "@/eos";
+import ui from "@/ui";
 import { storage, DEFAULT_STORAGE, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
 import Helpers from "@/helpers";
@@ -143,10 +142,7 @@ export default {
       await this.loadReccomendedMods();
     },
     async loadReccomendedMods() {
-      var git = JSON.parse(await Helpers.AsyncGet(
-        "https://raw.githubusercontent.com/Novusphere/eos-forum-mod-list/master/list.json"
-      )); 
-      this.mod_list = git.list;
+      this.mod_list = await ui.GetReccomendedModList();
     },
     modListChange() {
       this.new_mod = this.mod_list_value;

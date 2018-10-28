@@ -57,6 +57,10 @@ async function MigratePost(p) {
     p.o_transaction = p.transaction;
     p.o_id = p.id;
 
+    if (p.recent_edit) {
+        ApplyPostEdit(p, p.recent_edit);
+    }
+
     var attachment = p.data.json_metadata.attachment;
     p.o_attachment = jQuery.extend(true, {}, attachment);
 
@@ -148,10 +152,6 @@ async function MigratePost(p) {
             p.data.json_metadata.title = title;
         }
     }
-
-    if (p.recent_edit) {
-        ApplyPostEdit(p, p.recent_edit);
-    }
 }
 
 function ApplyPostEdit(parent, p) {
@@ -167,17 +167,4 @@ function ApplyPostEdit(parent, p) {
     parent.id = p.id;
 }
 
-function PlaceholderPost() {
-    return {
-        children: [],
-        data: {
-            title: '',
-            poster: '',
-            json_metadata: {
-                'sub': ''
-            },
-        }
-    };
-}
-
-export { MigratePost, PlaceholderPost, ApplyPostEdit };
+export { MigratePost, ApplyPostEdit };
