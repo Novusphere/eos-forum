@@ -660,6 +660,9 @@ async function PushNewPost(post, parent_tx, anon, warn_anon, set_status) {
                 console.log(eostx.error);
                 return false;
             }
+
+            txid = eostx.transaction_id;
+
         } else {
             var tips_rx = post.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
             var actions = [
