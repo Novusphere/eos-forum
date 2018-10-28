@@ -80,6 +80,9 @@ class NovusphereForum {
             query["data.json_metadata.sub"] = { $regex: "(^anon$|^anon-)", $options: 'i' };
             //{ $regex: "(^anon$|^anon-)(?!r-)", $options: 'i' };
         }
+        else if (Array.isArray(sub)) {
+            query["data.json_metadata.sub"] = { $in: sub };
+        }
 
         if (ignoreAccounts && ignoreAccounts.length > 0) {
             query["data.poster"] = { $nin: ignoreAccounts };

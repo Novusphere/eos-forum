@@ -3,9 +3,9 @@
     <SubmitPostModal ref="submit_modal" :sub="sub" :post_content_callback="postContent"></SubmitPostModal>
     <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
-      <button v-if="!is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary ml-1">subscribe</button>
-      <button v-if="is_subscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger ml-1">unsubscribe</button>
-      <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="newThread()">new</button>
+      <button v-if="sub && !is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary ml-1">subscribe</button>
+      <button v-if="sub && is_subscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger ml-1">unsubscribe</button>
+      <button v-if="sub" type="button" class="btn btn-sm btn-outline-primary" v-on:click="newThread()">new</button>
       <PostSorter ref="sorter" :change="load"></PostSorter>
     </HeaderSection>
     <MainSection>

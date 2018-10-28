@@ -40,7 +40,7 @@ async function Home(current_page, sub, sorter) {
     current_page = parseInt(current_page ? current_page : 1);
 
     if (!sub) {
-        sub = DEFAULT_SUB;
+        sub = storage.subscribed_subs;
     }
 
     // ---
@@ -141,7 +141,7 @@ async function Home(current_page, sub, sorter) {
         posts: threads,
         pages: num_pages,
         current_page: current_page,
-        sub: sub
+        sub: Array.isArray(sub) ? "" : sub
     };
 }
 

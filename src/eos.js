@@ -207,7 +207,7 @@ async function ExecuteEOSActions(actions) {
 
     const identity = await GetIdentity();
     const auth = {
-        authorzation: [
+        authorization: [
             {
                 actor: identity.account,
                 permission: identity.auth
@@ -236,12 +236,11 @@ async function ExecuteEOSActions(actions) {
                 account: a.contract,
                 name: a.name,
                 data: a.data,
-                authorzation: auth.authorzation
+                authorization: auth.authorization
             };
         });
 
         var eostx = await lynx.transact(lynx_actions);
-
         return eostx.transaction_id;
     }
 

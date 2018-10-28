@@ -1,7 +1,12 @@
 <template>
-    <div>
-      <div class="header">
-          <ul class="list-inline mb-0">
+  <div>
+    <div class="header">
+      <ul class="list-inline mb-0">
+            <li class="list-inline-item">
+              <router-link :to="'/'">
+                <img src="https://cdn.novusphere.io/static/atmos.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+              </router-link>
+            </li>
             <li v-if="!identity.account" class="list-inline-item">
               <a v-on:click="login()" href="javascript:void(0)">login</a>
             </li>
@@ -28,21 +33,20 @@
             <li class="list-inline-item">
               <a href="#faq" data-toggle="modal">faq/help</a>
             </li>
-          </ul>
-          <ul class="list-inline">
-            <li v-for="sub in subs" :key="sub" class="list-inline-item"><router-link :to="'/e/' + sub">{{sub}}</router-link></li>
-          </ul>
-          <div class="text-center ml-1 mr-1" v-html="random_header">
-            Did you know that the Novusphere team runs a moderated version of the forum at forum.novusphere.io?
-          </div>
-      </div>
-      <div class="header-second">
+    </ul>
+    <ul class="list-inline">
+      <li v-for="sub in subs" :key="sub" class="list-inline-item"><router-link :to="'/e/' + sub">{{sub}}</router-link></li>
+    </ul>
+    <div class="text-center ml-1 mr-1" v-html="random_header">
+    </div>
+  </div>
+  <div class="header-second">
         <div class="ml-3">
           <slot></slot>
           <div class="mt-1"></div>
         </div>
-      </div>
-    </div>
+  </div>
+</div>
 </template>
 
 <script>
