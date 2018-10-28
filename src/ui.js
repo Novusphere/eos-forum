@@ -332,11 +332,11 @@ async function Thread(id, child_id) {
 
     // permalink child
     if (child_id) {
-        var childPost;
-        if (childId.length == 64) {
+        var child_post;
+        if (child_id.length == 64) {
             child_post = responses.find(p => p.transaction == child_id);
         } else {
-            childId = parseInt(childId);
+            child_id = parseInt(child_id);
             child_post = responses.find(p => p.o_id == child_id);
         }
 
@@ -356,6 +356,7 @@ async function Thread(id, child_id) {
     }
 
     return {
+        opening_post: op,
         main_post: main_post
     }
 }

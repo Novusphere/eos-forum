@@ -1,9 +1,9 @@
 <template>
   <div> 
     <PostHistoryModal ref="history_modal"></PostHistoryModal>
-    <SubmitPostModal ref="submit_modal" :sub="main_post.data.json_metadata.sub" :post_content_callback="postContent" :reply_uuid="main_post.data.post_uuid" :reply_account="main_post.data.poster"></SubmitPostModal>
+    <SubmitPostModal ref="submit_modal" :sub="opening_post.data.json_metadata.sub" :post_content_callback="postContent" :reply_uuid="opening_post.data.post_uuid" :reply_account="opening_post.data.poster"></SubmitPostModal>
     <HeaderSection :load="load">
-      <span class="title mr-3"><router-link :to="'/e/' + main_post.data.json_metadata.sub">{{ main_post.data.json_metadata.sub }}</router-link></span>          
+      <span class="title mr-3"><router-link :to="'/e/' + opening_post.data.json_metadata.sub">{{ opening_post.data.json_metadata.sub }}</router-link></span>          
     </HeaderSection>
     <MainSection>
       <div class="thread">
@@ -56,6 +56,7 @@ export default {
   methods: {
     async load() {
       var thread = await ui.Thread(this.$route.params.id, this.$route.params.child_id);
+      this.opening_post = thread.opening_post;
       this.main_post = thread.main_post;
     },
     postContent(txid) {
@@ -64,6 +65,7 @@ export default {
   },
   data() {
     return {
+      opening_post: ui.PlaceholderPost(),
       main_post: ui.PlaceholderPost()
     };
   }
