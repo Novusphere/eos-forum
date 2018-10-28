@@ -18,7 +18,7 @@ const RX_DATA = new RegExp('data', 'i');
 
 class MarkdownParser {
     constructor(text, createdAt) {
-        this.text = text;
+        this.text = text.replace(/&#x200B;/g, "");
         this.html = '';
         this.attachments = [];
 
