@@ -8,7 +8,7 @@ import { PostData } from "./data";
 class Post { 
     static async fromArray(data) {
         var result = data.map(p => (p instanceof Post) ? p : new Post(p));
-        await Promise.all(result.map(p => p.normalize));
+        await Promise.all(result.map(p => p.normalize()));
         return result;
     }
 
@@ -111,8 +111,8 @@ class Post {
         }
     }
 
-    async normaize() {
-        await this.post.data.json_metadata.normalize();
+    async normalize() {
+        await this.data.json_metadata.attachment.normalize();
     }
 }
 

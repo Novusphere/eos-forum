@@ -1,3 +1,5 @@
+import Helpers from "@/helpers";
+
 class PostAttachment {
     constructor(attachment) {
         this.value = "";
@@ -41,7 +43,6 @@ class PostAttachment {
 
     async normalize() {
         var attachment = this;
-
         if (attachment && attachment.value) {
             if (attachment.type == 'ipfs') {
                 //

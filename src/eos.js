@@ -65,7 +65,7 @@ async function DetectWallet() {
         g_wallet_type = WALLET_TYPE_LYNX_MOBILE;
         window.lynxMobile = null;
     }
-    else {
+    else if (scatter_timeout < 10000) {
         console.log('Trying to connect to scatter with timeout ' + scatter_timeout + 'ms...');
         var connected = await ScatterJS.scatter.connect('eos-forum', { initTimeout: scatter_timeout });
         if (connected) {
