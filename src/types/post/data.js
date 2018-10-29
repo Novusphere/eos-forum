@@ -22,6 +22,7 @@ class PostData {
         this.reply_to_post_uuid = data.reply_to_post_uuid; // thread uuid
         this.certify = data.certify;
         this.json_metadata = new PostJsonMetadata(data.json_metadata);
+        this.json_metadata.anon_id.verify(this.content);
         this.tags = data.tags;
     }
 }

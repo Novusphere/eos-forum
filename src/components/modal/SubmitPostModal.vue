@@ -178,7 +178,8 @@ export default {
             value: post.attachment.value.trim(),
             type: post.attachment.type,
             display: post.attachment.value ? post.attachment.display : ""
-          }
+          },
+          anon_id: anon ? ui.GenerateAnonData(post.content) : null
         })
       };
 

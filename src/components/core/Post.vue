@@ -35,11 +35,11 @@
                   </li>
                   <li class="list-inline-item"><router-link :to="thread_link">{{ new Date(post.createdAt * 1000).toLocaleString() }}</router-link></li>
                   <li v-if="!reddit.author" class="list-inline-item">
-                    by <router-link :to="'/u/' + post.data.poster" :class="((post.data.poster == identity) ? 'text-mine' : 'author')">{{ post.data.poster }}</router-link>
+                    by <router-link :to="'/u/' + post.data.poster" :class="((post.data.poster == identity) ? 'text-mine' : 'author')">{{ poster_name }}</router-link>
                     <span v-if="op != 'eosforumanon' && post.data.poster == op" class="badge badge-success">op</span>
                   </li>
                   <li v-else class="list-inline-item">
-                    by <a :href="'https://www.reddit.com/user/' + reddit.author" class="author">{{ reddit.author }}[reddit]</a>
+                    by <a :href="'https://www.reddit.com/user/' + reddit.author" class="author">{{ poster_name }}</a>
                   </li>
                   <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
                   <li v-if="reddit.author" class="list-inline-item"><a :href="'https://reddit.com' + reddit.permalink">on reddit</a></li>
@@ -63,6 +63,14 @@
           :collapse="is_child || (!submit_modal && this.hasAttachment('iframe'))">
         </PostAttachment>
                 
+        <p style="font-weight: bold" v-if="post.createdAt >= 1540774751 && post.data.poster == 'eosforumanon'">
+          <span v-if="this.post.data.json_metadata.anon_id.verified">
+            Anon ID: {{ post.data.json_metadata.anon_id.pub }}
+          </span>
+          <span v-else>
+            Anon ID: unknown / unverified
+          </span>
+        </p>
         <p class="post-content" v-html="post_content"></p>
 
         <div class="text-xsmall post-buttons-bottom">
@@ -166,6 +174,19 @@ export default {
     reddit() {
       return this.post.data.json_metadata.reddit;
     },
+    poster_name() {
+      if (this.reddit.author) {
+        return this.reddit.author + "[reddit]";
+      } else if (
+        this.post.data.poster == "eosforumanon" &&
+        this.post.data.json_metadata.anon_id.name
+      ) {
+        return this.post.data.json_metadata.anon_id.name.substring(0, 12) + '[anon]'
+      }
+      else {
+        return this.post.data.poster;
+      }
+    },
     is_show_title() {
       if (!this.post.data.reply_to_post_uuid) return true; // top level post
 
@@ -235,9 +256,13 @@ export default {
         this.post.data.poster
       );
 
-      this.is_nsfw = 
-        (this.post.data.tags && this.post.data.tags.includes('nsfw')) ||
-        ((this.post.depth == 0) && (await moderation.isNsfw(this.post.createdAt, this.post.o_transaction)));
+      this.is_nsfw =
+        (this.post.data.tags && this.post.data.tags.includes("nsfw")) ||
+        (this.post.depth == 0 &&
+          (await moderation.isNsfw(
+            this.post.createdAt,
+            this.post.o_transaction
+          )));
 
       if (this.show_content) {
         var md = new MarkdownParser(
@@ -355,8 +380,7 @@ export default {
       }
       try {
         this.post.up = await ui.UpvoteFree(this.post);
-      }
-      catch (reason) {
+      } catch (reason) {
         console.log(reason);
         alert(reason);
       }

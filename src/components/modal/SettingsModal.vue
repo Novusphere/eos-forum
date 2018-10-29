@@ -17,6 +17,9 @@
                   <a class="nav-link active" data-toggle="tab" href="#settings-mod" role="tab">Delegated Moderation</a>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link" data-toggle="tab" href="#settings-anonid" role="tab">Anonymous Id</a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" data-toggle="tab" href="#settings-theme" role="tab">Theme</a>
                 </li>
                 <li class="nav-item">
@@ -24,26 +27,6 @@
                 </li>
               </ul>
               <div class="tab-content mt-2">
-                <div class="tab-pane fade" id="settings-api" role="tabpanel">
-                  <div class="text-center">
-                      <p class="text-alert">
-                          <strong>Warning:</strong> You should not modify these settings unless you know what you're doing! 
-                          If you incorrectly change something, click "reset" then "save" to restore the default settings.
-                      </p>
-                  </div>
-                  <form class="mx-4">
-                    <div class="form-group row">
-                      <div class="col-sm-12">
-                        <textarea rows="10" class="form-control" placeholder="Content" v-model="settings"></textarea>
-                      </div>
-                    </div>
-                    <div class="text-center">
-                      <button type="button" class="btn btn-outline-primary" data-dismiss="modal" v-on:click="save()">save</button>
-                      <button type="button" class="btn btn-outline-primary" v-on:click="reset()">reset</button>
-                      <button type="button" class="btn btn-outline-danger" v-on:click="forgetAll()">forget all</button>
-                    </div>
-                  </form>
-                </div>
                 <div class="tab-pane fade show active" id="settings-mod" role="tabpanel">
                   <div class="text-center">
                       <p class="">
@@ -81,6 +64,59 @@
                           <font-awesome-icon :icon="['fas', 'times']" ></font-awesome-icon>
                         </button>
                       </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="tab-pane fade" id="settings-anonid" role="tabpanel">
+                  <div class="text-center">
+                      <p class="">
+                          Use this panel to control your anonymous identity. 
+                          This is used when posting anonymously to identify your posts.
+                          You can regenerate a new anonymous identity at any time.
+                      </p>
+                  </div>
+                  <form class="mx-4">
+                    <div class="form-group row">
+                      <label class="col-2 col-form-label">Name</label>
+                      <div class="col-8">
+                        <input type="text" class="form-control" v-model="anon_name" placeholder="name">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-2 col-form-label">Key</label>
+                      <div class="col-8">
+                        <input type="text" class="form-control" v-model="anon_key" placeholder="identity key">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-2 col-form-label">Identity</label>
+                      <div class="col-8">
+                        <input type="text" class="form-control" v-model="anon_identity" readonly placeholder="identity public key">
+                      </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-outline-primary" v-on:click="newAnonId()">new</button>
+                        <button type="button" class="btn btn-outline-primary" v-on:click="saveAnonId()" data-dismiss="modal">save</button>
+                    </div>
+                  </form>
+                </div>
+                <div class="tab-pane fade" id="settings-api" role="tabpanel">
+                  <div class="text-center">
+                      <p class="text-alert">
+                          <strong>Warning:</strong> You should not modify these settings unless you know what you're doing! 
+                          If you incorrectly change something, click "reset" then "save" to restore the default settings.
+                      </p>
+                  </div>
+                  <form class="mx-4">
+                    <div class="form-group row">
+                      <div class="col-sm-12">
+                        <textarea rows="10" class="form-control" placeholder="Content" v-model="settings"></textarea>
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <button type="button" class="btn btn-outline-primary" data-dismiss="modal" v-on:click="save()">save</button>
+                      <button type="button" class="btn btn-outline-primary" v-on:click="reset()">reset</button>
+                      <button type="button" class="btn btn-outline-danger" v-on:click="forgetAll()">forget all</button>
                     </div>
                   </form>
                 </div>
@@ -124,21 +160,32 @@
 </template>
 
 <script>
+import ecc from "eosjs-ecc";
+
 import ui from "@/ui";
 import { storage, DEFAULT_STORAGE, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
-import Helpers from "@/helpers";
 
 export default {
   name: "SettingsModal",
   async mounted() {
     this.load();
   },
+  computed: {
+    anon_identity() {
+      if (!this.anon_key) {
+        return "";
+      }
+      return ecc.privateToPublic(this.anon_key);
+    }
+  },
   methods: {
     async load(txid) {
       this.settings = JSON.stringify(storage.settings, null, 2);
       this.mods = storage.moderation.mods;
       this.new_theme = storage.settings.theme;
+      this.anon_key = storage.anon_id.key;
+      this.anon_name = storage.anon_id.name;
       await this.loadReccomendedMods();
     },
     async loadReccomendedMods() {
@@ -198,6 +245,18 @@ export default {
       SaveStorage();
 
       this.mods = storage.moderation.mods;
+    },
+    async newAnonId() {
+      this.anon_key = await ecc.randomKey();
+    },
+    saveAnonId() {
+      if (this.anon_name.length > 12) {
+        alert('Anonymous name must be less than 13 characters');
+        return;
+      }
+      storage.anon_id.name = this.anon_name;
+      storage.anon_id.key = (this.anon_key && ecc.isValidPrivate(this.anon_key)) ? this.anon_key : "";
+      SaveStorage();
     }
   },
   data() {
@@ -209,7 +268,9 @@ export default {
       mod_list_value: "",
       new_mod: "",
       theme_list_value: "",
-      new_theme: ""
+      new_theme: "",
+      anon_name: "",
+      anon_key: ""
     };
   }
 };

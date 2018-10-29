@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import ecc from "eosjs-ecc";
 
 import Helpers from "@/helpers";
 import { MarkdownParser } from "@/markdown";
@@ -33,6 +34,21 @@ if (window.__PRESETS__ && window.__PRESETS__.header_texts) {
 function GetRandomHeaderText() {
     var header_text = HEADER_TEXTS[Math.floor(Math.random() * HEADER_TEXTS.length)];
     return header_text;
+}
+
+function GenerateAnonData(content) {
+    var data = {
+        name: storage.anon_id.name,
+        pub: "",
+        sig: ""
+    };
+
+    if (storage.anon_id.key && ecc.isValidPrivate(storage.anon_id.key)) {
+        data.pub = ecc.privateToPublic(storage.anon_id.key);
+        data.sig = ecc.sign(content, storage.anon_id.key, 'utf8');
+    }
+
+    return data;
 }
 
 async function Home(current_page, sub, sorter) {
@@ -866,6 +882,7 @@ export default {
     UpvoteFree,
     GetReccomendedModList,
     GeneratePostUuid,
+    GenerateAnonData,
     PushNewPost,
     // helpers [not async]
     GetRandomHeaderText,

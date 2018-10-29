@@ -3,7 +3,7 @@ import jQuery from "jquery";
 const MAX_TRACK_NEW_POSTS = 1000;
 
 var DEFAULT_STORAGE = {
-    version: 14,
+    version: 15,
     eos_referendum: true,
     subscribed_subs: ["all", "novusphere", "eos", "anon", "anon-r-eos", "anon-pol-econ", "music", "bounties"],
     new_posts: {},
@@ -13,6 +13,10 @@ var DEFAULT_STORAGE = {
         mods: [],
         accounts: [],
         transactions: []
+    },
+    anon_id: {
+        name: '',
+        key: ''
     },
     settings: {
         atmos_upvotes: true,
@@ -77,6 +81,9 @@ function importStorage(obj) {
         }
         else if (obj.version < 14) {
             obj.moderation.hide_spam_threads = storage.moderation.hide_spam_threads;
+        }
+        else if (obj.version < 15) {
+            obj.anon_id = storage.anon_id;
         }
 
         obj.version++;

@@ -17,6 +17,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.1",
     "bootstrap-vue": "^2.0.0-rc.11",
     "eosjs": "^15.0.6",
+    "eosjs-ecc": "^4.0.4",
     "gh-pages": "^1.2.0",
     "jquery": "^3.3.1",
     "readable-stream": "^3.0.6",

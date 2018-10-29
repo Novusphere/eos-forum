@@ -1,5 +1,6 @@
 import { PostAttachment } from "./attachment";
 import { PostReddit } from "./reddit";
+import { PostAnonId } from "./anonid";
 
 class PostJsonMetadata {
     constructor(json) {
@@ -10,7 +11,8 @@ class PostJsonMetadata {
             parent_poster: "",
             edit: false,
             attachment: null,
-            reddit: null
+            reddit: null,
+            anon_id: null,
 
         }, json);
 
@@ -25,6 +27,7 @@ class PostJsonMetadata {
 
             this.attachment = new PostAttachment(json.attachment);
             this.reddit = new PostReddit(json.reddit);
+            this.anon_id = new PostAnonId(json.anon_id);
         //}
     }
 }

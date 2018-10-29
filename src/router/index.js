@@ -53,11 +53,11 @@ export default new Router({
       path: '/referendum',
       name: 'Referendum',
       component: Referendum
-    }
-    /*{
+    },
+    {
         path: '/test',
         name: 'Test',
         component: Test
-    }*/
+    },
   ]
 })
