@@ -681,6 +681,8 @@ async function PushNewPost(post, parent_tx, anon, warn_anon, set_status) {
             txid = eostx.transaction_id;
 
         } else {
+            const eos = GetEOS();
+
             var tips_rx = post.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
             var actions = [
                 {
@@ -713,6 +715,8 @@ async function PushNewPost(post, parent_tx, anon, warn_anon, set_status) {
                     account: "eosio.token"
                 });
 
+                const tip_to = JSON.parse(post.json_metadata).parent_poster;
+
                 for (var i = 0; i < tips_rx.length; i++) {
                     var tip_args = tips_rx[i].split(" ");
 
@@ -733,17 +737,17 @@ async function PushNewPost(post, parent_tx, anon, warn_anon, set_status) {
                         .split(".")[1].length;
 
                     var adjusted_amount = parseFloat(tip_args[1]).toFixed(precision);
-
-                    actions.push({
+                    var tip_action = {
                         contract: token.account,
-                        method: "transfer",
+                        name: "transfer",
                         data: {
                             from: identity.account,
-                            to: post.json_metadata.parent_poster,
+                            to: tip_to,
                             quantity: adjusted_amount + " " + token.symbol,
                             memo: "tip for " + parent_tx
                         }
-                    });
+                    };
+                    actions.push(tip_action);
                 }
             }
             // ---

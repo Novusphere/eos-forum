@@ -14,10 +14,10 @@
             <div class="modal-body">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                  <a class="nav-link active" data-toggle="tab" href="#settings-mod" role="tab">Delegated Moderation</a>
+                  <a class="nav-link active" data-toggle="tab" href="#settings-mod" role="tab">Moderation</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="tab" href="#settings-anonid" role="tab">Anonymous Id</a>
+                  <a class="nav-link" data-toggle="tab" href="#settings-anonid" role="tab">Anon Id</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" data-toggle="tab" href="#settings-theme" role="tab">Theme</a>
@@ -89,7 +89,7 @@
                       </div>
                     </div>
                     <div class="form-group row">
-                      <label class="col-2 col-form-label">Identity</label>
+                      <label class="col-2 col-form-label"></label>
                       <div class="col-8">
                         <input type="text" class="form-control" v-model="anon_identity" readonly placeholder="identity public key">
                       </div>
