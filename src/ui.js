@@ -573,6 +573,7 @@ async function UpvoteFree(post) {
 }
 
 async function Upvote(post, atmos) {
+
     atmos = parseFloat(atmos);
     if (isNaN(atmos) || atmos <= 0) {
         throw ("Invalid quantity of atmos");

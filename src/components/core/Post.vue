@@ -63,7 +63,7 @@
           :collapse="is_child || (!submit_modal && this.hasAttachment('iframe'))">
         </PostAttachment>
                 
-        <p style="font-weight: bold" v-if="post.createdAt >= 1540774751 && post.data.poster == 'eosforumanon'">
+        <p style="font-weight: bold" v-if="!reddit.author && post.createdAt >= 1540774751 && post.data.poster == 'eosforumanon'">
           <span v-if="this.post.data.json_metadata.anon_id.verified">
             Anon ID: {{ post.data.json_metadata.anon_id.pub }}
           </span>

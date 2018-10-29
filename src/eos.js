@@ -218,11 +218,10 @@ async function ExecuteEOSActions(actions) {
     if (g_wallet_type == WALLET_TYPE_SCATTER) {        
         const eos = GetEOS();
 
-        var eostx = await eos.transaction(actions.map(a => a.contract), _contracts => {
-            var contracts = Object.values(_contracts);
+        var eostx = await eos.transaction(actions.map(a => a.contract), contracts => {
             for (var i = 0; i < actions.length; i++) {
                 var act = actions[i];
-                contracts[i][act.name](act.data, auth);
+                contracts[act.contract][act.name](act.data, auth);
             }
         });
     
