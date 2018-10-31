@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="header">
-      <ul class="list-inline mb-0">
+      <ul class="list-inline mb-0" v-if="identity">
             <li class="list-inline-item">
               <router-link :to="'/'">
                 <img src="https://cdn.novusphere.io/static/atmos.svg" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -55,9 +55,8 @@ import ui from "@/ui";
 import { MarkdownParser } from "@/markdown";
 
 import { storage } from "@/storage";
-import { DEFAULT_IDENTITY, ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
+import { ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
-import { forum } from "@/novusphere-forum";
 
 export default {
   name: "HeaderSection",
@@ -68,7 +67,7 @@ export default {
     }
   },
   async mounted() {
-    var header_text = ui.GetRandomHeaderText();
+    var header_text = ui.helpers.GetRandomHeaderText();
     this.random_header = new MarkdownParser(header_text).html;
 
     this.identity = await GetIdentity();
@@ -106,7 +105,7 @@ export default {
   },
   data() {
     return {
-      identity: DEFAULT_IDENTITY,
+      identity: null,
       eos_referendum: storage.eos_referendum,
       random_header: ""
     };

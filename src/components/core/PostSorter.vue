@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { forum } from "@/novusphere-forum";
+import { GetNovusphere } from "@/novusphere";
 
 export default {
   name: "PostSorter",
@@ -31,10 +31,11 @@ export default {
           }
       },
       getSorter() {
+          const novusphere = GetNovusphere();
           if (this.by == 'popular') {
-              return forum.sort_by_score();
+              return novusphere.query.sort.score();
           }
-          return forum.sort_by_time();
+          return novusphere.query.sort.time();
       }
   },
   data() {

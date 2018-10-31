@@ -166,7 +166,7 @@ export default {
         reply_to_post_uuid: this.reply_uuid,
         certify: 0,
         content: post.content,
-        post_uuid: ui.GeneratePostUuid(),
+        post_uuid: ui.helpers.GeneratePostUuid(),
         json_metadata: JSON.stringify({
           title: post.title,
           type: "novusphere-forum",
@@ -179,7 +179,7 @@ export default {
             type: post.attachment.type,
             display: post.attachment.value ? post.attachment.display : ""
           },
-          anon_id: anon ? ui.GenerateAnonData(post.content) : null
+          anon_id: anon ? ui.helpers.GenerateAnonData(post.content) : null
         })
       };
 
@@ -192,14 +192,20 @@ export default {
       }
     },
     async postContent(anon, warn_anon) {
-      
       this.setStatus("Creating tx and broadcasting to EOS...");
       var eos_post = await this.makePost(anon);
       if (!eos_post) {
         return false;
       }
 
-      var txid = await ui.PushNewPost(eos_post, this.post.parent_tx, anon, warn_anon, this.setStatus);
+      var txid = await ui.actions.PushNewPost(
+        eos_post,
+        this.post.parent_tx,
+        anon,
+        warn_anon,
+        this.setStatus
+      );
+      
       if (!txid) {
         return false;
       }
@@ -218,11 +224,11 @@ export default {
   },
   computed: {
     post_content: function() {
-      var md = ui.ParseMarkdown(this.post.content);
+      var md = ui.helpers.ParseMarkdown(this.post.content);
       return md.html;
     },
     is_anon_sub: function() {
-      return ui.IsAnonSub(this.sub);
+      return ui.helpers.IsAnonSub(this.sub);
     }
   },
   data() {

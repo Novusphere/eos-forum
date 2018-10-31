@@ -1,5 +1,5 @@
 import { storage } from "@/storage";
-import Helpers from "@/helpers";
+import requests from "@/requests";
 
 class Moderation {
     constructor() {
@@ -29,7 +29,7 @@ class Moderation {
 
         try {
             endpoint = endpoint + '/' + key + '.json';
-            var json = JSON.parse(await Helpers.AsyncGet(endpoint));
+            var json = JSON.parse(await requests.get(endpoint));
             return json;
         }
         catch (ex) {

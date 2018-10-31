@@ -189,7 +189,7 @@ export default {
       await this.loadReccomendedMods();
     },
     async loadReccomendedMods() {
-      this.mod_list = await ui.GetReccomendedModList();
+      this.mod_list = await ui.actions.GetReccomendedModList();
     },
     modListChange() {
       this.new_mod = this.mod_list_value;

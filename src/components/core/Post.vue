@@ -129,7 +129,7 @@ import jQuery from "jquery";
 
 import ui from "@/ui";
 
-import Helpers from "@/helpers";
+import requests from "@/requests";
 import { MarkdownParser } from "@/markdown";
 import { GetIdentity } from "@/eos";
 import { moderation } from "@/moderation";
@@ -371,7 +371,7 @@ export default {
       jQuery("#submitPost").modal();
     },
     getHost(href) {
-      return Helpers.GetHost(href);
+      return ui.helpers.GetHost(href);
     },
     async upvote() {
       if (this.post.my_vote) {
@@ -379,7 +379,7 @@ export default {
         return;
       }
       try {
-        this.post.up = await ui.UpvoteFree(this.post);
+        this.post.up = await ui.actions.UpvoteFree(this.post);
       } catch (reason) {
         console.log(reason);
         alert(reason);

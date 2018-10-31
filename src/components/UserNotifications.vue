@@ -54,12 +54,12 @@ export default {
   },
   methods: {
     async load() {
-      var notifications = await ui.Notifications(this.$route.query.page);
+      var notifications = await ui.views.UserNotifications(this.$route.query.page);
       this.current_page = notifications.current_page;
       this.pages = notifications.pages;
       this.posts = notifications.posts;
 
-      await ui.MarkNotificationsAsRead();
+      await ui.actions.MarkNotificationsAsRead();
     }
   },
   data() {

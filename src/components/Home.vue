@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     async load() {
-      var home = await ui.Home(this.$route.query.page, this.$route.params.sub, this.$refs.sorter.getSorter());
+      var home = await ui.views.Home(this.$route.query.page, this.$route.params.sub, this.$refs.sorter.getSorter());
       this.is_subscribed = home.is_subscribed;
       this.posts = home.posts;
       this.pages = home.pages;
@@ -81,7 +81,7 @@ export default {
     },
     async newThread() {
       try {
-        await ui.NewThread(this.sub);
+        await ui.actions.CheckCreateThread(this.sub);
         jQuery("#submitPost").modal();
       }
       catch (reason) {
@@ -92,7 +92,7 @@ export default {
       this.$router.push("/e/" + this.sub + "/" + txid);
     },
     async subscribe(sub) {
-      this.is_subscribed = await ui.Subscribe(sub, this.sub);
+      this.is_subscribed = await ui.actions.Subscribe(sub, this.sub);
     }
   },
   data() {

@@ -51,13 +51,13 @@ export default {
   async mounted() {},
   computed: {
     upvotes() {
-      return ui.AtmosToUpvotes(this.atmos);
+      return ui.helpers.AtmosToUpvotes(this.atmos);
     }
   },
   methods: {
     async upvote() {
       try {
-        this.post.up = await ui.Upvote(this.post, this.atmos);
+        this.post.up = await ui.actions.UpvotePaid(this.post, this.atmos);
         jQuery("#upvoteModal").modal("hide");
       } catch (reason) {
         this.error = reason;
@@ -65,7 +65,7 @@ export default {
     },
     modal(post) {
       this.post = post;
-      this.atmos = ui.UpvotesToAtmos(1);
+      this.atmos = ui.helpers.UpvotesToAtmos(1);
       this.error = "";
       jQuery("#upvoteModal").modal();
     }
@@ -74,7 +74,7 @@ export default {
     return {
       error: "",
       atmos: 10,
-      post: ui.PlaceholderPost()
+      post: ui.helpers.PlaceholderPost()
     };
   }
 };

@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     async load() {
-      var search = ui.Search();
+      var search = ui.views.Search();
 
       this.subs = search.subs;
     }

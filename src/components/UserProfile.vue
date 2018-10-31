@@ -57,7 +57,6 @@ import {
   ScatterEosOptions
 } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
-import { forum } from "@/novusphere-forum";
 import { storage, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
 
@@ -96,7 +95,7 @@ export default {
   },
   methods: {
     async load() {
-      var profile = await ui.UserProfile(this.$route.query.page, this.$route.params.account, this.$refs.sorter.getSorter());
+      var profile = await ui.views.UserProfile(this.$route.query.page, this.$route.params.account, this.$refs.sorter.getSorter());
       
       this.current_page = profile.current_page;
       this.account = profile.account;
@@ -110,7 +109,7 @@ export default {
       this.pages = profile.pages;
     },
     async toggleBlock() {
-      await ui.ToggleBlockUser(this.account, this.is_blocked);
+      await ui.actions.BlockUser(this.account, this.is_blocked);
       await this.load();
     }
   },

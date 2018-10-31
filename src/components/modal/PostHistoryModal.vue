@@ -23,7 +23,6 @@
 import ui from "@/ui";
 import { GetEOS, GetIdentity } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
-import { forum } from "@/novusphere-forum";
 
 import Post from "@/components/core/Post";
 
@@ -38,16 +37,16 @@ export default {
   methods: {
     resetPost() {
       // stop any attachments from playing, etc.
-      this.main_post = ui.PlaceholderPost();
+      this.main_post = ui.helpers.PlaceholderPost();
     },
     async load(txid) {
-      var history = await ui.PostHistory(txid);
+      var history = await ui.views.PostHistory(txid);
       this.main_post = history.main_post;
     }
   },
   data() {
     return {
-      main_post: ui.PlaceholderPost()
+      main_post: ui.helpers.PlaceholderPost()
     };
   }
 };

@@ -1,4 +1,5 @@
-import Helpers from "@/helpers";
+import requests from "@/requests";
+import ui from "@/ui";
 
 class PostAttachment {
     constructor(attachment) {
@@ -55,7 +56,7 @@ class PostAttachment {
                 //
                 //  transform youtube --> auto embed
                 //
-                var host = Helpers.GetHost(attachment.value);
+                var host = ui.helpers.GetHost(attachment.value);
                 if (host == 'youtu.be') {
                     var split = attachment.value.split('/');
                     attachment.value = 'https://www.youtube.com/?v=' + split[split.length - 1];
@@ -73,6 +74,9 @@ class PostAttachment {
                 if (host == 'i.imgur.com') {
                     attachment.display = 'img';
                 }
+                if (host == 'i.redd.it') {
+                    attachment.display = 'img';
+                }
                 if (host == 'twitter.com') {
                     attachment.value = 'https://twitframe.com/show?url=' + attachment.value;
                     attachment.width = 560;
@@ -88,7 +92,7 @@ class PostAttachment {
                 }
                 if (host == 'soundcloud.com') {
                     try {
-                        var sc_json = await Helpers.AsyncGet('https://soundcloud.com/oembed?format=json&url=' + attachment.value);
+                        var sc_json = await requests.get('https://soundcloud.com/oembed?format=json&url=' + attachment.value);
                         var sc_src = sc_json.html.match(/src=\".+\"/);
                         if (sc_src.length > 0) {
                             var sc_iframe = sc_src[0].substring(5);

@@ -174,7 +174,6 @@ import {
   GetIdentity
 } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
-import { forum } from "@/novusphere-forum";
 import { MarkdownParser } from "@/markdown";
 
 import Post from "@/components/core/Post";
@@ -249,8 +248,8 @@ export default {
         cursor: {},
         pipeline: [
           { $match: MATCH_QUERY },
-          { $sort: forum.sort_by_time() },
-          { $skip: forum.skip_page(currentPage, MAX_ITEMS_PER_PAGE) },
+          { $sort: novusphere.query.sort.time() },
+          { $skip: novusphere.query.skip.page(currentPage, MAX_ITEMS_PER_PAGE) },
           { $limit: MAX_ITEMS_PER_PAGE },
           {
             $lookup: {
@@ -393,7 +392,7 @@ export default {
           "data.proposal_name": prop.data.proposal_name,
           createdAt: { $gte: prop.createdAt }
         },
-        sort: forum.sort_by_time()
+        sort: novusphere.query.sort.time()
       })).cursor.firstBatch;
 
       var unvotes = (await novusphere.api({
@@ -404,7 +403,7 @@ export default {
           "data.proposal_name": prop.data.proposal_name,
           createdAt: { $gte: prop.createdAt }
         },
-        sort: forum.sort_by_time()
+        sort: novusphere.query.sort.time()
       })).cursor.firstBatch;
 
       return { votes: votes, unvotes: unvotes };

@@ -1,6 +1,6 @@
 import EOSFormat from "eosjs/lib/format";
 
-export class EOSBinaryReader {
+export default class EOSBinaryReader {
 
     constructor(hex) {
         var bytes = new Uint8Array(hex.length / 2);

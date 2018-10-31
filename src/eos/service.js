@@ -1,4 +1,4 @@
-import jQuery from "jquery";
+import requests from "@/requests";
 
 var ServiceConfig = {
     url: 'https://eos-service.novusphere.io',
@@ -10,14 +10,8 @@ class EOSService {
         this.config = config;
     }
     async anonymousPost(post) {
-        var _this = this;
-        return new Promise((resolve, reject) => {
-            jQuery.post(_this.config.url + '/eosforum/anon', post, function (res) {
-                resolve(res);
-            }).fail(function() {
-                reject();
-            });
-        });
+        var result = await requests.post(this.config.url + '/eosforum/anon', post);
+        return result;
     }
 }
 

@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     async load() {
-      var thread = await ui.Thread(this.$route.params.id, this.$route.params.child_id);
+      var thread = await ui.views.Thread(this.$route.params.id, this.$route.params.child_id);
       this.opening_post = thread.opening_post;
       this.main_post = thread.main_post;
     },
@@ -65,8 +65,8 @@ export default {
   },
   data() {
     return {
-      opening_post: ui.PlaceholderPost(),
-      main_post: ui.PlaceholderPost()
+      opening_post: ui.helpers.PlaceholderPost(),
+      main_post: ui.helpers.PlaceholderPost()
     };
   }
 };

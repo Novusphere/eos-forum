@@ -1,5 +1,7 @@
 import { storage } from "@/storage";
 
+import { GetEOS, EOSBinaryReader } from "@/eos";
+
 import { PostReddit } from "./reddit";
 import { PostAttachment } from "./attachment";
 import { PostJsonMetadata } from "./jsonmetadata";
@@ -54,6 +56,7 @@ class Post {
 
         this.o_transaction = this.transaction;
         this.o_id = this.id;
+        this.o_attachment = new PostAttachment(this.data.json_metadata.attachment);
 
         if (post.recent_edit) {
             this.applyEdit(post.recent_edit);
@@ -63,6 +66,29 @@ class Post {
             this.parent = new Post(post.parent);
             this.data.json_metadata.title = this.parent.data.json_metadata.title;
         }
+    }
+
+    async decensor() {
+        if (this.data.content) // we know a condition is content cannot be empty
+            return;
+
+        const eos = GetEOS();
+        const tx = await eos.getTransaction(this.transaction);
+    
+        var hex = tx.trx.trx.actions[0].data;
+        var rdr = new EOSBinaryReader(hex);
+    
+        var tx_data = {
+            poster: rdr.readName(),
+            post_uuid: rdr.readString(),
+            content: rdr.readString(),
+            reply_to_poster: rdr.readName(),
+            reply_to_post_uuid: rdr.readString(),
+            certify: rdr.readVarInt(),
+            json_metadata: rdr.readString()
+        };
+
+        // to-do ...
     }
 
     getTitle() {

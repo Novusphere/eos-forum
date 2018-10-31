@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     async load() {
-      var tag = await ui.Tag(this.$route.query.page, this.$route.params.tag, this.$refs.sorter.getSorter());
+      var tag = await ui.views.Tag(this.$route.query.page, this.$route.params.tag, this.$refs.sorter.getSorter());
 
       // push data to this
       this.posts = tag.posts;

@@ -5,8 +5,8 @@
 </template>
 
 <script>
-import { GetNovusphere } from "../novusphere";
-import { GetEOS } from "../eos";
+import { GetNovusphere } from "@/novusphere";
+import { GetEOS } from "@/eos";
 //import IPFS from "ipfs";
 //import render from "render-media";
 
@@ -17,20 +17,6 @@ export default {
   name: "Test",
   async mounted() {
     const novusphere = GetNovusphere();
-    const query = {
-        find: novusphere.config.collection,
-        maxTimeMS: 1000,
-        filter: {
-          "data.json_metadata.title": { $regex: '^(Weekly Discussion \\(anon\\-pol\\-econ\\))' },
-          "data.json_metadata.sub": "anon-pol-econ",
-          "data.poster": "eosforumanon"
-        },
-        sort: { createdAt: -1 },
-        limit: 1,
-    };
-    var result = await novusphere.api(query);
-
-    console.log(result);
 
     //console.log("ipfs creating");
     //const ipfs = new IPFS();
