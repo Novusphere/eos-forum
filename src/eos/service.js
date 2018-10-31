@@ -2,7 +2,6 @@ import requests from "@/requests";
 
 var ServiceConfig = {
     url: 'https://eos-service.novusphere.io',
-    anon_account: 'eosforumanon'
 };
 
 class EOSService {

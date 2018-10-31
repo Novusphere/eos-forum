@@ -10,6 +10,7 @@ import Thread from "./views/Thread";
 import UserNotifications from "./views/UserNotifications";
 import UserProfile from "./views/UserProfile";
 import Search from "./views/Search";
+import Referendum from "./views/Referendum";
 
 // actions
 import CheckCreateThread from "./actions/CheckCreateThread";
@@ -20,6 +21,7 @@ import UpvotePaid from "./actions/UpvotePaid";
 import UpvoteFree from "./actions/UpvoteFree";
 import GetReccomendedModList from "./actions/GetReccomendedModList"; 
 import PushNewPost from "./actions/PushNewPost";
+import ReferendumActions from "./actions/Referendum";
 
 // helpers
 import UIHelpers from "./helpers";
@@ -66,6 +68,7 @@ export default {
         UserProfile,
         PostHistory,
         Search,
+        Referendum,
     },
     actions: { // all actions should be async
         CheckCreateThread,
@@ -76,6 +79,7 @@ export default {
         UpvoteFree,
         GetReccomendedModList,
         PushNewPost,
+        Referendum: ReferendumActions
     },
     helpers: UIHelpers
 };

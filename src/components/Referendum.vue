@@ -51,8 +51,8 @@
         <div class="row mb-4">
             <div class="col-12">
               <div class="float-right">
-                  <router-link v-if="currentPage>1" class="btn btn-outline-primary" :to="'/referendum?page=' + (currentPage-1)">&larr; prev</router-link>
-                  <router-link v-if="currentPage<pages" class="btn btn-outline-primary" :to="'/referendum?page=' + (currentPage+1)">next &rarr;</router-link>
+                  <router-link v-if="current_page>1" class="btn btn-outline-primary" :to="'/referendum?page=' + (current_page-1)">&larr; prev</router-link>
+                  <router-link v-if="current_page<pages" class="btn btn-outline-primary" :to="'/referendum?page=' + (current_page+1)">next &rarr;</router-link>
               </div>
             </div>
         </div>
@@ -168,11 +168,9 @@
 import jQuery from "jquery";
 import sha256 from "sha256";
 
-import {
-  GetEOS,
-  ScatterEosOptions,
-  GetIdentity
-} from "@/eos";
+import ui from "@/ui";
+
+import { GetEOS, ScatterEosOptions, GetIdentity } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { MarkdownParser } from "@/markdown";
 
@@ -223,78 +221,11 @@ export default {
       const identity = await GetIdentity();
       this.identity = identity.account;
 
-      var currentPage = parseInt(
-        this.$route.query.page ? this.$route.query.page : 1
-      );
+      var referendum = await ui.views.Referendum(this.$route.query.page);
 
-      const novusphere = GetNovusphere();
-
-      var MATCH_QUERY = {
-        name: "propose",
-        createdAt: { $gte: 1537221139 }
-      };
-
-      var apiResult = await novusphere.api({
-        count: REFERENDUM_COLLECTION,
-        maxTimeMS: 1000,
-        query: MATCH_QUERY
-      });
-
-      var numPages = Math.ceil(apiResult.n / MAX_ITEMS_PER_PAGE);
-
-      apiResult = await novusphere.api({
-        aggregate: REFERENDUM_COLLECTION,
-        maxTimeMS: 1000,
-        cursor: {},
-        pipeline: [
-          { $match: MATCH_QUERY },
-          { $sort: novusphere.query.sort.time() },
-          { $skip: novusphere.query.skip.page(currentPage, MAX_ITEMS_PER_PAGE) },
-          { $limit: MAX_ITEMS_PER_PAGE },
-          {
-            $lookup: {
-              from: REFERENDUM_COLLECTION,
-              let: {
-                proposal_name: "$data.proposal_name",
-                createdAt: "$createdAt"
-              },
-              pipeline: [
-                { $match: { name: "expire" } },
-                {
-                  $project: {
-                    txid: "$transaction",
-                    test: {
-                      $and: [
-                        { $eq: ["$data.proposal_name", "$$proposal_name"] },
-                        { $gte: ["$createdAt", "$$createdAt"] }
-                      ]
-                    }
-                  }
-                },
-                { $match: { test: true } }
-              ],
-              as: "expired"
-            }
-          }
-        ]
-      });
-
-      // mark expired proposals
-      const unixNow = new Date();
-      var payload = apiResult.cursor.firstBatch;
-      for (var i = 0; i < payload.length; i++) {
-        var p = payload[i];
-        p.expired = p.expired.length > 0;
-
-        if (unixNow > new Date(p.data.expires_at)) {
-          p.expired = true;
-        }
-      }
-
-      // push data to this
-      this.posts = payload;
-      this.pages = numPages;
-      this.currentPage = currentPage;
+      this.posts = referendum.posts;
+      this.pages = referendum.pages;
+      this.current_page = referendum.current_page;
     },
     async newProposal() {
       const identity = await GetIdentity();
@@ -305,59 +236,14 @@ export default {
       }
     },
     async submitProposal() {
-      if (this.post.title.length > 1024) {
-        this.status =
-          "Title is too long, over limit by " +
-          (1024 - post.title.length) +
-          " characters";
-        return;
-      }
+      this.status = "Submitting proposal... this may take a moment.";
 
-      if (this.post.content.length > 30000) {
-        this.status =
-          "Post is too long, over limit by " +
-          (30000 - post.content.length) +
-          " characters";
-        return;
-      }
-
-      const identity = await GetIdentity();
-
-      var eostxArg = {
-        proposer: identity.account,
-        proposal_name: this.generateName(identity.account, this.post.content),
-        title: this.post.title,
-        proposal_json: JSON.stringify({
-          content: this.post.content,
-          src: "novusphere-forum"
-        }),
-        expires_at: new Date(this.post.expiry).getTime() / 1000
-      };
-
-      var txid;
       try {
-        const eos = GetEOS();
-        var contract = await eos.contract(REFERENDUM_CONTRACT);
-        var eostx = await contract.transaction(tx => {
-          tx.propose(eostxArg, {
-            authorization: [
-              {
-                actor: identity.account,
-                permission: identity.auth
-              }
-            ]
-          });
-        });
-
-        txid = eostx.transaction_id;
-      } catch (ex) {
-        console.log(ex);
-        this.status = "Error: Failed to submit proposal!";
+        await ui.actions.Referendum.PushNewProposal(this.post);
+      } catch (reason) {
+        this.status = reason;
         return;
       }
-
-      const novusphere = GetNovusphere();
-      await novusphere.waitTx(txid, 500, 1000, REFERENDUM_COLLECTION);
 
       jQuery("#submitProposal").modal("hide");
       this.status = "";
@@ -365,225 +251,35 @@ export default {
       await this.load();
     },
     md(text) {
-      var md = new MarkdownParser(text);
+      var md = ui.helpers.ParseMarkdown(text);
       return md.html;
     },
-    async getProposal(txid) {
-      const novusphere = GetNovusphere();
-      var prop = (await novusphere.api({
-        find: REFERENDUM_COLLECTION,
-        maxTimeMS: 1000,
-        filter: {
-          name: "propose",
-          transaction: txid
-        }
-      })).cursor.firstBatch[0];
-
-      return prop;
-    },
-    async getProposalVotes(prop) {
-      var novusphere = GetNovusphere();
-
-      var votes = (await novusphere.api({
-        find: REFERENDUM_COLLECTION,
-        maxTimeMS: 1000,
-        filter: {
-          name: "vote",
-          "data.proposal_name": prop.data.proposal_name,
-          createdAt: { $gte: prop.createdAt }
-        },
-        sort: novusphere.query.sort.time()
-      })).cursor.firstBatch;
-
-      var unvotes = (await novusphere.api({
-        find: REFERENDUM_COLLECTION,
-        maxTimeMS: 1000,
-        filter: {
-          name: "unvote",
-          "data.proposal_name": prop.data.proposal_name,
-          createdAt: { $gte: prop.createdAt }
-        },
-        sort: novusphere.query.sort.time()
-      })).cursor.firstBatch;
-
-      return { votes: votes, unvotes: unvotes };
-    },
     async cleanProposal(propTxid) {
-      const novusphere = GetNovusphere();
-      const identity = await GetIdentity();
-
-      const eos = GetEOS();
-      const prop = await this.getProposal(propTxid);
-
-      var eostxArg = {
-        proposal_name: prop.data.proposal_name,
-        max_count: 0xffffffff
-      };
-      var eosforum = await eos.contract(REFERENDUM_CONTRACT);
-      var eostx = await eosforum.transaction(tx => {
-        tx.clnproposal(eostxArg, {
-          authorization: [
-            {
-              actor: identity.account,
-              permission: identity.auth
-            }
-          ]
-        });
-      });
+      await ui.actions.Referendum.CleanProposal(propTxid);
     },
     async expire(propTxid) {
-      const novusphere = GetNovusphere();
-      const identity = await GetIdentity();
-
-      const eos = GetEOS();
-      const prop = await this.getProposal(propTxid);
-
-      var eostxArg = {
-        proposal_name: prop.data.proposal_name
-      };
-      var eosforum = await eos.contract(REFERENDUM_CONTRACT);
-      var eostx = await eosforum.transaction(tx => {
-        tx.expire(eostxArg, {
-          authorization: [
-            {
-              actor: identity.account,
-              permission: identity.auth
-            }
-          ]
-        });
-      });
-
-      // show status
-      await novusphere.waitTx(
-        eostx.transaction_id,
-        500,
-        1000,
-        REFERENDUM_COLLECTION
-      );
+      await ui.actions.Referendum.Expire(propTxid);
       await this.load();
     },
     async castVote(propTxid, vote) {
-      const novusphere = GetNovusphere();
-      const identity = await GetIdentity();
-
-      if (!identity.account) {
-        alert("You must be logged in to vote!");
-        return;
-      }
-
-      const eos = GetEOS();
-      const prop = await this.getProposal(propTxid);
-
-      // NOTE & TO-DO: "vote" is changing to "vote_value"
-      var eostxArg = {
-        voter: identity.account,
-        proposal_name: prop.data.proposal_name,
-        vote: vote,
-        vote_json: ""
-      };
-      var eosforum = await eos.contract(REFERENDUM_CONTRACT);
-      var eostx = await eosforum.transaction(tx => {
-        tx.vote(eostxArg, {
-          authorization: [
-            {
-              actor: identity.account,
-              permission: identity.auth
-            }
-          ]
-        });
-      });
-
-      // show status
-      await novusphere.waitTx(
-        eostx.transaction_id,
-        500,
-        1000,
-        REFERENDUM_COLLECTION
-      );
-      await this.proposalStatus(prop.transaction);
+      await ui.actions.Referendum.Vote(propTxid, vote);
+      await this.proposalStatus(propTxid);
     },
     async proposalStatus(txid) {
-      var eos = GetEOS();
-      var prop = await this.getProposal(txid);
-      var pv = await this.getProposalVotes(prop);
+      var status = await ui.actions.Referendum.Status(txid);
 
-      var voteResult = {};
-      var voteResult_for = 0;
-      var voteResult_against = 0;
-
-      // update vote results
-      for (var i = 0; i < pv.votes.length; i++) {
-        var v = pv.votes[i];
-        if (v.data.voter in voteResult) {
-          continue;
-        }
-        voteResult[v.data.voter] = {
-          account: v.data.voter,
-          txid: v.transaction,
-          time: v.createdAt,
-          vote: v.data.vote,
-          json: v.data.vote_json,
-          staked: 0
-        };
-      }
-
-      // remove unvoted unvotes
-      for (var i = 0; i < pv.unvotes.length; i++) {
-        var uv = pv.unvotes[i];
-        var vr = voteResult[uv.data.voter];
-        if (vr) {
-          if (vr.time < uv.createdAt) {
-            delete voteResult[uv.data.voter];
-          }
-        } else {
-          console.log("no vote found for " + uv.data.voter);
-        }
-      }
-
-      // pull stake data from bp api async
-      await Promise.all(
-        Object.keys(voteResult).map(
-          voter =>
-            new Promise(async resolve => {
-              var account = await eos.getAccount(voter);
-              //var staked = (account.voter_info) ? (account.voter_info.staked / 10000) : 0;
-              //var staked = (account.cpu_weight + account.net_weight) / 10000;
-              var staked = account.self_delegated_bandwidth
-                ? parseFloat(account.self_delegated_bandwidth.cpu_weight) +
-                  parseFloat(account.self_delegated_bandwidth.net_weight)
-                : 0;
-              var vr = voteResult[voter];
-              vr.staked = staked;
-              resolve();
-            })
-        )
-      );
-
-      // tall up votes
-      for (var voter in voteResult) {
-        var vr = voteResult[voter];
-        if (vr.vote) {
-          voteResult_for += vr.staked;
-        } else {
-          voteResult_against += vr.staked;
-        }
-      }
-
-      this.vote.title = prop.data.title;
-      this.vote.for = voteResult_for;
-      this.vote.against = voteResult_against;
-      this.vote.approval =
-        voteResult_for / Math.max(voteResult_for + voteResult_against, 1);
-      this.vote.voters = Object.values(voteResult).sort(
-        (v1, v2) => v2.staked - v1.staked
-      );
+      this.vote.title = status.title;
+      this.vote.for = status.for;
+      this.vote.against = status.against;
+      this.vote.approval = status.approval;
+      this.vote.voters = status.voters;
 
       jQuery("#voteResult").modal();
     }
   },
   data() {
     return {
-      currentPage: 0,
+      current_page: 0,
       pages: 0,
       posts: [],
       identity: "",

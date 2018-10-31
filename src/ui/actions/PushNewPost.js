@@ -18,8 +18,8 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
     const eos_service = GetEOSService();
     const identity = await GetIdentity();
 
-    // set correct poster
-    post.poster = (anon) ? eos_service.config.anon_account : identity.account;
+    // if anon, service will set poster
+    post.poster = (anon) ? "" : identity.account;
 
     var txid;
 
