@@ -44,11 +44,26 @@ class Moderation {
     }
 
     async getCacheSet(createdAt) {
+
         var now = new Date().getTime();
         var date = new Date(createdAt * 1000);
         var key = this.dateToKey(date);
-        var data = this.cache[key];
+        var data;
+
+        // lock
+        for (;;) {
+            data = this.cache[key];
+            if (data == 0) {
+                await requests.sleep(5);
+            }
+            else {
+                break;
+            }
+        }
+
         if (data == null || (now - data.last_updated) >= 1000 * 60 * 10) { // update cache every 10 min
+
+            this.cache[key] = 0; // lock
 
             data = {
                 last_updated: now,

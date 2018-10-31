@@ -1,10 +1,6 @@
 import requests from "@/requests";
 import query from "./query";
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 class NovusphereAdapter {
     constructor(config) {
         this.config = config;
@@ -25,7 +21,7 @@ class NovusphereAdapter {
             if (payload.length > 0)
                 return result;
 
-            await sleep(delay);
+            await requests.sleep(delay);
         }
     }
     async waitTx(txid, delay, maxtimeMS, collection) {

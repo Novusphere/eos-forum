@@ -26,6 +26,7 @@ export default async function Thread(id, child_id) {
     })).cursor.firstBatch[0];
 
     main_post = new Post(main_post);
+    await main_post.normalize();
 
     var mp_np = storage.new_posts[main_post.data.post_uuid];
     main_post.__seen = (mp_np) ? mp_np.seen : ((new Date().getTime()) / 1000);
@@ -73,7 +74,7 @@ export default async function Thread(id, child_id) {
                     p.data.poster == parent.data.poster &&
                     p.createdAt > parent.createdAt
                 ) {
-                    parent.applyEdit(p);
+                    await parent.applyEdit(p);
                 }
             } else {
                 new_posts++;

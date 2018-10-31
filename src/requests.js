@@ -20,6 +20,9 @@ export default {
                 reject(reason);
             });
         });
+    },
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 

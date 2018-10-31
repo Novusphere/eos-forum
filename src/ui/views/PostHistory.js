@@ -24,6 +24,7 @@ export default async function PostHistory(txid) {
     })).cursor.firstBatch[0];
 
     main_post = new Post(main_post);
+    await main_post.normalize();
 
     var edits = (await novusphere.api({
         find: novusphere.config.collection_forum,
