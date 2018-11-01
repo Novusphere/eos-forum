@@ -48,42 +48,10 @@ export default async function Thread(id, child_id) {
         ]
     })).cursor.firstBatch;
 
+    var new_posts = await Post.threadify(main_post, responses);
+
     responses.splice(0, 0, main_post);
     responses = await Post.fromArray(responses);
-
-    var commentMap = {};
-    var new_posts = 0;
-    for (var i = 0; i < responses.length; i++) {
-        var p = responses[i];
-        commentMap[p.data.post_uuid] = p;
-
-        if (i > 0) {
-            p.parent = main_post;
-
-            var tree;
-            var parent_uuid = p.data.json_metadata.parent_uuid;
-            parent_uuid = parent_uuid ? parent_uuid : main_post.data.post_uuid;
-
-            var parent = commentMap[parent_uuid];
-
-            // if this is is an edit, update parent content
-            // check parent content isn't already newest
-            // check that this post is actually by the person who made original post
-            if (p.data.json_metadata.edit) {
-                if (
-                    p.data.poster == parent.data.poster &&
-                    p.createdAt > parent.createdAt
-                ) {
-                    await parent.applyEdit(p);
-                }
-            } else {
-                new_posts++;
-                parent.addChild(p);
-            }
-        }
-    }
-
-    Post.sortChildren(responses);
 
     // only count non-edits for new_posts length
     storage.new_posts[main_post.data.post_uuid] = {

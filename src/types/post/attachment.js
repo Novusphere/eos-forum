@@ -1,5 +1,13 @@
 import requests from "@/requests";
-import ui from "@/ui";
+
+function GetHost(href) {
+    if (href.indexOf("magnet:") == 0) {
+        return "magnet link";
+    }
+    var parser = document.createElement("a");
+    parser.href = href;
+    return parser.host.toLowerCase();
+}
 
 class PostAttachment {
     constructor(attachment) {
@@ -56,7 +64,7 @@ class PostAttachment {
                 //
                 //  transform youtube --> auto embed
                 //
-                var host = ui.helpers.GetHost(attachment.value);
+                var host = GetHost(attachment.value);
                 if (host == 'youtu.be') {
                     var split = attachment.value.split('/');
                     attachment.value = 'https://www.youtube.com/?v=' + split[split.length - 1];
@@ -120,6 +128,10 @@ class PostAttachment {
             }
 
             if (attachment.display == 'iframe') {
+                if (attachment.value.indexOf('http:') == 0) {
+                    attachment.value = 'https:' + attachment.value.substring(5);
+                }
+
                 if (!(attachment.width) && !(attachment.height)) {
                     attachment.width = 560;
                     attachment.height = 315;

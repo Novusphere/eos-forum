@@ -11,7 +11,7 @@ async function DecensorData(txid, data) {
     if (!txid) {
         return null;
     }
-    
+
     if (data && data.content) { // doesn't need to be decensored
         return data;
     }
@@ -42,17 +42,54 @@ async function DecensorData(txid, data) {
     return tx_data;
 }
 
-class Post { 
+class Post {
     static async fromArray(data) {
         var result = data.map(p => (p instanceof Post) ? p : new Post(p));
         await Promise.all(result.map(p => p.normalize()));
         return result;
     }
 
-    static sortChildren(posts) {
-        for (var i = 0; i < posts.length; i++) {
-            posts[i].children.sort((a, b) => b.score - a.score);
-        }    
+    static async threadify(main_post, responses) {
+        responses.splice(0, 0, main_post);
+        responses = await Post.fromArray(responses);
+
+        var commentMap = {};
+        var new_posts = 0;
+        for (var i = 0; i < responses.length; i++) {
+            var p = responses[i];
+            commentMap[p.data.post_uuid] = p;
+
+            if (i > 0) {
+                p.parent = main_post;
+
+                var tree;
+                var parent_uuid = p.data.json_metadata.parent_uuid;
+                parent_uuid = parent_uuid ? parent_uuid : main_post.data.post_uuid;
+
+                var parent = commentMap[parent_uuid];
+
+                // if this is is an edit, update parent content
+                // check parent content isn't already newest
+                // check that this post is actually by the person who made original post
+                if (p.data.json_metadata.edit) {
+                    if (
+                        p.data.poster == parent.data.poster &&
+                        p.createdAt > parent.createdAt
+                    ) {
+                        await parent.applyEdit(p);
+                    }
+                } else {
+                    new_posts++;
+                    parent.addChild(p);
+                }
+            }
+        }
+
+        for (var i = 0; i < responses.length; i++) {
+            responses[i].children.sort((a, b) => b.score - a.score);
+        }
+
+        return new_posts;
     }
 
     constructor(post) { // post is from mongodb
@@ -130,7 +167,7 @@ class Post {
         this.createdAt = edit.createdAt;
         this.transaction = edit.transaction;
         this.id = edit.id;
-        
+
         this.data.content = edit.data.content;
         this.data.json_metadata.edit = true;
 
@@ -147,15 +184,15 @@ class Post {
         var title = this.data.json_metadata.title;
 
         if (
-          !title &&
-          this.parent &&
-          this.parent.data.json_metadata.title
+            !title &&
+            this.parent &&
+            this.parent.data.json_metadata.title
         ) {
-          title = this.parent.data.json_metadata.title;
+            title = this.parent.data.json_metadata.title;
         }
-  
+
         if (!title) {
-          title = "untitled";
+            title = "untitled";
         }
 
         return title;
