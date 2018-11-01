@@ -81,10 +81,10 @@
             <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub) && (post.data.poster == identity)">
               <a href="javascript:void(0)" v-on:click="edit()">edit</a>
             </li>
-            <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
+            <li class="list-inline-item" v-if="show_content && submit_modal /*&& (identity || is_anon_sub)*/">
               <a href="javascript:void(0)" class="highlight" data-toggle="collapse" :data-target="'#qreply-' + post.data.post_uuid" v-on:click="showQuickReply()">quick-reply</a>
             </li>
-            <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
+            <li class="list-inline-item" v-if="show_content && submit_modal /*&& (identity || is_anon_sub)*/">
               <a href="javascript:void(0)" class="highlight" v-on:click="reply()">reply</a>
             </li>
             <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
@@ -295,7 +295,8 @@ export default {
       await this.history_modal.load(this.post.o_transaction);
       jQuery("#postHistory").modal();
     },
-    edit() {
+    async edit() {
+      this.submit_modal.$data.identity = (await GetIdentity()).account;
       var $post = this.submit_modal.$data.post;
       var p = this.post;
 
@@ -325,6 +326,8 @@ export default {
       //qr.removeClass('show');
     },
     async quickReply(anon) {
+      this.submit_modal.$data.identity = (await GetIdentity()).account;
+
       var $post = this.submit_modal.$data.post;
       $post.parent_uuid = this.post.data.post_uuid;
       $post.parent_tx = this.post.transaction;
@@ -356,7 +359,8 @@ export default {
         jQuery("#qreply-" + this.post.data.post_uuid).removeClass("show");
       }
     },
-    reply() {
+    async reply() {
+      this.submit_modal.$data.identity = (await GetIdentity()).account;
       var $post = this.submit_modal.$data.post;
       $post.parent_uuid = this.post.data.post_uuid;
       $post.parent_tx = this.post.transaction;

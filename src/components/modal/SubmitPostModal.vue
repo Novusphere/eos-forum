@@ -97,8 +97,8 @@
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)">post</button>
-                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true, true)" v-if="is_anon_sub">post anon</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)" v-if="identity">post</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true, true)">post anon</button>
                 <button type="button" class="btn btn-outline-primary" v-on:click="preview = true">preview</button>
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
               </div>
@@ -233,6 +233,7 @@ export default {
   },
   data() {
     return {
+      identity: "",
       status: "",
       set_status: null,
       preview: false,
