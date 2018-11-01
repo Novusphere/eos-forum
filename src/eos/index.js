@@ -36,7 +36,9 @@ async function DetectWallet() {
 async function GetIdentity(pull) {
 
     if (!g_identity.account && pull) {
-        await g_wallet.setIdentity(g_identity);
+        if (g_wallet) {
+            await g_wallet.setIdentity(g_identity);
+        }
     }
 
     return g_identity;
