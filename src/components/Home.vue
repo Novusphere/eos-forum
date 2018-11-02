@@ -82,7 +82,7 @@ export default {
     async newThread() {
       try {
         await ui.actions.CheckCreateThread(this.sub);
-        jQuery("#submitPost").modal();
+        this.$refs.submit_modal.showModal();
       }
       catch (reason) {
         alert(reason);

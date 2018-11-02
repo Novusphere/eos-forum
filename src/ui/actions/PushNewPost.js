@@ -118,6 +118,31 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
             }
             // ---
 
+            // extension message hack
+            // https://github.com/eoscanada/eosio.forum/blob/master/src/forum.cpp#L157
+            const MAX_CONTENT = 1024 * 10;
+            if (post.content.length >= MAX_CONTENT) {
+                var overflow = post.content.substring(MAX_CONTENT-1);
+                var underflow = post.content.substring(0, MAX_CONTENT-1);
+
+                post.content = underflow; // update underflow
+                actions.push({ // push overflow to nsdb contract
+                    contract: "novuspheredb",
+                    name: "push",
+                    data: {
+                        account: identity.account,
+                        json: JSON.stringify({
+                            protocol: "novusphere",
+                            method: "content_ext",
+                            data: {
+                                post_uuid: post.post_uuid,
+                                content: overflow
+                            }
+                        })
+                    }
+                });
+            }
+
             txid = await ExecuteEOSActions(actions);
         }
 

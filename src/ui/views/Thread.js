@@ -28,6 +28,29 @@ export default async function Thread(id, child_id) {
     main_post = new Post(main_post);
     await main_post.normalize();
 
+    if (main_post.data.content.length == ((1024 * 10) - 1)) {
+        // look for extension
+        var content_ext = (await novusphere.api({
+            aggregate: novusphere.config.collection_nsdb,
+            maxTimeMS: 1000,
+            cursor: {},
+            pipeline: [
+                {
+                    $match: {
+                        'data.account': main_post.data.poster,
+                        'data.json.method': 'content_ext',
+                        'data.json.data.post_uuid': main_post.data.post_uuid
+                    }
+                }
+            ]
+        })).cursor.firstBatch[0];
+
+        if (content_ext) {
+            // apply extension
+            main_post.data.content += content_ext.data.json.data.content;
+        }
+    }
+
     var mp_np = storage.new_posts[main_post.data.post_uuid];
     main_post.__seen = (mp_np) ? mp_np.seen : ((new Date().getTime()) / 1000);
 

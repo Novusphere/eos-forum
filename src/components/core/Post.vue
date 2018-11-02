@@ -296,7 +296,6 @@ export default {
       jQuery("#postHistory").modal();
     },
     async edit() {
-      this.submit_modal.$data.identity = (await GetIdentity()).account;
       var $post = this.submit_modal.$data.post;
       var p = this.post;
 
@@ -319,7 +318,7 @@ export default {
         $post.attachment.display = "link";
       }
 
-      jQuery("#submitPost").modal();
+      this.submit_modal.showModal();
     },
     showQuickReply() {
       //var qr = jQuery(".quick-reply");
@@ -360,7 +359,7 @@ export default {
       }
     },
     async reply() {
-      this.submit_modal.$data.identity = (await GetIdentity()).account;
+
       var $post = this.submit_modal.$data.post;
       $post.parent_uuid = this.post.data.post_uuid;
       $post.parent_tx = this.post.transaction;
@@ -372,7 +371,7 @@ export default {
       //$post.attachment.type = "";
       //$post.attachment.display = "link";
 
-      jQuery("#submitPost").modal();
+      this.submit_modal.showModal();
     },
     getHost(href) {
       return ui.helpers.GetHost(href);

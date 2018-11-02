@@ -1,6 +1,6 @@
 <template>
     <div id="test">
-      hi
+      go away this is for testing
     </div>
 </template>
 

@@ -33,10 +33,10 @@
                       <textarea rows="10" class="form-control" placeholder="Content" v-model="post.content"></textarea>
                     </div>
                   </div>
-                  <div class="form-group row">
+                  <div class="form-group row" v-if="reply_uuid">
                     <label class="col-sm-2 col-form-label"></label>
                     <div class="col-sm-10">
-                      {{ post.content.length }} / {{ 1024 * 10 }}
+                      {{ post.content.length }} / {{ (1024 * 10)-1 }}
                     </div>
                   </div>
                   <fieldset class="form-group">
@@ -113,6 +113,8 @@ import jQuery from "jquery";
 
 import ui from "@/ui";
 
+import { GetIdentity } from "@/eos";
+
 export default {
   name: "SubmitPostModal",
   props: {
@@ -151,10 +153,10 @@ export default {
         return;
       }
 
-      if (post.content.length > 1024 * 10) {
+      if (this.reply_uuid && post.content.length > 1024 * 10) {
         this.setStatus(
           "Post is too long, over limit by " +
-            (1024 * 10 - post.content.length) +
+            (post.content.length - (1024 * 10 - 1)) +
             " characters"
         );
         return;
@@ -191,6 +193,10 @@ export default {
         this.set_status(text);
       }
     },
+    async showModal() {
+      this.identity = (await GetIdentity()).account;
+      jQuery("#submitPost").modal();
+    },
     async postContent(anon, warn_anon) {
       this.setStatus("Creating tx and broadcasting to EOS...");
       var eos_post = await this.makePost(anon);
@@ -205,7 +211,7 @@ export default {
         warn_anon,
         this.setStatus
       );
-      
+
       if (!txid) {
         return false;
       }
