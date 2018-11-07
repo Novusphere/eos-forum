@@ -2,7 +2,8 @@
   <div>
     <HeaderSection :load="load">
       <span class="title mr-3"><router-link :to="'/referendum'">EOS Referendum</router-link></span>
-      <button type="button" class="btn btn-outline-primary ml-1" v-on:click="newProposal()">new</button>
+      <button type="button" class="btn btn-sm btn-outline-primary ml-1" v-on:click="newProposal()">new</button>
+      <PostSorter ref="sorter" :change="load" :default_by="'active'" :options="['active', 'cleaned']"></PostSorter>
     </HeaderSection>
     <MainSection>
       <div>
@@ -69,7 +70,7 @@
                 </button>
             </div>
             <div class="modal-body">
-              <div class="text-center">
+              <div class="text-center" v-if="vote.voters>=0">
                 This proposal has an approval rating of
                 <span :class="vote.approval >= 0.5 ? 'text-success' : 'text-danger'">{{ (vote.approval * 100).toFixed(2) }}%</span>
                 with 
@@ -77,17 +78,11 @@
                 for and 
                 <span class="text-danger">{{ vote.against.toFixed(4) }} EOS</span> 
                 against and a total of 
-                <a href="javascript:void(0)" data-toggle="collapse" data-target="#voteResults" class="text-primary">{{ vote.voters.length }} votes</a> 
+                <span class="text-primary">{{ vote.voters }} votes</span> 
                 casted.
               </div>
-              <div id="voteResults" class="collapse">
-                <ul>
-                  <li v-for="voter in vote.voters" :key="voter.account">
-                    <span :class="voter.vote ? 'text-success' : 'text-danger'">
-                      {{ voter.account }} - {{ voter.staked.toFixed(4) }} EOS ({{ voter.vote ? 'for' : 'against'}})
-                    </span>
-                  </li>
-                </ul>
+              <div class="text-center" v-else>
+                This proposal is expired, and archived proposal results are not yet available.
               </div>
             </div>
             <div class="modal-footer">
@@ -174,10 +169,12 @@ import { GetEOS, ScatterEosOptions, GetIdentity } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { MarkdownParser } from "@/markdown";
 
+import PostSorter from "@/components/core/PostSorter";
 import Post from "@/components/core/Post";
 
 import HeaderSection from "@/components/section/HeaderSection";
 import MainSection from "@/components/section/MainSection";
+
 
 const MAX_ITEMS_PER_PAGE = 25;
 const REFERENDUM_CONTRACT = "eosforumrcpp";
@@ -187,6 +184,7 @@ export default {
   name: "Referendum",
   components: {
     Post: Post,
+    PostSorter: PostSorter,
     HeaderSection: HeaderSection,
     MainSection: MainSection
   },
@@ -221,7 +219,7 @@ export default {
       const identity = await GetIdentity();
       this.identity = identity.account;
 
-      var referendum = await ui.views.Referendum(this.$route.query.page);
+      var referendum = await ui.views.Referendum(this.$route.query.page, this.$refs.sorter.by);
 
       this.posts = referendum.posts;
       this.pages = referendum.pages;
@@ -288,7 +286,7 @@ export default {
         for: 0,
         against: 0,
         approval: 0,
-        voters: []
+        voters: 0
       },
       status: "", // of post
       post: {

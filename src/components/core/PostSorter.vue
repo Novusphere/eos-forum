@@ -4,8 +4,7 @@
           {{ by }}
         </button>
         <div class="dropdown-menu">
-          <a class="dropdown-item" href="javascript:void(0)" v-on:click="setBy('popular')">popular</a>
-          <a class="dropdown-item" href="javascript:void(0)" v-on:click="setBy('time')">time</a>
+          <a v-for="o in options" :key="o" class="dropdown-item" href="javascript:void(0)" v-on:click="setBy(o)">{{ o }}</a>
         </div>
       </div>
 </template>
@@ -20,9 +19,21 @@ export default {
           type: Function,
           required: false,
           default: null
+      },
+      options: {
+          type: Array,
+          required: false,
+          default: () => [ 'popular', 'time' ]
+      },
+      default_by: {
+          type: String,
+          required: false,
+          default: 'popular'
       }
   },
-  async mounted() {},
+  async mounted() {
+      this.by = this.default_by;
+  },
   methods: {
       setBy(val) {
           this.by = val;

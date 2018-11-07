@@ -1,3 +1,5 @@
+import requests from "@/requests";
+
 import { GetEOS, GetIdentity, ExecuteEOSActions } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 
@@ -48,7 +50,29 @@ export default {
     async Status(txid) {
         var eos = GetEOS();
         var prop = await this.GetProposal(txid);
-        var pv = await this.GetVotes(prop);
+
+        var eosvotes = JSON.parse(await requests.get('https://s3.amazonaws.com/api.eosvotes.io/eosvotes/tallies/latest.json'));        
+        var status = eosvotes[prop.data.proposal_name];
+
+        var voteResult_for=0, voteResult_against=0;
+
+        if (status) {
+        var voteResult_for = status.stats.staked['1'];
+        var voteResult_against = status.stats.staked['0'];
+
+        voteResult_for = (isNaN(voteResult_for) ? 0 : parseInt(voteResult_for)) / 10000;
+        voteResult_against = (isNaN(voteResult_against) ? 0 : parseInt(voteResult_against)) / 10000;
+        }
+
+        return {
+            title: prop.data.title,
+            for: voteResult_for,
+            against: voteResult_against,
+            approval: voteResult_for / Math.max(voteResult_for + voteResult_against, 1),
+            voters: status ? status.stats.votes.total : (-1)
+        }
+
+        /*var pv = await this.GetVotes(prop);
 
         var voteResult = {};
         var voteResult_for = 0;
@@ -117,8 +141,8 @@ export default {
             for: voteResult_for,
             against: voteResult_against,
             approval: voteResult_for / Math.max(voteResult_for + voteResult_against, 1),
-            voters: Object.values(voteResult).sort((v1, v2) => v2.staked - v1.staked)
-        }
+            voters: [] //Object.values(voteResult).sort((v1, v2) => v2.staked - v1.staked)
+        }*/
     },
     async PushNewProposal(post) {
         if (post.title.length > 1024) {

@@ -54,22 +54,36 @@ export default async function Thread(id, child_id) {
     var mp_np = storage.new_posts[main_post.data.post_uuid];
     main_post.__seen = (mp_np) ? mp_np.seen : ((new Date().getTime()) / 1000);
 
-    var responses = (await novusphere.api({
-        aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
-        cursor: {},
-        pipeline: [
-            { $match: novusphere.query.match.threadReplies(main_post.data.post_uuid) },
-            { $lookup: novusphere.query.lookup.postState() },
-            { $lookup: novusphere.query.lookup.postMyVote(identity.account) },
-            {
-                $project: novusphere.query.project.post({
-                    normalize_up: true,
-                    normalize_my_vote: true
-                })
-            }
-        ]
-    })).cursor.firstBatch;
+    var responses = [];
+    var r_skip = 0;
+
+    for (; ;) {
+        var _responses = (await novusphere.api({
+            aggregate: novusphere.config.collection_forum,
+            maxTimeMS: 1000,
+            cursor: {},
+            pipeline: [
+                { $match: novusphere.query.match.threadReplies(main_post.data.post_uuid) },
+                { $lookup: novusphere.query.lookup.postState() },
+                { $lookup: novusphere.query.lookup.postMyVote(identity.account) },
+                {
+                    $project: novusphere.query.project.post({
+                        normalize_up: true,
+                        normalize_my_vote: true
+                    })
+                },
+                { $skip: r_skip }
+            ]
+        })).cursor.firstBatch;
+
+        r_skip += _responses.length;
+
+        for (var i = 0; i < _responses.length; i++)
+            responses.push(_responses[i]);
+
+        if (!_responses || _responses.length == 0 || _responses.length < 100)
+            break;
+    }
 
     var new_posts = await Post.threadify(main_post, responses);
 

@@ -221,6 +221,8 @@ export default {
       this.post.attachment.type = "";
       this.post.attachment.display = "link";
 
+      this.setStatus("");
+
       jQuery("#submitPost").modal("hide");
 
       this.post_content_callback(txid);

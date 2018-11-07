@@ -10,6 +10,8 @@ import { GetEOS } from "@/eos";
 //import IPFS from "ipfs";
 //import render from "render-media";
 
+import requests from "@/requests";
+
 const novusphere = GetNovusphere();
 var data = {};
 
@@ -17,6 +19,9 @@ export default {
   name: "Test",
   async mounted() {
     const novusphere = GetNovusphere();
+
+    var test = await requests.get('https://api.jikan.moe/v3/search/anime?q=gundam&page=1');
+    console.log(test);
 
     //console.log("ipfs creating");
     //const ipfs = new IPFS();

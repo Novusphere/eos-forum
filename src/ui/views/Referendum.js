@@ -6,7 +6,7 @@ import {
 
 const REFERENDUM_COLLECTION = "_eosforum";
 
-export default async function Referendum(current_page) {
+export default async function Referendum(current_page, by) {
 
     current_page = parseInt(current_page ? current_page : 1);
 
@@ -16,6 +16,19 @@ export default async function Referendum(current_page) {
         name: "propose",
         createdAt: { $gte: 1537221139 }
     };
+
+    var now = (new Date().getTime()) / 1000;
+    var MATCH_CONDITION;
+    if (by == 'active') {
+        MATCH_CONDITION = {
+            "expired.0": { "$exists": false }
+        };
+    }
+    else {
+        MATCH_CONDITION = {
+            "expired.0": { "$exists": true }
+        }
+    }
 
     var n_proposals = (await novusphere.api({
         count: REFERENDUM_COLLECTION,
@@ -31,9 +44,6 @@ export default async function Referendum(current_page) {
         cursor: {},
         pipeline: [
             { $match: MATCH_QUERY },
-            { $sort: novusphere.query.sort.time() },
-            { $skip: novusphere.query.skip.page(current_page, MAX_ITEMS_PER_PAGE) },
-            { $limit: MAX_ITEMS_PER_PAGE },
             {
                 $lookup: {
                     from: REFERENDUM_COLLECTION,
@@ -42,7 +52,7 @@ export default async function Referendum(current_page) {
                         createdAt: "$createdAt"
                     },
                     pipeline: [
-                        { $match: { name: "expire" } },
+                        { $match: { name: "clnproposal" } },
                         {
                             $project: {
                                 txid: "$transaction",
@@ -58,7 +68,11 @@ export default async function Referendum(current_page) {
                     ],
                     as: "expired"
                 }
-            }
+            },
+            { $match: MATCH_CONDITION },
+            { $sort: novusphere.query.sort.time() },
+            { $skip: novusphere.query.skip.page(current_page, MAX_ITEMS_PER_PAGE) },
+            { $limit: MAX_ITEMS_PER_PAGE },
         ]
     })).cursor.firstBatch;
 
