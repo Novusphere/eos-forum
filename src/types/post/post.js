@@ -1,4 +1,5 @@
 import { storage } from "@/storage";
+import requests from "@/requests";
 
 import { GetEOS, EOSBinaryReader } from "@/eos";
 
@@ -7,12 +8,29 @@ import { PostAttachment } from "./attachment";
 import { PostJsonMetadata } from "./jsonmetadata";
 import { PostData } from "./data";
 
+var referendum_cache = null;
+
+async function GetReferendumCache() {
+    const now = (new Date()).getTime();
+    if (referendum_cache == null || (now - referendum_cache.last >= 60000)) {
+
+        var eosvotes = JSON.parse(await requests.get('https://s3.amazonaws.com/api.eosvotes.io/eosvotes/tallies/latest.json'));
+
+        referendum_cache = {
+            last: now,
+            active: eosvotes
+        };
+    }
+
+    return referendum_cache;
+}
+
 async function DecensorData(txid, data) {
     if (!txid) {
         return null;
     }
 
-    if (data && data.content) { // doesn't need to be decensored
+    if ((data && data.content) || data.name != 'post') { // doesn't need to be decensored
         return data;
     }
 
@@ -94,10 +112,45 @@ class Post {
 
     constructor(post) { // post is from mongodb
 
+        // transform referendum proposal into post() data
+        if (post && post.name == 'propose') {
+            var data = post.data;
+
+            post.referendum = {
+                name: post.data.proposal_name,
+                expired: post.expired,
+                expires_at: data.expires_at,
+                details: null
+            };
+
+            post.data = {
+                poster: data.proposer,
+                post_uuid: 'ref-' + post.transaction,
+                content: data.proposal_json.content,
+                reply_to_poster: '',
+                reply_to_post_uuid: '',
+                certify: 0,
+                json_metadata: {
+                    title: data.title,
+                    type: "novusphere-forum",
+                    sub: 'eos-referendum',
+                    parent_uuid: '',
+                    parent_poster: '',
+                    edit: false,
+                    attachment: {
+                        value: '',
+                        type: '',
+                        display: ''
+                    }
+                }
+            };
+        }
+
         post = Object.assign({
 
             createdAt: 0,
             transaction: "",
+            name: "post",
             id: 0,
             data: null,
             up: 0,
@@ -105,7 +158,8 @@ class Post {
             total_replies: 0,
             recent_edit: null,
             parent: null,
-            my_vote: null
+            my_vote: null,
+            referendum: null
 
         }, post);
 
@@ -122,6 +176,7 @@ class Post {
         this.up = post.up;
         this.total_replies = post.total_replies;
         this.my_vote = post.my_vote;
+        this.referendum = post.referendum;
 
         if (storage.settings.atmos_upvotes) {
             this.up = Math.floor(this.up + (post.up_atmos ? post.up_atmos : 0));
@@ -156,6 +211,30 @@ class Post {
             await this.parent.normalize();
 
             this.data.json_metadata.title = this.parent.data.json_metadata.title;
+        }
+
+        if (post.referendum) {
+            const rcache = await GetReferendumCache();
+            const eosvotes = rcache.active;
+            const status = eosvotes[this.referendum.name];
+
+            var rfor = 0, ragainst = 0;
+            if (status) {
+                rfor = status.stats.staked['1'];
+                ragainst = status.stats.staked['0'];
+
+                rfor = (isNaN(rfor) ? 0 : parseInt(rfor)) / 10000;
+                ragainst = (isNaN(ragainst) ? 0 : parseInt(ragainst)) / 10000;
+            }
+
+            this.referendum.details = {
+                for: rfor,
+                against: ragainst,
+                for_percent: 100 * (rfor / Math.max(rfor + ragainst, 1)),
+                against_percent: 100 * (ragainst / Math.max(rfor + ragainst, 1)),
+                total_participants: status ? status.stats.votes.total : 0,
+                total_eos: (status ? status.stats.staked.total : 0) / 10000,
+            }
         }
 
         await this.data.json_metadata.attachment.normalize();

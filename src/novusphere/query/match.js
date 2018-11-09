@@ -38,19 +38,23 @@ export default {
         var query = {
             "data.json_metadata.sub": sub,
             "data.reply_to_post_uuid": "",
-            createdAt: {
-                $gte: 1531434299
-            } /* Last eosforumtest contract redeploy */
+            createdAt: { $gte: 1531434299 } /* Last eosforumtest contract redeploy */
         };
 
         if (sub == "all") {
-            query["data.json_metadata.sub"] = { $exists: true, $ne: "" }; 
+            query["data.json_metadata.sub"] = { $exists: true, $ne: "" };
             //{ $regex: "^(?!anon-r).*", $options: 'i' };
         }
         else if (sub == "anon") {
             query["data.json_metadata.sub"] = { $regex: "(^anon$|^anon-)", $options: 'i' };
             //{ $regex: "(^anon$|^anon-)(?!r-)", $options: 'i' };
         }
+        /*else if (sub == "eos-referendum") {
+            query = {
+                "name": "propose",
+                "createdAt": { $gte: 1537279731 } // first eosforumrcpp prop
+            }
+        }*/
         else if (Array.isArray(sub)) {
             query["data.json_metadata.sub"] = { $in: sub };
         }

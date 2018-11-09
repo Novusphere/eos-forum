@@ -51,6 +51,7 @@ export default {
 
         var query = {
             id: "$id",
+            name: "$name",
             transaction: "$transaction",
             createdAt: "$createdAt",
             data: "$data",

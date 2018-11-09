@@ -7,7 +7,7 @@ import { Post } from "@/types/post";
 export default async function Thread(id, child_id) {
     const novusphere = GetNovusphere();
     const identity = await GetIdentity();
-
+    
     var main_post = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
         maxTimeMS: 1000,
@@ -101,6 +101,7 @@ export default async function Thread(id, child_id) {
 
     // permalink child
     if (child_id) {
+
         var child_post;
         if (child_id.length == 64) {
             child_post = responses.find(p => p.transaction == child_id);
@@ -109,6 +110,7 @@ export default async function Thread(id, child_id) {
             child_post = responses.find(p => p.o_id == child_id);
         }
 
+        child_post.parent = main_post;
         child_post.depth = 0;
         child_post.data.json_metadata.title = main_post.data.json_metadata.title;
 

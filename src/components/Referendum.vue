@@ -1,7 +1,7 @@
 <template>
   <div>
     <HeaderSection :load="load">
-      <span class="title mr-3"><router-link :to="'/referendum'">EOS Referendum</router-link></span>
+      <span class="title mr-3"><router-link :to="'/referendum'">eos-referendum</router-link></span>
       <button type="button" class="btn btn-sm btn-outline-primary ml-1" v-on:click="newProposal()">new</button>
       <PostSorter ref="sorter" :change="load" :default_by="'active'" :options="['active', 'cleaned']"></PostSorter>
     </HeaderSection>
@@ -12,43 +12,13 @@
                 <h1>There doesn't seem to be any posts here! Why not make one?</h1>
               </div>
         </div>
-        <div class="row mb-2" v-for="p in posts" :key="p.transaction">
-            <div :class="'col-md-12 mb-3 post'">
-                <span style="font-weight: bold; font-size: 20px">
-                    <div>
-                        <span class="title">{{ p.data.title }}</span>
-                        <span v-if="p.expired" class="text-danger">[exp.]</span>
-                        <span v-else class="text-warning">[exp. {{ getDeltaDays(new Date(p.data.expires_at)) }} days]</span>
-                    </div>
-                </span>
-                
-                <div style="font-size: x-small">
-                    <ul class="list-inline">
-                    <li class="list-inline-item"><a class="post-collapse" data-toggle="collapse" :href="'#post-' + p.transaction"></a></li>
-                    <li class="list-inline-item">{{ new Date(p.createdAt * 1000).toLocaleString() }}</li>
-                    <li class="list-inline-item">by <router-link :to="'/u/' + p.data.proposer" :class="(p.data.proposer == identity) ? 'text-mine' : ''">{{ p.data.proposer }}</router-link></li>
-                    <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + p.transaction">on chain</a></li>
-                    </ul>
-                </div>
-                <div :id="'post-' + p.transaction" class="post-attachment collapse show">
-                    <p class="post-content" v-html="md(p.data.proposal_json.content)">               
-                    </p>
-                    <div style="font-size: x-small">
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="proposalStatus(p.transaction)">{{ p.expired ? ' results' : 'status' }}</button>
-                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-primary" v-on:click="castVote(p.transaction, 1)">vote for</button>
-                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-danger" v-on:click="castVote(p.transaction, 0)">vote against</button>
-                            </li>
-                            <li v-if="p.data.proposer == identity" class="list-inline-item">
-                                <button v-if="p.expired" type="button" class="btn btn-sm btn-outline-primary" v-on:click="cleanProposal(p.transaction)">clean</button>
-                                <button v-if="!p.expired" type="button" class="btn btn-sm btn-outline-danger" v-on:click="expire(p.transaction)">force expire</button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>  
-        </div>
+        <Post 
+            v-for="p in posts" 
+            :key="p.o_id" 
+            :history_modal="null" 
+            :post="p" 
+            :show_content="true">
+        </Post>
         <div class="row mb-4">
             <div class="col-12">
               <div class="float-right">
@@ -59,38 +29,6 @@
         </div>
       </div>
     </MainSection>
-
-    <div id="voteResult" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ vote.title }}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-              <div class="text-center" v-if="vote.voters>=0">
-                This proposal has an approval rating of
-                <span :class="vote.approval >= 0.5 ? 'text-success' : 'text-danger'">{{ (vote.approval * 100).toFixed(2) }}%</span>
-                with 
-                <span class="text-success">{{ vote.for.toFixed(4) }} EOS</span> 
-                for and 
-                <span class="text-danger">{{ vote.against.toFixed(4) }} EOS</span> 
-                against and a total of 
-                <span class="text-primary">{{ vote.voters }} votes</span> 
-                casted.
-              </div>
-              <div class="text-center" v-else>
-                This proposal is expired, and archived proposal results are not yet available.
-              </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
-            </div>
-            </div>
-        </div>
-    </div>
 
     <div id="submitProposal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-full" role="document">
@@ -178,7 +116,7 @@ import MainSection from "@/components/section/MainSection";
 
 const MAX_ITEMS_PER_PAGE = 25;
 const REFERENDUM_CONTRACT = "eosforumrcpp";
-const REFERENDUM_COLLECTION = "_eosforum";
+const REFERENDUM_COLLECTION = "eosforum";
 
 export default {
   name: "Referendum",
@@ -248,32 +186,6 @@ export default {
 
       await this.load();
     },
-    md(text) {
-      var md = ui.helpers.ParseMarkdown(text);
-      return md.html;
-    },
-    async cleanProposal(propTxid) {
-      await ui.actions.Referendum.CleanProposal(propTxid);
-    },
-    async expire(propTxid) {
-      await ui.actions.Referendum.Expire(propTxid);
-      await this.load();
-    },
-    async castVote(propTxid, vote) {
-      await ui.actions.Referendum.Vote(propTxid, vote);
-      await this.proposalStatus(propTxid);
-    },
-    async proposalStatus(txid) {
-      var status = await ui.actions.Referendum.Status(txid);
-
-      this.vote.title = status.title;
-      this.vote.for = status.for;
-      this.vote.against = status.against;
-      this.vote.approval = status.approval;
-      this.vote.voters = status.voters;
-
-      jQuery("#voteResult").modal();
-    }
   },
   data() {
     return {

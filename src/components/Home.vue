@@ -72,6 +72,11 @@ export default {
   },
   methods: {
     async load() {
+      if (this.$route.params.sub == 'eos-referendum') {
+        this.$router.push('/referendum');
+        return;
+      }
+
       var home = await ui.views.Home(this.$route.query.page, this.$route.params.sub, this.$refs.sorter.getSorter());
       this.is_subscribed = home.is_subscribed;
       this.posts = home.posts;

@@ -201,7 +201,7 @@ export default {
       this.setStatus("Creating tx and broadcasting to EOS...");
       var eos_post = await this.makePost(anon);
       if (!eos_post) {
-        return false;
+        return null;
       }
 
       var txid = await ui.actions.PushNewPost(
@@ -213,7 +213,7 @@ export default {
       );
 
       if (!txid) {
-        return false;
+        return null;
       }
 
       this.post.content = "";
@@ -225,9 +225,9 @@ export default {
 
       jQuery("#submitPost").modal("hide");
 
-      this.post_content_callback(txid);
+      this.post_content_callback(txid, eos_post);
 
-      return true;
+      return txid;
     }
   },
   computed: {

@@ -153,7 +153,6 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
     }
 
     set_status("Waiting for Novusphere to index...");
-
     const novusphere = GetNovusphere();
     await novusphere.waitTx(txid, 500, 1000);
 

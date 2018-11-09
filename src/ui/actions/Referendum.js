@@ -3,7 +3,7 @@ import requests from "@/requests";
 import { GetEOS, GetIdentity, ExecuteEOSActions } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 
-const REFERENDUM_COLLECTION = "_eosforum";
+const REFERENDUM_COLLECTION = "eosforum";
 const REFERENDUM_CONTRACT = "eosforumrcpp";
 
 export default {
@@ -230,7 +230,9 @@ export default {
 
         var vote_txid = await ExecuteEOSActions(action);
 
-        const novusphere = GetNovusphere();
-        await novusphere.waitTx(vote_txid, 500, 1000, REFERENDUM_COLLECTION);
+        //const novusphere = GetNovusphere();
+        //await novusphere.waitTx(vote_txid, 500, 1000, REFERENDUM_COLLECTION);
+
+        return vote_txid;
     }
 }

@@ -1,10 +1,12 @@
 import { GetNovusphere } from "@/novusphere";
 
+import { Post } from "@/types/post";
+
 import {
     MAX_ITEMS_PER_PAGE,
 } from "@/ui/constants";
 
-const REFERENDUM_COLLECTION = "_eosforum";
+const REFERENDUM_COLLECTION = "eosforum";
 
 export default async function Referendum(current_page, by) {
 
@@ -85,6 +87,11 @@ export default async function Referendum(current_page, by) {
         if (unix_now > new Date(p.data.expires_at)) {
             p.expired = true;
         }
+
+        // standardize
+        p = new Post(p);
+        await p.normalize();
+        payload[i] = p; 
     }
 
     return {

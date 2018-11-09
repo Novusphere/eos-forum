@@ -59,7 +59,7 @@ export default {
       this.opening_post = thread.opening_post;
       this.main_post = thread.main_post;
     },
-    postContent(txid) {
+    postContent(txid, data) {
       this.load(); // reload thread
     }
   },

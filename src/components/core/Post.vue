@@ -24,10 +24,10 @@
                   <li v-if="show_content" class="list-inline-item">
                     <a class="post-collapse" data-toggle="collapse" :href="'#post-' + post.transaction"></a>
                   </li>
-                  <li class="list-inline-item">
+                  <li class="list-inline-item" v-if="!post.referendum">
                     <a :class="(post.my_vote ? 'text-mine': '')" href="javascript:void(0)" v-on:click="upvote()">
                       <font-awesome-icon :icon="['fas', 'arrow-up']" ></font-awesome-icon> 
-                      {{post.up}} upvotes
+                      {{post.up}} up votes
                     </a>
                   </li>
                   <li class="list-inline-item" v-if="!show_content">
@@ -96,6 +96,38 @@
                   data-toggle="collapse" :data-target="'#content-' + post.data.post_uuid">
                     show attachment
                 </a>
+            </li>
+
+            <li class="list-inline-item" v-if="show_content && !submit_modal && post.referendum">
+              <router-link :to="thread_link">discuss</router-link>
+            </li>
+            <li class="list-inline-item" v-if="post.referendum">
+              <a href="javascript:void(0)" class="text-success" v-on:click="referendumVote(1)">
+                <font-awesome-icon :icon="['fas', 'thumbs-up']" ></font-awesome-icon> 
+                ({{ post.referendum.details.for_percent.toFixed(2) }}%)
+              </a>
+            </li>
+            <li class="list-inline-item" v-if="post.referendum">
+              <a href="javascript:void(0)" class="text-danger" v-on:click="referendumVote(0)">
+                <font-awesome-icon :icon="['fas', 'thumbs-down']" ></font-awesome-icon>
+                ({{ post.referendum.details.against_percent.toFixed(2) }}%)
+              </a>
+            </li>
+            <li class="list-inline-item" v-if="post.referendum && post.data.poster == identity">
+              <a href="javascript:void(0)" class="text-danger" v-on:click="referendumExpire()">
+                expire
+              </a>
+            </li>
+            <li class="list-inline-item" v-if="post.referendum && post.data.poster == identity">
+              <a href="javascript:void(0)" class="text-danger" v-on:click="referendumClean()">
+                clean
+              </a>
+            </li>
+            <li class="list-inline-item" v-if="post.referendum">
+              EOS: {{ post.referendum.details.total_eos.toFixed(4) }}
+            </li>
+            <li class="list-inline-item" v-if="post.referendum">
+              Participants: {{ post.referendum.details.total_participants }}
             </li>
           </ul>
         </div>
@@ -290,6 +322,20 @@ export default {
         return false;
 
       return type ? this.post.o_attachment.display == type : true;
+    },
+    async referendumClean() {
+      await ui.actions.Referendum.CleanProposal(this.post.transaction);
+    },
+    async referendumExpire() {
+      await ui.actions.Referendum.Expire(this.post.transaction);
+    },
+    async referendumVote(vote) {
+      var txid = await ui.actions.Referendum.Vote(this.post.transaction, vote);
+      alert(`Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`, 
+        {
+          title: 'Thanks for voting!',
+          text_class: 'text-success'
+        });
     },
     async history() {
       await this.history_modal.load(this.post.o_transaction);
