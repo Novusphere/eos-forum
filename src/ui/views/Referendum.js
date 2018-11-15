@@ -75,21 +75,20 @@ export default async function Referendum(current_page, by) {
             { $sort: novusphere.query.sort.time() },
             { $skip: novusphere.query.skip.page(current_page, MAX_ITEMS_PER_PAGE) },
             { $limit: MAX_ITEMS_PER_PAGE },
+            { $lookup: novusphere.query.lookup.threadReplies(true) },
+            {
+                $project: novusphere.query.project.post({
+                    total_replies: true
+                })
+            }
         ]
     })).cursor.firstBatch;
 
     // mark expired proposals
     const unix_now = new Date();
     for (var i = 0; i < payload.length; i++) {
-        var p = payload[i];
-        p.expired = (p.expired.length > 0);
+        var p = new Post(payload[i]);
 
-        if (unix_now > new Date(p.data.expires_at)) {
-            p.expired = true;
-        }
-
-        // standardize
-        p = new Post(p);
         await p.normalize();
         payload[i] = p; 
     }

@@ -87,7 +87,7 @@ export default {
 
         return {
             "data.json_metadata.edit": false,
-            "data.tags": { $in: tag },
+            "tags": { $in: tag },
             //"data.content": { $regex: ".*#" + tag + ".*", $options: 'i' },
             createdAt: {
                 $gte: 1531434299

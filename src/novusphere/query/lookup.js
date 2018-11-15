@@ -19,14 +19,46 @@ export default {
             as: "state"
         };
     },
-    threadReplies() {
+    threadReplies(referendum) {
         const novusphere = GetNovusphere();
-        return {
-            from: novusphere.config.collection_forum,
-            localField: "data.post_uuid",
-            foreignField: "data.reply_to_post_uuid",
-            as: "replies"
-        };
+
+        if (!referendum) {
+            return {
+                from: novusphere.config.collection_forum,
+                localField: "data.post_uuid",
+                foreignField: "data.reply_to_post_uuid",
+                as: "replies"
+            };
+        }
+        else {
+            return {
+                from: novusphere.config.collection_forum,
+                let: {
+                    "post_uuid": {
+                        $concat: [
+                            { $literal: "ref-" },
+                            "$transaction"
+                        ]
+                    }
+                },
+                pipeline: [
+                    {
+                        $project: {
+                            test: {
+                                $eq: [
+                                    "$$post_uuid",
+                                    "$data.reply_to_post_uuid"
+                                ]
+                            },
+                        },
+                    },
+                    {
+                        $match: { test: true }
+                    },
+                ],
+                as: "replies"
+            }
+        }
     },
     postReplies() {
         const novusphere = GetNovusphere();

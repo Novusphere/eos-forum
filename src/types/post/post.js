@@ -118,7 +118,7 @@ class Post {
 
             post.referendum = {
                 name: post.data.proposal_name,
-                expired: post.expired,
+                expired: Array.isArray(post.expired) ? (post.expired.length>0) : post.expired,
                 expires_at: data.expires_at,
                 details: null
             };
@@ -159,7 +159,8 @@ class Post {
             recent_edit: null,
             parent: null,
             my_vote: null,
-            referendum: null
+            referendum: null,
+            tags: []
 
         }, post);
 
@@ -177,6 +178,7 @@ class Post {
         this.total_replies = post.total_replies;
         this.my_vote = post.my_vote;
         this.referendum = post.referendum;
+        this.tags = post.tags;
 
         if (storage.settings.atmos_upvotes) {
             this.up = Math.floor(this.up + (post.up_atmos ? post.up_atmos : 0));
@@ -214,6 +216,14 @@ class Post {
         }
 
         if (post.referendum) {
+            if (isNaN(post.referendum.expires_at)) {
+                post.referendum.expires_at = (new Date(post.referendum.expires_at)).getTime() / 1000;
+            }
+
+            if (post.referendum.expires_at <= (new Date()).getTime() / 1000) {
+                post.referendum.expired = true;
+            }
+
             const rcache = await GetReferendumCache();
             const eosvotes = rcache.active;
             const status = eosvotes[this.referendum.name];

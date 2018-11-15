@@ -27,7 +27,7 @@
                   <li class="list-inline-item" v-if="!post.referendum">
                     <a :class="(post.my_vote ? 'text-mine': '')" href="javascript:void(0)" v-on:click="upvote()">
                       <font-awesome-icon :icon="['fas', 'arrow-up']" ></font-awesome-icon> 
-                      {{post.up}} up votes
+                      {{post.up}} upvotes
                     </a>
                   </li>
                   <li class="list-inline-item" v-if="!show_content">
@@ -99,7 +99,7 @@
             </li>
 
             <li class="list-inline-item" v-if="show_content && !submit_modal && post.referendum">
-              <router-link :to="thread_link">discuss</router-link>
+              <router-link :to="thread_link">{{ post.total_replies }} comments</router-link>
             </li>
             <li class="list-inline-item" v-if="post.referendum">
               <a href="javascript:void(0)" class="text-success" v-on:click="referendumVote(1)">
@@ -124,10 +124,14 @@
               </a>
             </li>
             <li class="list-inline-item" v-if="post.referendum">
-              EOS: {{ post.referendum.details.total_eos.toFixed(4) }}
+              eos: {{ post.referendum.details.total_eos.toFixed(4) }}
             </li>
             <li class="list-inline-item" v-if="post.referendum">
-              Participants: {{ post.referendum.details.total_participants }}
+              participants: {{ post.referendum.details.total_participants }}
+            </li>
+            <li class="list-inline-item" v-if="post.referendum">
+              <span v-if="post.referendum.expired" class="text-danger">expired</span>
+              <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
             </li>
           </ul>
         </div>
@@ -289,7 +293,7 @@ export default {
       );
 
       this.is_nsfw =
-        (this.post.data.tags && this.post.data.tags.includes("nsfw")) ||
+        (this.post.tags && this.post.tags.includes("nsfw")) ||
         (this.post.depth == 0 &&
           (await moderation.isNsfw(
             this.post.createdAt,
@@ -330,6 +334,11 @@ export default {
       await ui.actions.Referendum.Expire(this.post.transaction);
     },
     async referendumVote(vote) {
+      if (this.post.referendum.expired) {
+        alert('This proposal has expired and can no longer be voted on');
+        return;
+      }
+
       var txid = await ui.actions.Referendum.Vote(this.post.transaction, vote);
       alert(`Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`, 
         {
