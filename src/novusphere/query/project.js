@@ -55,6 +55,7 @@ export default {
             transaction: "$transaction",
             createdAt: "$createdAt",
             data: "$data",
+            tags: "$tags",
             //state: "$state",
             expired: "$expired",
             replies: !opts.total_replies ? "$replies" : [],
