@@ -126,7 +126,7 @@ class Post {
             post.data = {
                 poster: data.proposer,
                 post_uuid: 'ref-' + post.transaction,
-                content: data.proposal_json.content,
+                content: data.proposal_json.content ? data.proposal_json.content : '',
                 reply_to_poster: '',
                 reply_to_post_uuid: '',
                 certify: 0,

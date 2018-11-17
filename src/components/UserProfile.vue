@@ -38,8 +38,7 @@
             <div class="row mb-4">
                 <div class="col-12">
                   <div class="float-right">
-                      <router-link v-if="current_page>1" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (current_page-1)">&larr; prev</router-link>
-                      <router-link v-if="current_page<pages" class="btn btn-outline-primary" :to="'/u/' + account + '?page=' + (current_page+1)">next &rarr;</router-link>
+                      <Pager :pages="pages" :current_page="current_page"></Pager>
                   </div>
                 </div>
             </div>
@@ -60,6 +59,7 @@ import { GetNovusphere } from "@/novusphere";
 import { storage, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
 
+import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
 
@@ -76,6 +76,7 @@ export default {
     PostHistoryModal: PostHistoryModal,
     HeaderSection: HeaderSection,
     MainSection: MainSection,
+    Pager: Pager,
     Post: Post,
     PostSorter: PostSorter
   },

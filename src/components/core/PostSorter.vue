@@ -10,48 +10,61 @@
 </template>
 
 <script>
+import ui from "@/ui";
 import { GetNovusphere } from "@/novusphere";
 
 export default {
   name: "PostSorter",
   props: {
-      change: {
-          type: Function,
-          required: false,
-          default: null
-      },
-      options: {
-          type: Array,
-          required: false,
-          default: () => [ 'popular', 'time' ]
-      },
-      default_by: {
-          type: String,
-          required: false,
-          default: 'popular'
-      }
+    change: {
+      type: Function,
+      required: false,
+      default: null
+    },
+    options: {
+      type: Array,
+      required: false,
+      default: () => ["popular", "time"]
+    },
+    default_by: {
+      type: String,
+      required: false,
+      default: "popular"
+    }
   },
   async mounted() {
-      this.by = this.default_by;
+    this.load();
+  },
+  watch: {
+    "$route.query.sort": function() {
+      this.load();
+      if (this.change) {
+        this.change(this.by);
+      }
+    }
   },
   methods: {
-      setBy(val) {
-          this.by = val;
-          if (this.change) {
-              this.change(this.by);
-          }
-      },
-      getSorter() {
-          const novusphere = GetNovusphere();
-          if (this.by == 'popular') {
-              return novusphere.query.sort.score();
-          }
-          return novusphere.query.sort.time();
+    load() {
+      var sort = this.$route.query.sort;
+      this.by = sort && this.options.includes(sort) ? sort : this.default_by;
+    },
+    setBy(val) {
+      const route = ui.helpers.Route(this.$route, {
+        query: { sort: val }
+      });
+      this.$router.push(route);
+    },
+    getSorter() {
+      const novusphere = GetNovusphere();
+      if (this.by == "popular") {
+        return novusphere.query.sort.score();
       }
+      return novusphere.query.sort.time();
+    }
   },
   data() {
     return {
-        by: 'popular'
+      by: "popular"
     };
   }
 };

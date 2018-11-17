@@ -67,6 +67,20 @@ function ParseMarkdown(content, createdAt) {
     return new MarkdownParser(content, createdAt);
 }
 
+function Route($route, delta) {
+    var query = Object.assign({}, $route.query);
+    var params = Object.assign({}, $route.params);
+    var name = $route.name;
+
+    if (delta.query)
+        query = Object.assign(query, delta.query);
+
+    if (delta.params)
+        params = Object.assign(params, delta.params);
+
+    return { name: name, query: query, params: params };
+}
+
 export default {
     GetRandomHeaderText,
     GenerateAnonData,
@@ -76,5 +90,6 @@ export default {
     IsAnonSub,
     GeneratePostUuid,
     ParseMarkdown,
-    GetHost
+    GetHost,
+    Route
 }

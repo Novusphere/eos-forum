@@ -22,8 +22,7 @@
         <div class="row mb-4">
             <div class="col-12">
               <div class="float-right">
-                  <router-link v-if="current_page>1" class="btn btn-outline-primary" :to="'/referendum?page=' + (current_page-1)">&larr; prev</router-link>
-                  <router-link v-if="current_page<pages" class="btn btn-outline-primary" :to="'/referendum?page=' + (current_page+1)">next &rarr;</router-link>
+                  <Pager :pages="pages" :current_page="current_page"></Pager>
               </div>
             </div>
         </div>
@@ -107,6 +106,7 @@ import { GetEOS, ScatterEosOptions, GetIdentity } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { MarkdownParser } from "@/markdown";
 
+import Pager from "@/components/core/Pager";
 import PostSorter from "@/components/core/PostSorter";
 import Post from "@/components/core/Post";
 
@@ -121,10 +121,16 @@ const REFERENDUM_COLLECTION = "eosforum";
 export default {
   name: "Referendum",
   components: {
+    Pager: Pager,
     Post: Post,
     PostSorter: PostSorter,
     HeaderSection: HeaderSection,
     MainSection: MainSection
+  },
+  watch: {
+    "$route.query.page": function() {
+      this.load();
+    }
   },
   async mounted() {
     await this.load();

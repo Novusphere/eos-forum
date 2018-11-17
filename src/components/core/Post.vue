@@ -1,7 +1,12 @@
 <template>
     <div :class="'col-md-12 mb-3 post ' + ((post.depth>0) ? 'post-child' : '')">
       <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-1">
+          <a :href="thread_link">
+            <img style="height:70px; width:auto;" :src="thumbnail ? thumbnail : 'https://cdn.novusphere.io/static/atmos.svg'">
+          </a>
+        </div>
+        <div class="col-md-11">
           <!-- title -->
           <span style="font-weight: bold; font-size: 20px">
                 <div v-if="is_show_title">
@@ -264,6 +269,9 @@ export default {
     },
     sub() {
       return this.post.data.json_metadata.sub;
+    },
+    thumbnail() {
+      return this.post.data.json_metadata.attachment.thumbnail;
     },
     attachment() {
       return this.post.data.json_metadata.attachment.value;

@@ -11,7 +11,7 @@ export default {
         const novusphere = GetNovusphere();
         var prop = (await novusphere.api({
             find: REFERENDUM_COLLECTION,
-            maxTimeMS: 1000,
+            maxTimeMS: 5000,
             filter: {
                 name: "propose",
                 transaction: txid
