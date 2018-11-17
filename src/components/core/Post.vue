@@ -2,9 +2,9 @@
     <div :class="'col-md-12 mb-3 post ' + ((post.depth>0) ? 'post-child' : '')">
       <div class="row">
         <div class="col-md-1">
-          <a :href="thread_link">
+          <router-link :to="thread_link">
             <img style="height:70px; width:auto;" :src="thumbnail ? thumbnail : 'https://cdn.novusphere.io/static/atmos.svg'">
-          </a>
+          </router-link>
         </div>
         <div class="col-md-11">
           <!-- title -->
