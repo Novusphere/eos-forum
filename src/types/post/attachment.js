@@ -1,4 +1,5 @@
 import requests from "@/requests";
+import { GetNovusphere } from "@/novusphere";
 
 function GetHost(href) {
     if (href.indexOf("magnet:") == 0) {
@@ -10,10 +11,13 @@ function GetHost(href) {
 }
 
 async function OEmbed(url) {
-    url = 'https://cors.io/?' + url;
+    console.log(url);
+
+    const novusphere = GetNovusphere();
+
     var oembed = null; 
     
-    try { oembed = JSON.parse(await requests.get(url)); }
+    try { oembed = JSON.parse(await novusphere.cors(url)); }
     catch (ex) { return null; }
 
     var src = oembed.html.match(/src=\".+\"/);
@@ -92,7 +96,7 @@ class PostAttachment {
                 var host = GetHost(attachment.value);
                 if (host == 'youtu.be') {
                     var split = attachment.value.split('/');
-                    attachment.value = 'https://www.youtube.com/?v=' + split[split.length - 1];
+                    attachment.value = 'https://www.youtube.com/watch?v=' + split[split.length - 1];
                     host = 'youtube.com';
                 }
                 if (host == 'youtube.com' || host == 'www.youtube.com') {
@@ -125,6 +129,16 @@ class PostAttachment {
                         attachment.value = 'https://www.bitchute.com/embed/' + vid[0].substring(6);
                         attachment.display = 'iframe';
                     }
+                }
+            }
+
+            if (attachment.display == 'link') {
+                if (attachment.value.endsWith('.png') ||
+                    attachment.value.endsWith('.jpg') ||
+                    attachment.value.endsWith('.jpeg') || 
+                    attachment.value.endsWith('.gif')) {
+
+                    attachment.display = 'img';
                 }
             }
 

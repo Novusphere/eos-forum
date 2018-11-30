@@ -15,7 +15,7 @@
               </iframe>
             </div>
             <div v-if="img" class="text-center">
-                <img :src="attachment.value">
+                <a :href="attachment.value"><img :src="attachment.value"></a>
             </div>
             <div v-if="mp4" class="text-center">
                 <video style="width: 100%" controls>

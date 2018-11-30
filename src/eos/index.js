@@ -4,7 +4,6 @@ import { LoadStorage, storage } from '@/storage';
 LoadStorage();
 
 import EOSBinaryReader from "./binaryreader";
-import { GetEOSService } from "./service";
 
 import ScatterWallet from "./wallets/scatter";
 import LynxWallet from "./wallets/lynx";
@@ -92,5 +91,4 @@ export {
     ForgetIdentity,
     ExecuteEOSActions,
     EOSBinaryReader,
-    GetEOSService
 };

@@ -1,12 +1,14 @@
 <template>
     <div :class="'col-md-12 mb-3 post ' + ((post.depth>0) ? 'post-child' : '')">
       <div class="row">
-        <div class="col-md-1">
-          <router-link :to="thread_link">
-            <img style="height:70px; width:auto;" :src="thumbnail ? thumbnail : 'https://cdn.novusphere.io/static/atmos.svg'">
-          </router-link>
+        <div v-if="!show_content" class="col-md-1">
+          <div class="text-center">
+            <router-link :to="thread_link">
+              <img style="height:70px; width:auto;" :src="thumbnail">
+            </router-link>
+          </div>
         </div>
-        <div class="col-md-11">
+        <div :class="show_content ? 'col-md-12' : 'col-md-11'">
           <!-- title -->
           <span style="font-weight: bold; font-size: 20px">
                 <div v-if="is_show_title">
@@ -222,9 +224,10 @@ export default {
         this.post.data.poster == "eosforumanon" &&
         this.post.data.json_metadata.anon_id.name
       ) {
-        return this.post.data.json_metadata.anon_id.name.substring(0, 12) + '[anon]'
-      }
-      else {
+        return (
+          this.post.data.json_metadata.anon_id.name.substring(0, 12) + "[anon]"
+        );
+      } else {
         return this.post.data.poster;
       }
     },
@@ -271,7 +274,15 @@ export default {
       return this.post.data.json_metadata.sub;
     },
     thumbnail() {
-      return this.post.data.json_metadata.attachment.thumbnail;
+      var t = this.post.data.json_metadata.attachment.thumbnail;
+      if (!t) {
+        if (this.reddit.author) {
+          t = "https://cdn.novusphere.io/static/reddit.png";
+        } else {
+          t = "https://cdn.novusphere.io/static/atmos.svg";
+        }
+      }
+      return t;
     },
     attachment() {
       return this.post.data.json_metadata.attachment.value;
@@ -343,16 +354,18 @@ export default {
     },
     async referendumVote(vote) {
       if (this.post.referendum.expired) {
-        alert('This proposal has expired and can no longer be voted on');
+        alert("This proposal has expired and can no longer be voted on");
         return;
       }
 
       var txid = await ui.actions.Referendum.Vote(this.post.transaction, vote);
-      alert(`Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`, 
+      alert(
+        `Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`,
         {
-          title: 'Thanks for voting!',
-          text_class: 'text-success'
-        });
+          title: "Thanks for voting!",
+          text_class: "text-success"
+        }
+      );
     },
     async history() {
       await this.history_modal.load(this.post.o_transaction);
@@ -422,7 +435,6 @@ export default {
       }
     },
     async reply() {
-
       var $post = this.submit_modal.$data.post;
       $post.parent_uuid = this.post.data.post_uuid;
       $post.parent_tx = this.post.transaction;

@@ -14,6 +14,32 @@ class NovusphereAdapter {
         }
         return result;
     }
+    async cors(url) {
+        var endpoint = this.config.url + '/service/cors/?' + url;
+        var result = await requests.get(endpoint);
+        return result;
+    }
+    async anonymousPost(post) {
+        //
+        // check whether if our current api end point has an anon service
+        //
+        try {
+            if (this._anonymous_post == undefined) {
+                var check = await requests.get(this.config.url + '/service/anon/');
+                this._anonymous_post = check.enabled;
+            }
+        }
+        catch (ex) {
+            this._anonymous_post = false;
+        }
+
+        var endpoint = this._anonymous_post ?
+            (this.config.url + '/service/anon/post') :
+            'https://db.novusphere.io/service/anon/post';
+
+        var result = await requests.post(endpoint, post);
+        return result;
+    }
     async wait(delay, query) {
         for (; ;) {
             var result = (await this.api(query));

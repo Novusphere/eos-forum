@@ -15,7 +15,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
         set_status = function () { }; // dummy
     }
 
-    const eos_service = GetEOSService();
+    const novusphere = GetNovusphere();
     const identity = await GetIdentity();
 
     // if anon, service will set poster
@@ -37,9 +37,9 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
 
             }
 
-            var eostx = await eos_service.anonymousPost(post);
+            var eostx = await novusphere.anonymousPost(post);
             if (eostx.error) {
-                set_status("Error: " + eostx.error);
+                set_status(eostx.error);
                 console.log(eostx.error);
                 return false;
             }
@@ -153,7 +153,6 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
     }
 
     set_status("Waiting for Novusphere to index...");
-    const novusphere = GetNovusphere();
     await novusphere.waitTx(txid, 500, 1000);
 
     // reset default
