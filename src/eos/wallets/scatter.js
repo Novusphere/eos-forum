@@ -69,6 +69,7 @@ export default class ScatterWallet {
         this.identity.account = identity.accounts[0].name;
         this.identity.auth = identity.accounts[0].authority;
         this.identity.atmos = '0.000';
+        this.identity.token = '0.000';
         this.identity.notifications = 0;
 
         await this.identity.update(true);

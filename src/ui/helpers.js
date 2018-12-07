@@ -91,5 +91,5 @@ export default {
     GeneratePostUuid,
     ParseMarkdown,
     GetHost,
-    Route
+    Route,
 }

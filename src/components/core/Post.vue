@@ -171,6 +171,7 @@
 import jQuery from "jquery";
 
 import ui from "@/ui";
+import { FORUM_BRAND } from "@/ui/constants";
 
 import requests from "@/requests";
 import { MarkdownParser } from "@/markdown";
@@ -279,7 +280,7 @@ export default {
         if (this.reddit.author) {
           t = "https://cdn.novusphere.io/static/reddit.png";
         } else {
-          t = "https://cdn.novusphere.io/static/atmos.svg";
+          t = FORUM_BRAND.logo;
         }
       }
       return t;

@@ -15,11 +15,12 @@ library.add(fab);
 
 import App from "@/App"
 import router from '@/router'
+import Meta from 'vue-meta'
 import { LoadStorage } from "@/storage"
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(BootstrapVue);
-
+Vue.use(Meta);
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */

@@ -27,6 +27,9 @@ import ReferendumActions from "./actions/Referendum";
 import UIHelpers from "./helpers";
 import { GetIdentity } from "../eos";
 
+// constants
+import { FORUM_BRAND } from "./constants";
+
 window.addEventListener('identityUpdate', async function() {
     const eos = GetEOS();
     const identity = await GetIdentity();
@@ -38,6 +41,18 @@ window.addEventListener('identityUpdate', async function() {
             "ATMOS"
         ))[0]
     );
+
+    var token = atmos;
+    const FORUM_TOKEN = FORUM_BRAND.token;
+    if (FORUM_TOKEN && (FORUM_TOKEN.contract != 'novusphereio' || FORUM_TOKEN.symbol != 'ATMOS')) {
+        token = parseFloat(
+            (await eos.getCurrencyBalance(
+                FORUM_TOKEN.contract,
+                identity.account,
+                FORUM_TOKEN.symbol
+            ))[0]
+        );
+    }
 
     const novusphere = GetNovusphere();
     const notifications = (await novusphere.api({
@@ -56,6 +71,7 @@ window.addEventListener('identityUpdate', async function() {
     })).cursor.firstBatch;
 
     identity.atmos = (isNaN(atmos) ? 0 : atmos).toFixed(3);
+    identity.token = (isNaN(token) ? 0 : token).toFixed(3);
     identity.notifications = notifications.length > 0 ? notifications[0].n : 0;
 });
 

@@ -9,6 +9,7 @@ export default class Identity {
         this.account = '';
         this.auth = '';
         this.atmos = '0.000';
+        this.token = '0.000';
         this.notifications = 0;
 
         window.dispatchEvent(new Event('identity'));

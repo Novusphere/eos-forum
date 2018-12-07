@@ -4,7 +4,7 @@
       <ul class="list-inline mb-0" v-if="identity">
             <li class="list-inline-item">
               <router-link :to="'/'">
-                <img src="https://cdn.novusphere.io/static/atmos.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+                <img :src="logo" width="30" height="30" class="d-inline-block align-top" alt="">
               </router-link>
             </li>
             <li v-if="!identity.account" class="list-inline-item">
@@ -12,7 +12,7 @@
             </li>
             <li v-if="identity.account" class="list-inline-item">
               <router-link :to="'/u/' + identity.account" class="text-mine">
-                {{ identity.account }} | {{ identity.atmos }} ATMOS
+                {{ identity.account }} | {{ identity.token }} {{ token_symbol }}
               </router-link>
             </li>
             <li v-if="identity.account" class="list-inline-item">
@@ -51,6 +51,7 @@
 
 <script>
 import ui from "@/ui";
+import { FORUM_BRAND } from "@/ui/constants";
 
 import { MarkdownParser } from "@/markdown";
 
@@ -60,6 +61,18 @@ import { GetNovusphere } from "@/novusphere";
 
 export default {
   name: "HeaderSection",
+  metaInfo() {
+    return {
+      title: FORUM_BRAND.title,
+      link: [
+        { rel: "icon", href: FORUM_BRAND.icon }
+      ],
+      htmlAttrs: {
+        lang: "en",
+        amp: undefined // "amp" has no value
+      }
+    };
+  },
   props: {
     load: {
       type: Function,
@@ -67,6 +80,9 @@ export default {
     }
   },
   async mounted() {
+    this.logo = FORUM_BRAND.logo;
+    this.token_symbol = FORUM_BRAND.token.symbol;
+
     var header_text = ui.helpers.GetRandomHeaderText();
     this.random_header = new MarkdownParser(header_text).html;
 
@@ -107,7 +123,9 @@ export default {
     return {
       identity: null,
       eos_referendum: storage.eos_referendum,
-      random_header: ""
+      random_header: "",
+      logo: "https://cdn.novusphere.io/static/atmos.svg",
+      token_symbol: "ATMOS"
     };
   }
 };

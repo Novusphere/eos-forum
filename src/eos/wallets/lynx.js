@@ -21,6 +21,7 @@ export default class LynxWallet {
         this.identity.account = identity;
         this.identity.auth = 'active'; // assume
         this.identity.atmos = '0.000';
+        this.identity.token = '0.000';
         this.identity.notifications = 0;
         
         await this.identity.update(true);

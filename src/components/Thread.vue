@@ -35,6 +35,12 @@ import MainSection from "@/components/section/MainSection";
 
 export default {
   name: "Thread",
+  metaInfo() {
+    const title = this.main_post.data.json_metadata.title;
+    return {
+      titleTemplate: `%s | ${title}`,
+    };
+  },
   components: {
     SubmitPostModal: SubmitPostModal,
     PostHistoryModal: PostHistoryModal,
@@ -55,7 +61,10 @@ export default {
   },
   methods: {
     async load() {
-      var thread = await ui.views.Thread(this.$route.params.id, this.$route.params.child_id);
+      var thread = await ui.views.Thread(
+        this.$route.params.id,
+        this.$route.params.child_id
+      );
       this.opening_post = thread.opening_post;
       this.main_post = thread.main_post;
     },

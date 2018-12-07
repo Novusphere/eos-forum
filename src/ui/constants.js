@@ -13,13 +13,27 @@ if (window.__PRESETS__ && window.__PRESETS__.default_sub) {
     DEFAULT_SUB = window.__PRESETS__.default_sub;
 }
 
+var FORUM_BRAND =  {
+    "title": "A decentralized forum",
+    "logo": "https://cdn.novusphere.io/static/atmos.svg",
+    "icon": "https://cdn.novusphere.io/static/atmos2.png",
+    "token": {
+        "contract": "novusphereio",
+        "symbol": "ATMOS"
+    }
+}
+
 if (window.__PRESETS__) {
     var presets = window.__PRESETS__;
+
     if (presets.header_texts)
         HEADER_TEXTS = presets.header_texts;
 
     if (presets.default_sub)
         DEFAULT_SUB = presets.default_sub;
+
+    if (presets.brand)
+        FORUM_BRAND = presets.brand;
 }
 
 export {
@@ -27,5 +41,6 @@ export {
     MAX_ITEMS_PER_PAGE,
     UPVOTE_ATMOS_RATE,
     HEADER_TEXTS,
-    DEFAULT_SUB
+    DEFAULT_SUB,
+    FORUM_BRAND
 }

@@ -160,8 +160,9 @@ export default {
             proposal_name: this.generateName(identity.account, post.content),
             title: post.title,
             proposal_json: JSON.stringify({
+                type: "referendum-v1",
                 content: post.content,
-                src: "novusphere-forum"
+                //src: "novusphere-forum"
             }),
             expires_at: new Date(post.expiry).getTime() / 1000
         };
