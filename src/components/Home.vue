@@ -1,64 +1,75 @@
 <template>
   <div>
-    <SubmitPostModal ref="submit_modal" :sub="sub" :post_content_callback="postContent"></SubmitPostModal>
-    <HeaderSection :load="load">
-      <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
-      <button v-if="sub && !is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary ml-1">subscribe</button>
-      <button v-if="sub && is_subscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger ml-1">unsubscribe</button>
-      <button v-if="sub" type="button" class="btn btn-sm btn-outline-primary" v-on:click="newThread()">new</button>
-      <PostSorter ref="sorter" :change="load"></PostSorter>
-    </HeaderSection>
-    <MainSection>
-      <div>
-        <div v-if="posts.length == 0">
-              <div class="text-center">
-                <h1>There doesn't seem to be any posts here! Why not make one?</h1>
-              </div>
-        </div>
-     
-          <Post 
-            v-for="p in posts" 
-            :key="p.transaction" 
-            :submit_modal="$refs.submit_modal" 
-            :post="p" 
-            :show_content="false">
-          </Post>
-     
-        <div class="row mb-4">
-            <div class="col-12">
-              <div class="float-right">
-                  <Pager :pages="pages" :current_page="current_page"></Pager>
-              </div>
+    
+    <layout :load="load">
+        <template slot="topic">
+          <span v-if="sub">e/{{sub}}</span>
+          <span v-else>Home</span>
+        </template>
+        <template slot="content">
+          <div class="mb-1">
+            <div class="float-left">
+              <router-link :to="{ name: 'StartThread', params: { sub: sub ? sub : 'all' } }" class="btn btn-sm btn-outline-success">
+                new
+              </router-link>
             </div>
-        </div>
-      </div>
-    </MainSection>
+            <div class="ml-1 float-left">
+              <post-sorter ref="sorter" :change="load"></post-sorter>
+            </div>
+            <div class="ml-1 float-left">
+              <button v-if="sub && !is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary">subscribe</button>
+              <button v-if="sub && is_subscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger">unsubscribe</button>
+            </div>
+            <div class="float-right">
+              <pager :pages="pages" :current_page="current_page"></pager>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+            <div v-if="posts.length == 0">
+                  <div class="text-center">
+                    <h1>There doesn't seem to be any posts here! Why not make one?</h1>
+                  </div>
+            </div>
+
+            <post v-for="p in posts" :key="p.transaction" :post="p"></post>
+      
+        </template>
+        <template slot="sidebar">
+            <div class="sidebarblock">
+                <recently-visited></recently-visited>
+            </div>
+        </template>
+    </layout>
+
   </div>
 </template>
 
 <script>
-import jQuery from "jquery";
-
 import ui from "@/ui";
+import { GetNovusphere } from "@/novusphere";
 
 import Pager from "@/components/core/Pager";
-import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
+import RecentlyVisited from "@/components/core/RecentlyVisited";
+import Post from "@/components/core/Post";
 
-import SubmitPostModal from "@/components/modal/SubmitPostModal";
-
-import HeaderSection from "@/components/section/HeaderSection";
-import MainSection from "@/components/section/MainSection";
+import Layout from "@/components/section/Layout";
 
 export default {
-  name: "Home",
+  name: "Home2",
+  metaInfo() {
+    const sub = (this.sub) ? `e/${this.sub}` : 'Home';
+    return {
+      titleTemplate: `%s | ${sub}`,
+    };
+  },
   components: {
-    Pager: Pager,
-    Post: Post,
-    PostSorter: PostSorter,
-    SubmitPostModal: SubmitPostModal,
-    HeaderSection: HeaderSection,
-    MainSection: MainSection
+    Pager,
+    PostSorter,
+    RecentlyVisited,
+    Post,
+    Layout
   },
   watch: {
     "$route.query.page": function() {
@@ -73,17 +84,20 @@ export default {
   },
   methods: {
     async load() {
+
       if (this.$route.params.sub == 'eos-referendum') {
         this.$router.push('/referendum');
         return;
       }
 
+      const novusphere = GetNovusphere();
       var home = await ui.views.Home(this.$route.query.page, this.$route.params.sub, this.$refs.sorter.getSorter());
       this.is_subscribed = home.is_subscribed;
       this.posts = home.posts;
       this.pages = home.pages;
       this.current_page = home.current_page;
       this.sub = home.sub;
+
     },
     async newThread() {
       try {

@@ -38,7 +38,7 @@ class MarkdownParser {
             // but hey, at least it works
             //
             extensions.push(twitter(
-                (username) => { 
+                (username) => {
                     return '<a href="\\#/u/' + username.trim().substring(1) + '">' + username + '</a>';
                 },
                 //(tag) => '<a href="">#' + tag + '</a>'
@@ -64,11 +64,13 @@ class MarkdownParser {
         this.html = html;
     }
     _safeAttribute(value) {
-        if (value.search(RX_JAVASCRIPT) == 0 ||
-            value.search(RX_VBSCRIPT) == 0 ||
-            value.search(RX_DATA) == 0) {
+        if (value) {
+            if (value.search(RX_JAVASCRIPT) == 0 ||
+                value.search(RX_VBSCRIPT) == 0 ||
+                value.search(RX_DATA) == 0) {
 
-            return 'javascript:void(0)';
+                return 'javascript:void(0)';
+            }
         }
 
         return value;

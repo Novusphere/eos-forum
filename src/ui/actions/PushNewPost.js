@@ -6,7 +6,7 @@ import {
     FORUM_CONTRACT,
 } from "@/ui/constants";
 
-export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_status) {
+export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_status, skip_index) {
     if (!post) {
         return false;
     }
@@ -19,7 +19,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
     const identity = await GetIdentity();
 
     // if anon, service will set poster
-    post.poster = (anon) ? "" : identity.account;
+    post.poster = (anon) ? post.poster : identity.account;
 
     var txid;
 
@@ -122,8 +122,8 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
             // https://github.com/eoscanada/eosio.forum/blob/master/src/forum.cpp#L157
             const MAX_CONTENT = 1024 * 10;
             if (post.content.length >= MAX_CONTENT) {
-                var overflow = post.content.substring(MAX_CONTENT-1);
-                var underflow = post.content.substring(0, MAX_CONTENT-1);
+                var overflow = post.content.substring(MAX_CONTENT - 1);
+                var underflow = post.content.substring(0, MAX_CONTENT - 1);
 
                 post.content = underflow; // update underflow
                 actions.push({ // push overflow to nsdb contract
@@ -152,8 +152,12 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
         return false;
     }
 
-    set_status("Waiting for Novusphere to index...");
-    await novusphere.waitTx(txid, 500, 1000);
+    if (!skip_index) {
+
+        set_status("Waiting for Novusphere to index...");
+        await novusphere.waitTx(txid, 500, 1000);
+
+    }
 
     // reset default
     set_status("");

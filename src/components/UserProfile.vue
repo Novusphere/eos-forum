@@ -1,50 +1,56 @@
 <template>
-    <div>
-        <PostHistoryModal ref="history_modal"></PostHistoryModal>
-        <HeaderSection :load="load">
-            <span class="title mr-3"><router-link :to="'/u/' + account">{{account}}</router-link></span>
-            <a target="_blank" class="btn btn-sm btn-outline-primary ml-1" :href="'https://eosq.app/account/' + account">view on chain</a>
-            <PostSorter ref="sorter" :change="load"></PostSorter>
-            <button class="btn btn-sm btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
-        </HeaderSection>
-        <MainSection>
-        <div>
-            <div class="row mb-4">
-                <div class="col-md-6 col-12">
-                    <div class="row">
-                        <div class="col-md-6 col-5">Balances</div>
-                        <div class="col-md-6 col-7">{{balances.atmos}} ATMOS</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-5">Comments</div>
-                        <div class="col-md-6 col-7">{{comments}}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-5">Threads</div>
-                        <div class="col-md-6 col-7">{{threads}}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-5">Last Activity</div>
-                        <div class="col-md-6 col-7">{{ last_activity }}</div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-12">
-                    
-                </div>
+  <div>
+    
+    <layout :load="load">
+        <template slot="topic">
+          <span>u/{{ account }}</span>
+        </template>
+        <template slot="content">
+          <div class="mb-1">
+            <div class="float-left">
+              <post-sorter ref="sorter" :change="load"></post-sorter>
             </div>
-            <div class="row mb-2" v-for="p in posts" :key="p.o_id">
-              <Post :history_modal="$refs.history_modal" :post="p" :show_content="true"></Post>
+            <div class="float-left ml-1">
+              <button class="btn btn-sm btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
             </div>
-            <div class="row mb-4">
-                <div class="col-12">
-                  <div class="float-right">
-                      <Pager :pages="pages" :current_page="current_page"></Pager>
-                  </div>
+            <div class="float-right">
+              <pager :pages="pages" :current_page="current_page"></pager>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div v-if="posts.length == 0">
+                <div class="text-center">
+                  <h1>No posts history found!</h1>
                 </div>
+          </div>
+
+          <post v-for="p in posts" :key="p.o_id" 
+            :post="p"></post>
+        </template>
+        <template slot="sidebar">
+            <div class="sidebarblock">
+              <div>
+                <h3>{{ account }}</h3>
+                <div class="divline"></div>
+                <div class="blocktxt">
+                  Balances: {{ balances.atmos }} ATMOS
+                </div>
+                <div class="blocktxt">
+                  Comments: {{ comments }}
+                </div>
+                <div class="blocktxt">
+                  Threads: {{ threads }}
+                </div>
+                <div class="blocktxt">
+                  Last Activity: {{ last_activity }}
+                </div>
+              </div>
             </div>
-        </div>
-        </MainSection>
-    </div>
+        </template>
+    </layout>
+
+  </div>
 </template>
 
 <script>
@@ -63,22 +69,15 @@ import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
 
-import PostHistoryModal from "@/components/modal/PostHistoryModal";
-
-import HeaderSection from "@/components/section/HeaderSection";
-import MainSection from "@/components/section/MainSection";
-
-const MAX_ITEMS_PER_PAGE = 25;
+import Layout from "@/components/section/Layout";
 
 export default {
   name: "UserProfile",
   components: {
-    PostHistoryModal: PostHistoryModal,
-    HeaderSection: HeaderSection,
-    MainSection: MainSection,
-    Pager: Pager,
-    Post: Post,
-    PostSorter: PostSorter
+    Layout,
+    Pager,
+    Post,
+    PostSorter
   },
   watch: {
     "$route.query.page": function() {

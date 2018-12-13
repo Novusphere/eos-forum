@@ -1,24 +1,35 @@
 <template>
-    <div>
-        <PostHistoryModal ref="history_modal"></PostHistoryModal>
-        <HeaderSection :load="load">
-            <span class="title mr-3">notifications</span>
-        </HeaderSection>
-        <MainSection>
-        <div>
-            <div class="row mb-2" v-for="p in posts" :key="p.o_id">
-              <Post :history_modal="$refs.history_modal" :post="p" :show_content="true"></Post>
+  <div>
+    
+    <layout :load="load">
+        <template slot="topic">
+          <span>Notifications</span>
+        </template>
+        <template slot="content">
+          <div class="mb-1">
+            <div class="float-right">
+              <pager :pages="pages" :current_page="current_page"></pager>
             </div>
-            <div class="row mb-4">
-                <div class="col-12">
-                  <div class="float-right">
-                      <Pager :pages="pages" :current_page="current_page"></Pager>
-                  </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div v-if="posts.length == 0">
+                <div class="text-center">
+                  <h1>You have no notifications</h1>
                 </div>
+          </div>
+
+          <post v-for="p in posts" :key="p.o_id" 
+            :post="p"></post>
+        </template>
+        <template slot="sidebar">
+            <div class="sidebarblock">
+                <recently-visited></recently-visited>
             </div>
-        </div>
-        </MainSection>
-    </div>
+        </template>
+    </layout>
+
+  </div>
 </template>
 
 <script>
@@ -27,21 +38,18 @@ import ui from "@/ui";
 import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
+import RecentlyVisited from "@/components/core/RecentlyVisited";
 
-import PostHistoryModal from "@/components/modal/PostHistoryModal";
-
-import HeaderSection from "@/components/section/HeaderSection";
-import MainSection from "@/components/section/MainSection";
+import Layout from "@/components/section/Layout";
 
 export default {
   name: "UserNotifications",
   components: {
-    PostHistoryModal: PostHistoryModal,
-    HeaderSection: HeaderSection,
-    MainSection: MainSection,
-    Pager: Pager,
-    Post: Post,
-    PostSorter: PostSorter
+    Layout,
+    Pager,
+    Post,
+    PostSorter,
+    RecentlyVisited
   },
   watch: {
     "$route.query.page": function() {
@@ -56,6 +64,7 @@ export default {
   methods: {
     async load() {
       var notifications = await ui.views.UserNotifications(this.$route.query.page);
+
       this.current_page = notifications.current_page;
       this.pages = notifications.pages;
       this.posts = notifications.posts;

@@ -1,9 +1,9 @@
 <template>
   <div>
     
-    <layout :load="load">
+    <layout>
         <template slot="topic">
-          <span>Thread</span>
+          <span>History</span>
         </template>
         <template slot="content">
           <post :post="main_post" :thread="opening_post"></post>
@@ -30,7 +30,7 @@ import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Layout from "@/components/section/Layout";
 
 export default {
-  name: "Thread2",
+  name: "History",
   metaInfo() {
     const title = this.main_post.data.json_metadata.title;
     return {
@@ -48,25 +48,16 @@ export default {
     "$route.params.id": function() {
       this.load();
     },
-    "$route.params.child_id": function() {
-      this.load();
-    }
   },
   async mounted() {
     this.load();
   },
   methods: {
     async load() {
-      var thread = await ui.views.Thread(
-        this.$route.params.id,
-        this.$route.params.child_id
-      );
-      this.opening_post = thread.opening_post;
-      this.main_post = thread.main_post;
+      var history = await ui.views.PostHistory(this.$route.params.id);
+      this.main_post = history.main_post;
+      this.opening_post = history.main_post;
     },
-    postContent(txid, data) {
-      this.load(); // reload thread
-    }
   },
   data() {
     return {

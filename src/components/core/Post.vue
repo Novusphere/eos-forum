@@ -1,278 +1,235 @@
 <template>
-    <div :class="'col-md-12 mb-3 post ' + ((post.depth>0) ? 'post-child' : '')">
-      <div class="row">
-        <div v-if="!show_content" class="col-md-1">
-          <div class="text-center">
-            <router-link :to="thread_link">
-              <img style="height:70px; width:auto;" :src="thumbnail">
-            </router-link>
-          </div>
-        </div>
-        <div :class="show_content ? 'col-md-12' : 'col-md-11'">
-          <!-- title -->
-          <span style="font-weight: bold; font-size: 20px">
-                <div v-if="is_show_title">
-                  <!-- links to off-site content -->
-                  <span v-if="post.o_attachment && post.o_attachment.type == 'url'">
-                        <span class="title"><a target="_blank" :href="post.o_attachment.value">{{ title }}</a></span>
-                        <span class="text-xsmall domain">(<span class="domain-offsite">{{this.getHost(post.o_attachment.value)}}</span> in <router-link :to="'/e/' + sub">self.{{sub}}</router-link>)</span>
-                  </span>
-                  <!-- links to on site content -->
-                  <span v-else>
-                        <span class="title"><router-link :to="thread_link">{{ title }}</router-link></span>
-                        <span v-if="sub" class="text-xsmall domain"><router-link :to="'/e/' + sub">(self.{{sub}})</router-link></span>
-                  </span>
-                    
-                  <span v-if="post.new_replies" class="badge badge-danger text-xsmall">new ({{post.new_replies}})</span>
+   <div>
+      <!-- POST -->
+      <div class="post">
+         <div class="topwrap">
+            <div class="userinfo float-left">
+                <div v-if="!thread" class="postthumbnail">
+                  <img :src="thumbnail" class="img-fluid" alt="thumbnail">
                 </div>
-          </span>
-          <div class="text-xsmall post-buttons">
-                <ul class="list-inline">
-                  <li v-if="show_content" class="list-inline-item">
-                    <a class="post-collapse" data-toggle="collapse" :href="'#post-' + post.transaction"></a>
-                  </li>
-                  <li class="list-inline-item" v-if="!post.referendum">
-                    <a :class="(post.my_vote ? 'text-mine': '')" href="javascript:void(0)" v-on:click="upvote()">
-                      <font-awesome-icon :icon="['fas', 'arrow-up']" ></font-awesome-icon> 
-                      {{post.up}} upvotes
+                <div class="text-center">
+                    <a href="javascript:void(0)" class="up" v-on:click="upvote()">
+                        <font-awesome-icon :icon="['far', 'thumbs-up']" ></font-awesome-icon>
+                        {{ post.up }}
                     </a>
-                  </li>
-                  <li class="list-inline-item" v-if="!show_content">
-                    <router-link :to="thread_link">{{ post.total_replies }} comments</router-link>
-                  </li>
-                  <li class="list-inline-item"><router-link :to="thread_link">{{ new Date(post.createdAt * 1000).toLocaleString() }}</router-link></li>
-                  <li v-if="!reddit.author" class="list-inline-item">
-                    by <router-link :to="'/u/' + post.data.poster" :class="((post.data.poster == identity) ? 'text-mine' : 'author')">{{ poster_name }}</router-link>
-                    <span v-if="op != 'eosforumanon' && post.data.poster == op" class="badge badge-success">op</span>
-                  </li>
-                  <li v-else class="list-inline-item">
-                    by <a :href="'https://www.reddit.com/user/' + reddit.author" class="author">{{ poster_name }}</a>
-                  </li>
-                  <li class="list-inline-item"><a :href="'https://eosq.app/tx/' + post.transaction">on chain</a></li>
-                  <li v-if="reddit.author" class="list-inline-item"><a :href="'https://reddit.com' + reddit.permalink">on reddit</a></li>
-                  <li v-if="history_modal && show_content && post.data.json_metadata.edit" class="list-inline-item"><a href="javascript:void(0)" v-on:click="history()">history</a></li>
-                  <li v-if="is_moderated" class="list-inline-item"><span class="badge badge-warning text-xsmall">spam</span></li>
-                  <li v-if="is_nsfw" class="list-inline-item"><span class="badge badge-nsfw text-xsmall">nsfw</span></li>
-                  <li v-if="post.is_pinned" class="list-inline-item"><span class="badge badge-pinned text-xsmall">pinned</span></li>
-                  <li v-if="is_new" class="list-inline-item"><span class="badge badge-warning text-xsmall">new</span></li>
+                </div>
+                <div class="text-center">
+                  <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" ></font-awesome-icon>
+                  <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" ></font-awesome-icon>     
+                  <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" ></font-awesome-icon>     
+                </div>                
+            </div>
+            <div class="posttext float-left">
+                <p v-if="offsite">
+                    <a :href="post.o_attachment.value" class="title">
+                       {{ post.data.json_metadata.title }}
+                    </a>
+                    <span class="offsite" v-if="offsite">({{ offsite }})</span>
+                </p>
+                <p v-else>
+                    <router-link v-if="post.id" :to="thread_link" class="title">
+                        {{ post.data.json_metadata.title }}
+                    </router-link>
+                </p>
+                
+                <post-attachment
+                  v-if="thread"
+                  ref="post_attachment" 
+                  :attachment="post.data.json_metadata.attachment"
+                  :id="'content-' + post.data.post_uuid"
+                  :collapse="false">
+                </post-attachment>
+
+                <p v-html="post_content_html"></p>
+            </div>
+            <div class="clearfix"></div>
+         </div>
+         <div class="postinfobot">
+            <div class="posted">
+                <ul class="list-inline">
+                    <li class="list-inline-item">
+                        <router-link v-if="!thread && post.transaction" :to="thread_link">
+                            <font-awesome-icon :icon="['fas', 'reply']" ></font-awesome-icon>
+                            {{ post.total_replies }} comments
+                        </router-link>
+                        <a v-else href="javascript:void(0)" v-on:click="showQuickReply()">
+                            <font-awesome-icon :icon="['fas', 'reply']" ></font-awesome-icon>
+                            reply
+                        </a>
+                    </li>
+                    <li v-if="is_mine && thread" class="list-inline-item">
+                      <router-link v-if="is_op" :to="{ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction } }">
+                        <font-awesome-icon :icon="['fas', 'edit']" ></font-awesome-icon>
+                        edit
+                      </router-link>
+                      <a v-else href="javascript:void(0)" v-on:click="showQuickEdit()">
+                        <font-awesome-icon :icon="['fas', 'edit']" ></font-awesome-icon>
+                        edit
+                      </a>
+                    </li>
+                    <li class="list-inline-item">
+                        
+                            <font-awesome-icon :icon="['fas', 'clock']" ></font-awesome-icon>  
+                            {{ new Date(post.createdAt * 1000).toLocaleString() }}
+                        
+                        <router-link  v-if="post.id && is_edit" :to="{ name: 'History', params: { id: post.o_transaction } }">
+                          <font-awesome-icon :icon="['fas', 'history']" ></font-awesome-icon>  
+                      </router-link>
+                    </li>
+                    <li class="list-inline-item">
+                        <a v-if="reddit.author" :href="`https://www.reddit.com/user/${reddit.author}`">
+                          <font-awesome-icon :icon="['fab', 'reddit']" ></font-awesome-icon> 
+                          by {{ poster_name }} 
+                        </a>
+                        <router-link v-else-if="post.transaction" :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+                          <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" ></font-awesome-icon> 
+                          by {{ poster_name }}
+                        </router-link>
+                    </li>
+                    <li class="list-inline-item" v-if="!thread || post.depth == 0">
+                        in 
+                        <router-link v-if="post.id" :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
+                          {{ post.data.json_metadata.sub }}
+                        </router-link>
+                    </li>
+                    <li class="list-inline-item" v-if="post.depth > 0">
+                        <a v-if="reddit.author" :href="reddit.permalink">
+                          <font-awesome-icon :icon="['fab', 'reddit']" ></font-awesome-icon> 
+                          permalink
+                        </a>
+                        <router-link v-else-if="post.transaction" :to="perma_link">
+                          permalink
+                        </router-link>
+                    </li>
+                    <li class="list-inline-item">
+                      <a :href="`https://eosq.app/tx/${post.transaction}`">
+                        <font-awesome-icon :icon="['fas', 'link']" ></font-awesome-icon>  
+                      </a>      
+                    </li>
                 </ul>
             </div>
-        </div>
-      </div>
 
-      <div :id="'post-' + post.transaction" :class="'post-attachment collapse ' + ((is_moderated && is_child) ? '' : 'show')" v-if="show_content">
-        
-        <!-- attached content -->
-        <PostAttachment
-          ref="post_attachment" 
-          :attachment="post.data.json_metadata.attachment"
-          :id="'content-' + post.data.post_uuid"
-          :collapse="is_child || (!submit_modal && this.hasAttachment('iframe'))">
-        </PostAttachment>
-                
-        <p style="font-weight: bold" v-if="!reddit.author && post.createdAt >= 1540774751 && post.data.poster == 'eosforumanon'">
-          <span v-if="this.post.data.json_metadata.anon_id.verified">
-            Anon ID: {{ post.data.json_metadata.anon_id.pub }}
-          </span>
-          <span v-else>
-            Anon ID: unknown / unverified
-          </span>
-        </p>
-        <p class="post-content" v-html="post_content"></p>
+            <div :class="'row quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')" :id="'qreply-' + post.data.post_uuid">
+              <div class="col-sm-12">
+                <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
+              </div>
+              <div class="col-sm-12 text-center" v-if="status">
+                <span>{{ status }}</span>
+              </div>
+              <div class="col-sm-12 mt-1 mb-2">
+                <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
+                <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(true)">post anon</button>
+              </div>
+            </div>
 
-        <div class="text-xsmall post-buttons-bottom">
-          <ul class="list-inline">
-            <li class="list-inline-item" v-if="history_modal && post.depth > 0">
-              <router-link :to="perma_link">permalink</router-link>
-            </li>
-            <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub) && (post.data.poster == identity)">
-              <a href="javascript:void(0)" v-on:click="edit()">edit</a>
-            </li>
-            <li class="list-inline-item" v-if="show_content && submit_modal /*&& (identity || is_anon_sub)*/">
-              <a href="javascript:void(0)" class="highlight" data-toggle="collapse" :data-target="'#qreply-' + post.data.post_uuid" v-on:click="showQuickReply()">quick-reply</a>
-            </li>
-            <li class="list-inline-item" v-if="show_content && submit_modal /*&& (identity || is_anon_sub)*/">
-              <a href="javascript:void(0)" class="highlight" v-on:click="reply()">reply</a>
-            </li>
-            <li class="list-inline-item" v-if="show_content && submit_modal && (identity || is_anon_sub)">
-              <router-link :to="perma_link" class="highlight" v-if="is_max_depth && post.children.length>0">view replies</router-link>
-            </li>
-            <li class="list-inline-item" v-if="(is_child || (!submit_modal && this.hasAttachment('iframe'))) && post.o_attachment && post.o_attachment.value">
-                <a href="javascript:void(0)" class="highlight"
-                  v-on:click="showAttachment()"
-                  data-toggle="collapse" :data-target="'#content-' + post.data.post_uuid">
-                    show attachment
-                </a>
-            </li>
+            <div class="clearfix"></div>
+         </div>
 
-            <li class="list-inline-item" v-if="show_content && !submit_modal && post.referendum">
-              <router-link :to="thread_link">{{ post.total_replies }} comments</router-link>
-            </li>
-            <li class="list-inline-item" v-if="post.referendum">
-              <a href="javascript:void(0)" class="text-success" v-on:click="referendumVote(1)">
-                <font-awesome-icon :icon="['fas', 'thumbs-up']" ></font-awesome-icon> 
-                ({{ post.referendum.details.for_percent.toFixed(2) }}%)
-              </a>
-            </li>
-            <li class="list-inline-item" v-if="post.referendum">
-              <a href="javascript:void(0)" class="text-danger" v-on:click="referendumVote(0)">
-                <font-awesome-icon :icon="['fas', 'thumbs-down']" ></font-awesome-icon>
-                ({{ post.referendum.details.against_percent.toFixed(2) }}%)
-              </a>
-            </li>
-            <li class="list-inline-item" v-if="post.referendum && post.data.poster == identity">
-              <a href="javascript:void(0)" class="text-danger" v-on:click="referendumExpire()">
-                expire
-              </a>
-            </li>
-            <li class="list-inline-item" v-if="post.referendum && post.data.poster == identity">
-              <a href="javascript:void(0)" class="text-danger" v-on:click="referendumClean()">
-                clean
-              </a>
-            </li>
-            <li class="list-inline-item" v-if="post.referendum">
-              eos: {{ post.referendum.details.total_eos.toFixed(4) }}
-            </li>
-            <li class="list-inline-item" v-if="post.referendum">
-              participants: {{ post.referendum.details.total_participants }}
-            </li>
-            <li class="list-inline-item" v-if="post.referendum">
-              <span v-if="post.referendum.expired" class="text-danger">expired</span>
-              <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
-            </li>
-          </ul>
-        </div>
-
-        <div class="row collapse quick-reply" :id="'qreply-' + post.data.post_uuid">
-          <div class="col-sm-12">
-            <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
-          </div>
-          <div class="col-sm-2 mt-1 mb-2">
-            <button v-if="identity" type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(false)">post</button>
-            <button type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(true)">post anon</button>
-          </div>
-        </div>
-    
-        <div v-if="!is_max_depth" v-for="child in post.children" :key="child.o_id">
+        <div style="margin-left:5px; margin-bottom: 1px;" v-for="child in post.children" :key="child.o_id">
           <div v-if="!(child.hide)">
-                        <Post :submit_modal="submit_modal"
-                            :history_modal="history_modal" 
-                            :post="child"
-                            :op="op"
-                            :show_content="true">
-                        </Post>
+            <post :post="child" :thread="thread"></post>
           </div>
         </div>
+
       </div>
-    </div>  
+      <!-- POST -->
+   </div>
 </template>
 
 <script>
-import jQuery from "jquery";
-
-import ui from "@/ui";
 import { FORUM_BRAND } from "@/ui/constants";
-
+import ui from "@/ui";
 import requests from "@/requests";
-import { MarkdownParser } from "@/markdown";
 import { GetIdentity } from "@/eos";
+import { MarkdownParser } from "@/markdown";
 import { moderation } from "@/moderation";
 
 import PostAttachment from "@/components/core/PostAttachment.vue";
 
+import { Post } from "@/types/post";
+
 export default {
   name: "Post",
   components: {
-    PostAttachment: PostAttachment
+    PostAttachment
   },
   props: {
     post: {
       type: Object,
       required: true
     },
-    op: {
-      type: String,
-      required: false,
-      default: ""
-    },
-    show_content: {
-      type: Boolean,
-      required: false,
-      default: true
-    },
-    submit_modal: {
-      type: Object,
-      required: false,
-      default: null
-    },
-    history_modal: {
+    thread: {
       type: Object,
       required: false,
       default: null
     }
   },
-  async mounted() {
-    this.load();
-  },
   computed: {
+    is_edit() {
+      return (
+        this.post.data.json_metadata.edit && this.post.o_id != this.post.id
+      );
+    },
+    is_mine() {
+      return this.post.data.poster == this.identity.account;
+    },
+    is_op() {
+      return !this.post.data.reply_to_poster;
+    },
+    offsite() {
+      if (
+        this.post.o_attachment.type == "url" &&
+        this.post.o_attachment.value
+      ) {
+        return ui.helpers.GetHost(this.post.o_attachment.value);
+      }
+      return null;
+    },
+    sub() {
+      return this.thread
+        ? this.thread.data.json_metadata.sub
+        : this.post.data.json_metadata.sub;
+    },
+    thread_link() {
+      return {
+        name: "Thread",
+        params: {
+          sub: this.sub,
+          id: this.thread
+            ? this.thread.o_id || this.thread.o_transaction
+            : this.post.o_id || this.post.o_transaction,
+          title: this.thread
+            ? this.thread.getUrlTitle()
+            : this.post.getUrlTitle()
+        }
+      };
+    },
+    perma_link() {
+      var link = this.thread_link;
+      link.params.child_id = this.post.o_id || this.post.o_transaction;
+      return link;
+    },
+    post_content_html() {
+      var md = new MarkdownParser(this.post.data.content, this.post.createdAt);
+      return md.html;
+    },
     reddit() {
       return this.post.data.json_metadata.reddit;
     },
-    poster_name() {
-      if (this.reddit.author) {
-        return this.reddit.author + "[reddit]";
-      } else if (
+    is_anon_alias() {
+      return (
         this.post.data.poster == "eosforumanon" &&
         this.post.data.json_metadata.anon_id.name
-      ) {
-        return (
-          this.post.data.json_metadata.anon_id.name.substring(0, 12) + "[anon]"
-        );
+      );
+    },
+    poster_name() {
+      if (this.reddit.author) {
+        return this.reddit.author;
+      } else if (this.is_anon_alias) {
+        return this.post.data.json_metadata.anon_id.name.substring(0, 12);
       } else {
         return this.post.data.poster;
       }
-    },
-    is_show_title() {
-      if (!this.post.data.reply_to_post_uuid) return true; // top level post
-
-      if (this.post.parent && !this.is_child) return true; // has a parent, so userprofile/home
-
-      return false;
-    },
-    is_child() {
-      return this.post.depth > 0;
-    },
-    is_anon_sub() {
-      var sub = this.sub;
-      return sub == "anon" || sub.indexOf("anon-") == 0;
-    },
-    title() {
-      var title = this.post.getTitle();
-      if (!this.show_content && title.length > 80)
-        return title.substring(0, 80) + "...";
-
-      return title;
-    },
-    is_max_depth() {
-      var depth_lim = Math.floor(window.innerWidth / 65);
-      var depth = this.post.depth;
-      if (this.post.parent) {
-        depth = depth - this.post.parent.depth; // relative deth
-      }
-      return depth >= depth_lim;
-    },
-    is_new() {
-      if (!this.post.parent) {
-        return false;
-      }
-      var seen = this.post.parent.__seen;
-      if (!seen) {
-        return false;
-      }
-      return this.post.createdAt > seen;
-    },
-    sub() {
-      return this.post.data.json_metadata.sub;
     },
     thumbnail() {
       var t = this.post.data.json_metadata.attachment.thumbnail;
@@ -284,173 +241,38 @@ export default {
         }
       }
       return t;
-    },
-    attachment() {
-      return this.post.data.json_metadata.attachment.value;
-    },
-    perma_link() {
-      var path = "/e/" + this.sub + "/";
-      if (this.post.parent) {
-        path += this.post.parent.o_id + "/";
-      }
-      path += this.post.getUrlTitle() + "/" + this.post.o_id;
-      return path;
-    },
-    thread_link() {
-      var txid = this.post.parent ? this.post.parent.o_id : this.post.o_id;
-      return "/e/" + this.sub + "/" + txid + "/" + this.post.getUrlTitle();
     }
   },
+  async mounted() {
+    this.identity = await GetIdentity();
+
+    this.is_spam = await moderation.isBlocked(
+      this.post.createdAt,
+      this.post.o_transaction,
+      this.post.data.poster
+    );
+
+    this.is_nsfw =
+      (this.post.tags && this.post.tags.includes("nsfw")) ||
+      (this.post.depth == 0 &&
+        (await moderation.isNsfw(
+          this.post.createdAt,
+          this.post.o_transaction
+        )));
+  },
   methods: {
-    async load() {
-      const identity = await GetIdentity();
-      this.identity = identity.account;
+    showQuickEdit() {
+      this.show_quick_edit = !this.show_quick_edit;
+      this.quick_reply = this.show_quick_edit ? this.post.data.content : "";
 
-      this.is_moderated = await moderation.isBlocked(
-        this.post.createdAt,
-        this.post.o_transaction,
-        this.post.data.poster
-      );
-
-      this.is_nsfw =
-        (this.post.tags && this.post.tags.includes("nsfw")) ||
-        (this.post.depth == 0 &&
-          (await moderation.isNsfw(
-            this.post.createdAt,
-            this.post.o_transaction
-          )));
-
-      if (this.show_content) {
-        var md = new MarkdownParser(
-          this.post.data.content,
-          this.post.createdAt
-        );
-
-        this.post_content = md.html;
-
-        // only allow one attachment through
-        if (md.attachments.length > 0) {
-          this.post.o_attachment = md.attachments[0];
-          this.post.data.json_metadata.attachment = md.attachments[0];
-        }
-      }
-    },
-    showAttachment() {
-      // only load iframe in p.depth>0 when requested
-      this.$refs.post_attachment.show_iframe = !this.$refs.post_attachment
-        .show_iframe;
-    },
-    hasAttachment(type) {
-      if (!this.post) return false;
-      if (!this.post.o_attachment || !this.post.o_attachment.value)
-        return false;
-
-      return type ? this.post.o_attachment.display == type : true;
-    },
-    async referendumClean() {
-      await ui.actions.Referendum.CleanProposal(this.post.transaction);
-    },
-    async referendumExpire() {
-      await ui.actions.Referendum.Expire(this.post.transaction);
-    },
-    async referendumVote(vote) {
-      if (this.post.referendum.expired) {
-        alert("This proposal has expired and can no longer be voted on");
-        return;
-      }
-
-      var txid = await ui.actions.Referendum.Vote(this.post.transaction, vote);
-      alert(
-        `Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`,
-        {
-          title: "Thanks for voting!",
-          text_class: "text-success"
-        }
-      );
-    },
-    async history() {
-      await this.history_modal.load(this.post.o_transaction);
-      jQuery("#postHistory").modal();
-    },
-    async edit() {
-      var $post = this.submit_modal.$data.post;
-      var p = this.post;
-
-      // dupe existing post into submit
-      $post.parent_uuid = p.data.post_uuid;
-      $post.parent_tx = p.transaction;
-      $post.parent_poster = p.data.poster;
-      $post.title = p.data.json_metadata.title;
-      $post.content = p.data.content;
-      $post.edit = true;
-
-      var attachment = p.o_attachment;
-      if (attachment) {
-        $post.attachment.value = attachment.value;
-        $post.attachment.type = attachment.type;
-        $post.attachment.display = attachment.display;
-      } else {
-        $post.attachment.value = "";
-        $post.attachment.type = "";
-        $post.attachment.display = "link";
-      }
-
-      this.submit_modal.showModal();
+      this.show_quick_reply = false;
     },
     showQuickReply() {
-      //var qr = jQuery(".quick-reply");
-      //qr.removeClass('show');
-    },
-    async quickReply(anon) {
-      this.submit_modal.$data.identity = (await GetIdentity()).account;
-
-      var $post = this.submit_modal.$data.post;
-      $post.parent_uuid = this.post.data.post_uuid;
-      $post.parent_tx = this.post.transaction;
-      $post.parent_poster = this.post.data.poster;
-      $post.title = "";
-      $post.content = this.quick_reply;
-      $post.edit = false;
-
-      if (anon) {
-        if (
-          !await confirm(
-            "Are you sure you want to post this?",
-            ss => (this.submit_modal.set_status = ss),
-            async () => await this.submit_modal.postContent(anon)
-          )
-        ) {
-          return;
-        }
-      } else {
-        await this.submit_modal.postContent(anon);
-        if (this.submit_modal.status) {
-          alert(this.submit_modal.status);
-        }
-      }
-
-      if (!this.submit_modal.status) {
-        // sucessful
+      this.show_quick_reply = !this.show_quick_reply;
+      if (this.show_quick_edit) {
         this.quick_reply = "";
-        jQuery("#qreply-" + this.post.data.post_uuid).removeClass("show");
       }
-    },
-    async reply() {
-      var $post = this.submit_modal.$data.post;
-      $post.parent_uuid = this.post.data.post_uuid;
-      $post.parent_tx = this.post.transaction;
-      $post.parent_poster = this.post.data.poster;
-      $post.title = "";
-      //$post.content = "";
-      $post.edit = false;
-      //$post.attachment.value = "";
-      //$post.attachment.type = "";
-      //$post.attachment.display = "link";
-
-      this.submit_modal.showModal();
-    },
-    getHost(href) {
-      return ui.helpers.GetHost(href);
+      this.show_quick_edit = false;
     },
     async upvote() {
       if (this.post.my_vote) {
@@ -463,20 +285,94 @@ export default {
         console.log(reason);
         alert(reason);
       }
-    }
-  },
-  watch: {
-    post: function() {
-      this.load();
+    },
+    async quickReply(anon) {
+      const content = this.quick_reply;
+      const attachment = this.post.data.json_metadata.attachment;
+
+      this.setStatus("Generating post...");
+
+      if (anon) {
+        await requests.sleep(100); // allow UI thread to update (generating anon id sig can lag)
+      }
+
+      var eos_post = {
+        poster: anon ? "eosforumanon" : this.identity.account,
+        reply_to_poster:
+          this.post.data.reply_to_poster || this.post.data.poster, // thread creator
+        reply_to_post_uuid:
+          this.post.data.reply_to_post_uuid || this.post.data.post_uuid, // thread uuid
+        certify: 0,
+        content: content,
+        post_uuid: ui.helpers.GeneratePostUuid(),
+        json_metadata: JSON.stringify({
+          title: "",
+          type: "novusphere-forum",
+          sub: this.sub,
+          parent_uuid: this.post.data.post_uuid,
+          parent_poster: this.post.data.poster,
+          edit: this.show_quick_edit ? true : false,
+          attachment: {
+            value: this.show_quick_edit ? attachment.value : "",
+            type: this.show_quick_edit ? attachment.type : "",
+            display: this.show_quick_edit ? attachment.display : ""
+          },
+          anon_id: anon ? ui.helpers.GenerateAnonData(content) : null
+        })
+      };
+
+      this.setStatus("Waiting on anonymous posting service...");
+
+      var txid = await ui.actions.PushNewPost(
+        eos_post,
+        "",
+        anon,
+        true,
+        this.setStatus,
+        true // skip waiting for index
+      );
+
+      if (!txid) {
+        return;
+      }
+
+      // new: instead of refreshing, splice new post into the thread
+      if (this.show_quick_edit) {
+        this.post.data.content = this.quick_reply;
+      } else {
+        var new_post = new Post({
+          createdAt: parseInt(new Date().getTime() / 1000),
+          transaction: txid,
+          id: 0,
+          name: "post",
+          data: eos_post
+        });
+
+        await new_post.normalize();
+
+        new_post.depth = this.post.depth + 1;
+
+        this.post.children.splice(0, 0, new_post);
+      }
+
+      this.show_quick_reply = false;
+      this.show_quick_edit = false;
+      this.quick_reply = "";
+      this.setStatus("");
+    },
+    setStatus(message) {
+      this.status = message;
     }
   },
   data() {
     return {
+      status: "",
+      identity: {},
+      show_quick_reply: false,
+      show_quick_edit: false,
       quick_reply: "",
-      post_content: "",
-      identity: "",
-      is_moderated: false,
-      is_nsfw: false
+      is_nsfw: false,
+      is_spam: false
     };
   }
 };

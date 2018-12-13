@@ -22,13 +22,13 @@ export default async function UserProfile(current_page, account, sorter) {
 
     var n_comments = (await novusphere.api({
         count: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 10000,
         query: novusphere.query.match.postsByAccount(account, true)
     })).n;
 
     var n_threads = (await novusphere.api({
         count: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 10000,
         query: novusphere.query.match.threadsByAccount(account)
     })).n;
 
@@ -38,7 +38,7 @@ export default async function UserProfile(current_page, account, sorter) {
 
     var posts = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 5000,
+        maxTimeMS: 10000,
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.postsByAccount(account, false) },
