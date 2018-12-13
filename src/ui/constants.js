@@ -13,15 +13,25 @@ if (window.__PRESETS__ && window.__PRESETS__.default_sub) {
     DEFAULT_SUB = window.__PRESETS__.default_sub;
 }
 
-var FORUM_BRAND =  {
-    "title": "A decentralized forum",
-    "logo": "https://cdn.novusphere.io/static/atmos.svg",
-    "icon": "https://cdn.novusphere.io/static/atmos2.png",
-    "token": {
-        "contract": "novusphereio",
-        "symbol": "ATMOS"
+// TO-DO: remove hard coding?
+var BRANDS = {
+    "novusphere": {
+        "title": "A decentralized forum",
+        "logo": "https://cdn.novusphere.io/static/atmos.svg",
+        "icon": "https://cdn.novusphere.io/static/atmos2.png",
+        "token_symbol": "ATMOS",
+        "token_contract": "novusphereio"
+    },
+    "eos": {
+        "title": "EOS Community",
+        "logo": "https://cdn.novusphere.io/static/eos3.svg",
+        "icon": "https://cdn.novusphere.io/static/eos3.png",
+        "token_symbol": "EOS",
+        "token_contract": "eosio.token"
     }
 }
+
+var FORUM_BRAND =  Object.assign({}, BRANDS["novusphere"]);
 
 if (window.__PRESETS__) {
     var presets = window.__PRESETS__;
@@ -42,5 +52,6 @@ export {
     UPVOTE_ATMOS_RATE,
     HEADER_TEXTS,
     DEFAULT_SUB,
-    FORUM_BRAND
+    FORUM_BRAND,
+    BRANDS
 }

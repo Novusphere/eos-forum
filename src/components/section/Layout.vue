@@ -5,7 +5,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xl-1 col-3 col-md-2 col-lg-2 logo "> 
-                        <router-link :to="{ name: 'Index' }"><img src="https://novusphere.io/static/img/logo.svg" alt=""></router-link>
+                        <router-link :to="{ name: 'Index' }"><img :src="brand_logo" alt="" class="img-fluid"></router-link>
                     </div>
                     <div class="col-xl-3 col-9 col-md-5 col-lg-3 selecttopic">
                         <div class="dropdown d-inline-block">
@@ -47,8 +47,8 @@
                                 <li class="dropdown-item">
                                     {{ identity.atmos }} ATMOS
                                 </li>
-                                <li v-if="brand_token != 'ATMOS'" class="dropdown-item">
-                                    {{ identity.token }} {{ brand_token }}
+                                <li v-if="brand_symbol != 'ATMOS'" class="dropdown-item">
+                                    {{ identity.token }} {{ brand_symbol }}
                                 </li>
                                 <li class="dropdown-item">
                                     <a role="menuitem" tabindex="-3" href="javascript:void(0)" v-on:click="logout()">Log Out</a>
@@ -127,6 +127,7 @@
 import "@/assets/css/style2.css";
 import "@/assets/css/custom.css";
 
+import ui from "@/ui";
 import { FORUM_BRAND } from "@/ui/constants";
 import { storage } from "@/storage";
 import { ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
@@ -136,7 +137,7 @@ export default {
   name: "Layout",
   metaInfo() {
     return {
-      title: `eos-forum`,
+      title: FORUM_BRAND.title
     };
   },
   props: {
@@ -145,12 +146,18 @@ export default {
       required: false
     }
   },
+  watch: {
+    "$route.params.sub": function() {
+      this.updateBrand();
+    }
+  },
   computed: {
     subs() {
       return storage.subscribed_subs;
     }
   },
   async mounted() {
+    this.updateBrand();
     this.identity = await GetIdentity();
     window.addEventListener("identity", this.updateIdentity);
   },
@@ -158,6 +165,11 @@ export default {
     window.removeEventListener("identity", this.updateIdentity);
   },
   methods: {
+    updateBrand() {
+      ui.helpers.UpdateBrand(this.$route.params.sub);
+      this.brand_logo = FORUM_BRAND.logo;
+      this.brand_symbol = FORUM_BRAND.token_symbol;
+    },
     async updateIdentity() {
       this.identity = await GetIdentity();
       if (this.load) {
@@ -182,7 +194,8 @@ export default {
   data() {
     return {
       identity: {},
-      brand_token: FORUM_BRAND.token.symbol
+      brand_logo: "",
+      brand_symbol: ""
     };
   }
 };

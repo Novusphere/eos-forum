@@ -11,7 +11,9 @@ import {
     MAX_ITEMS_PER_PAGE,
     UPVOTE_ATMOS_RATE,
     HEADER_TEXTS,
-    DEFAULT_SUB
+    DEFAULT_SUB,
+    FORUM_BRAND,
+    BRANDS
 } from "@/ui/constants";
 
 function GetRandomHeaderText() {
@@ -81,6 +83,14 @@ function Route($route, delta) {
     return { name: name, query: query, params: params };
 }
 
+function UpdateBrand(sub) {
+    if (sub) {
+        sub = sub.toLowerCase();
+    }
+    const brand = (sub && (sub in BRANDS)) ? BRANDS[sub] : BRANDS["novusphere"];
+    Object.assign(FORUM_BRAND, brand);
+}
+
 export default {
     GetRandomHeaderText,
     GenerateAnonData,
@@ -92,4 +102,5 @@ export default {
     ParseMarkdown,
     GetHost,
     Route,
+    UpdateBrand
 }

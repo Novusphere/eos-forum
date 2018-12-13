@@ -78,12 +78,14 @@
                     </li>
                     <li class="list-inline-item">
                         <a v-if="reddit.author" :href="`https://www.reddit.com/user/${reddit.author}`">
+                          by 
                           <font-awesome-icon :icon="['fab', 'reddit']" ></font-awesome-icon> 
-                          by {{ poster_name }} 
+                          {{ poster_name }} 
                         </a>
                         <router-link v-else-if="post.transaction" :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+                          by 
                           <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" ></font-awesome-icon> 
-                          by {{ poster_name }}
+                          {{ poster_name }}
                         </router-link>
                     </li>
                     <li class="list-inline-item" v-if="!thread || post.depth == 0">
@@ -321,7 +323,7 @@ export default {
         })
       };
 
-      this.setStatus("Waiting on anonymous posting service...");
+      this.setStatus("Waiting on confirmation / posting service...");
 
       var txid = await ui.actions.PushNewPost(
         eos_post,

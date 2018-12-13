@@ -1,7 +1,7 @@
 <template>
   <div>
     
-    <layout :load="load">
+    <layout ref="layout" :load="load">
         <template slot="topic">
           <span v-if="sub">e/{{sub}}</span>
           <span v-else>Home</span>
@@ -90,8 +90,10 @@ export default {
         return;
       }
 
+      this.sub = this.$route.params.sub;
+
       const novusphere = GetNovusphere();
-      var home = await ui.views.Home(this.$route.query.page, this.$route.params.sub, this.$refs.sorter.getSorter());
+      var home = await ui.views.Home(this.$route.query.page, this.sub, this.$refs.sorter.getSorter());
       this.is_subscribed = home.is_subscribed;
       this.posts = home.posts;
       this.pages = home.pages;

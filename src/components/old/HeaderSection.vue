@@ -81,7 +81,7 @@ export default {
   },
   async mounted() {
     this.logo = FORUM_BRAND.logo;
-    this.token_symbol = FORUM_BRAND.token.symbol;
+    this.token_symbol = FORUM_BRAND.token_symbol;
 
     var header_text = ui.helpers.GetRandomHeaderText();
     this.random_header = new MarkdownParser(header_text).html;
