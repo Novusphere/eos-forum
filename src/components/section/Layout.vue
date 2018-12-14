@@ -1,6 +1,12 @@
 <template>
 <div>
     <div class="container-fluid">
+        <div class="tp-banner-container" v-if="brand_banner">
+                <div class="tp-banner" >
+                    <img :src="brand_banner">
+                </div>
+        </div>
+
         <div class="headernav">
             <div class="container">
                 <div class="row">
@@ -138,7 +144,12 @@ export default {
   name: "Layout",
   metaInfo() {
     return {
-      title: FORUM_BRAND.title
+      title: FORUM_BRAND.title,
+      link: [{ rel: "icon", href: this.brand_icon }],
+      htmlAttrs: {
+        lang: "en",
+        amp: undefined // "amp" has no value
+      }
     };
   },
   props: {
@@ -169,7 +180,9 @@ export default {
     updateBrand() {
       ui.helpers.UpdateBrand(this.$route.params.sub);
       this.brand_logo = FORUM_BRAND.logo;
+      this.brand_icon = FORUM_BRAND.icon;
       this.brand_symbol = FORUM_BRAND.token_symbol;
+      this.brand_banner = FORUM_BRAND.banner;
     },
     async updateIdentity() {
       this.identity = await GetIdentity();
@@ -197,7 +210,9 @@ export default {
       eos_referendum: storage.eos_referendum,
       identity: {},
       brand_logo: "",
-      brand_symbol: ""
+      brand_icon: "",
+      brand_symbol: "",
+      brand_banner: ""
     };
   }
 };

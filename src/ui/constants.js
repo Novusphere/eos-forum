@@ -19,13 +19,23 @@ var BRANDS = {
         "title": "A decentralized forum",
         "logo": "https://cdn.novusphere.io/static/atmos.svg",
         "icon": "https://cdn.novusphere.io/static/atmos2.png",
+        "banner": "",
         "token_symbol": "ATMOS",
         "token_contract": "novusphereio"
+    },
+    "eoscafe": {
+        "title": "A decentralized coffee lover's forum",
+        "logo": "https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png",
+        "icon": "https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png",
+        "banner": "https://cdn.discordapp.com/attachments/522320367293825036/523167806607589386/image0.jpg",
+        "token_symbol": "EOS",
+        "token_contract": "eosio.token"
     },
     "eos": {
         "title": "EOS Community",
         "logo": "https://cdn.novusphere.io/static/eos3.svg",
         "icon": "https://cdn.novusphere.io/static/eos3.png",
+        "banner": "",
         "token_symbol": "EOS",
         "token_contract": "eosio.token"
     }

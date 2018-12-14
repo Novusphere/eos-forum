@@ -9,9 +9,14 @@
 
 }
 
-.tp-banner{
+.tp-banner {
 	width:100%;
 	position:relative;
+}
+
+.tp-banner img {
+	width: 100%;
+	max-height: 278px;
 }
 
 .tp-banner-fullscreen-container {
