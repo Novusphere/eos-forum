@@ -36,6 +36,12 @@ export default {
     this.load();
   },
   watch: {
+    "default_by": function() {
+      this.load();
+      if (this.change) {
+        this.change(this.by);
+      }
+    },
     "$route.query.sort": function() {
       this.load();
       if (this.change) {
@@ -59,7 +65,10 @@ export default {
       if (this.by == "popular") {
         return novusphere.query.sort.score();
       }
-      return novusphere.query.sort.time();
+      else if (this.by == "time") {
+        return novusphere.query.sort.time();
+      }
+      return this.by;
     }
   },
   data() {

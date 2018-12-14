@@ -4,14 +4,32 @@
       <div class="post">
          <div class="topwrap">
             <div class="userinfo float-left">
-                <div v-if="!thread" class="postthumbnail">
+                <div v-if="!thread && !post.referendum" class="postthumbnail">
                   <img :src="thumbnail" class="img-fluid" alt="thumbnail">
                 </div>
-                <div class="text-center">
+                <div class="text-center" v-if="!post.referendum">
                     <a href="javascript:void(0)" class="up" v-on:click="upvote()">
                         <font-awesome-icon :icon="['far', 'thumbs-up']" ></font-awesome-icon>
                         {{ post.up }}
                     </a>
+                </div>
+                <div class="text-center" v-else>
+                  <div>
+                    <a href="javascript:void(0)" class="up" v-on:click="referendumVote(1)">
+                      <font-awesome-icon :icon="['fas', 'thumbs-up']" ></font-awesome-icon> 
+                      ({{ post.referendum.details.for_percent.toFixed(0) }}%)
+                    </a>
+                  </div>
+                  <div>
+                    <a href="javascript:void(0)" class="down" v-on:click="referendumVote(0)">
+                      <font-awesome-icon :icon="['fas', 'thumbs-down']" ></font-awesome-icon> 
+                      ({{ post.referendum.details.against_percent.toFixed(0) }}%)
+                    </a>
+                  </div>
+                  <div>
+                    <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon> 
+                    {{ post.referendum.details.total_participants }}
+                  </div>
                 </div>
                 <div class="text-center">
                   <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" ></font-awesome-icon>
@@ -57,7 +75,11 @@
                             reply
                         </a>
                     </li>
-                    <li v-if="is_mine && thread" class="list-inline-item">
+                    <li v-if="post.referendum" class="list-inline-item">
+                      <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
+                      {{ post.referendum.details.total_eos.toFixed(4) }}
+                    </li>
+                    <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
                       <router-link v-if="is_op" :to="{ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction } }">
                         <font-awesome-icon :icon="['fas', 'edit']" ></font-awesome-icon>
                         edit
@@ -67,14 +89,17 @@
                         edit
                       </a>
                     </li>
-                    <li class="list-inline-item">
-                        
-                            <font-awesome-icon :icon="['fas', 'clock']" ></font-awesome-icon>  
-                            {{ new Date(post.createdAt * 1000).toLocaleString() }}
+                    <li class="list-inline-item" v-if="!post.referendum">
+                        <font-awesome-icon :icon="['fas', 'clock']" ></font-awesome-icon>  
+                        {{ new Date(post.createdAt * 1000).toLocaleString() }}
                         
                         <router-link  v-if="post.id && is_edit" :to="{ name: 'History', params: { id: post.o_transaction } }">
                           <font-awesome-icon :icon="['fas', 'history']" ></font-awesome-icon>  
                       </router-link>
+                    </li>
+                    <li class="list-inline-item" v-else>
+                      <span v-if="post.referendum.expired" class="text-danger">expired</span>
+                      <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
                     </li>
                     <li class="list-inline-item">
                         <a v-if="reddit.author" :href="`https://www.reddit.com/user/${reddit.author}`">
@@ -173,7 +198,7 @@ export default {
       );
     },
     is_mine() {
-      return this.post.data.poster == this.identity.account;
+      return this.identity.account && this.post.data.poster == this.identity.account;
     },
     is_op() {
       return !this.post.data.reply_to_poster;
@@ -364,6 +389,21 @@ export default {
     },
     setStatus(message) {
       this.status = message;
+    },
+    async referendumVote(vote) {
+      if (this.post.referendum.expired) {
+        alert("This proposal has expired and can no longer be voted on");
+        return;
+      }
+
+      var txid = await ui.actions.Referendum.Vote(this.post.transaction, vote);
+      alert(
+        `Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`,
+        {
+          title: "Thanks for voting!",
+          text_class: "text-success"
+        }
+      );
     }
   },
   data() {

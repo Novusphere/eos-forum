@@ -14,6 +14,7 @@
                             </button>
                             <div class="dropdown-menu">
                                 <router-link class="dropdown-item" :to="{name: 'Index' }">Home</router-link>
+                                <router-link v-if="eos_referendum" class="dropdown-item" :to="{name: 'Sub', params: { sub: 'referendum' } }">Referendum</router-link>
                                 <router-link v-for="sub in subs" :key="sub" class="dropdown-item" :to="{ name: 'Sub', params: { sub: sub } }">e/{{ sub }}</router-link>
                             </div>
                         </div>
@@ -193,6 +194,7 @@ export default {
   },
   data() {
     return {
+      eos_referendum: storage.eos_referendum,
       identity: {},
       brand_logo: "",
       brand_symbol: ""

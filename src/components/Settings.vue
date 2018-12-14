@@ -14,7 +14,7 @@
                 <li class="nav-item">
                   <a class="nav-link" data-toggle="tab" href="#anonid" role="tab">Anon Id</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" v-if="false">
                   <a class="nav-link" data-toggle="tab" href="#theme" role="tab">Theme</a>
                 </li>
                 <li class="nav-item">

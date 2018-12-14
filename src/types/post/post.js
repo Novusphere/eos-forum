@@ -133,7 +133,7 @@ class Post {
                 json_metadata: {
                     title: data.title,
                     type: "novusphere-forum",
-                    sub: 'eos-referendum',
+                    sub: 'referendum',
                     parent_uuid: '',
                     parent_poster: '',
                     edit: false,
@@ -289,7 +289,7 @@ class Post {
 
     getUrlTitle() {
         var title = this.getTitle();
-        var friendly = title.replace(/[^a-zA-Z0-9 ]/g, "");
+        var friendly = title;
         friendly = friendly.replace(/ /g, "_");
         return friendly;
     }

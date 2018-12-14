@@ -8,13 +8,13 @@
         </template>
         <template slot="content">
           <div class="mb-1">
-            <div class="float-left">
+            <div class="float-left" v-if="sub != 'referendum'">
               <router-link :to="{ name: 'StartThread', params: { sub: sub ? sub : 'all' } }" class="btn btn-sm btn-outline-success">
                 new
               </router-link>
             </div>
             <div class="ml-1 float-left">
-              <post-sorter ref="sorter" :change="load"></post-sorter>
+              <post-sorter ref="sorter" :default_by="default_sorter" :options="sorter_options" :change="load"></post-sorter>
             </div>
             <div class="ml-1 float-left">
               <button v-if="sub && !is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary">subscribe</button>
@@ -79,16 +79,24 @@ export default {
       this.load();
     }
   },
+  computed: {
+    default_sorter() {
+      if (this.sub == 'referendum')
+        return 'active';
+      return 'popular';
+    },
+    sorter_options() {
+      if (this.sub == 'referendum') 
+        return ['active', 'old'];
+
+      return ['popular', 'time'];
+    }
+  },
   async mounted() {
     this.load();
   },
   methods: {
     async load() {
-
-      if (this.$route.params.sub == 'eos-referendum') {
-        this.$router.push('/referendum');
-        return;
-      }
 
       this.sub = this.$route.params.sub;
 

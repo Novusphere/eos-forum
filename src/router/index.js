@@ -6,7 +6,7 @@ import Home from '@/components/Home';
 import Thread from '@/components/Thread';
 import UserProfile from '@/components/UserProfile';
 import UserNotifications from "@/components/UserNotifications";
-//import Referendum from '@/components/Referendum'
+//import Referendum from '@/components/Referendum';
 import Tag from "@/components/Tag";
 //import Search from "@/components/Search";
 import History from "@/components/History";
@@ -72,15 +72,10 @@ export default new Router({
       name: 'UserNotifications',
       component: UserNotifications
     },
-    /*{
-      path: '/referendum',
-      name: 'Referendum',
-      component: Referendum
-    },*/
     {
-        path: '/test',
-        name: 'Test',
-        component: Test
+      path: '/test',
+      name: 'Test',
+      component: Test
     },
   ]
 })
