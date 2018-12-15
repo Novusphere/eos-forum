@@ -15,18 +15,6 @@
                 </div>
                 <div class="text-center" v-else>
                   <div>
-                    <a href="javascript:void(0)" class="up" v-on:click="referendumVote(1)">
-                      <font-awesome-icon :icon="['fas', 'thumbs-up']" ></font-awesome-icon> 
-                      ({{ post.referendum.details.for_percent.toFixed(0) }}%)
-                    </a>
-                  </div>
-                  <div>
-                    <a href="javascript:void(0)" class="down" v-on:click="referendumVote(0)">
-                      <font-awesome-icon :icon="['fas', 'thumbs-down']" ></font-awesome-icon> 
-                      ({{ post.referendum.details.against_percent.toFixed(0) }}%)
-                    </a>
-                  </div>
-                  <div>
                     <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon> 
                     {{ post.referendum.details.total_participants }}
                   </div>
@@ -59,6 +47,20 @@
                 </post-attachment>
 
                 <p v-html="post_content_html"></p>
+
+                <div v-if="post.referendum">
+                  <div v-for="(o, i) in post.referendum.options" :key="i">
+                    <input class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
+                        {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-center" v-if="!post.referendum.expired">
+                    <a href="javascript:void(0)" class="btn btn-primary" v-on:click="referendumVote()">vote</a>
+                  </div>
+                </div>
             </div>
             <div class="clearfix"></div>
          </div>
@@ -198,7 +200,9 @@ export default {
       );
     },
     is_mine() {
-      return this.identity.account && this.post.data.poster == this.identity.account;
+      return (
+        this.identity.account && this.post.data.poster == this.identity.account
+      );
     },
     is_op() {
       return !this.post.data.reply_to_poster;
@@ -352,7 +356,7 @@ export default {
 
       var txid = await ui.actions.PushNewPost(
         eos_post,
-        "",
+        this.post.transaction,
         anon,
         true,
         this.setStatus,
@@ -390,13 +394,26 @@ export default {
     setStatus(message) {
       this.status = message;
     },
-    async referendumVote(vote) {
+    referendumColor(i) {
+      return i >= this.referendum_colors.length
+        ? this.referendum_colors[0]
+        : this.referendum_colors[i];
+    },
+    async referendumVote() {
+      if (!this.identity.account) {
+        alert("You must be logged in to vote");
+        return;
+      }
+
       if (this.post.referendum.expired) {
         alert("This proposal has expired and can no longer be voted on");
         return;
       }
 
-      var txid = await ui.actions.Referendum.Vote(this.post.transaction, vote);
+      var txid = await ui.actions.Referendum.Vote(
+        this.post.transaction,
+        this.vote_value
+      );
       alert(
         `Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`,
         {
@@ -408,6 +425,8 @@ export default {
   },
   data() {
     return {
+      vote_value: 0,
+      referendum_colors: ["#dc3545", "#28a745"],
       status: "",
       identity: {},
       show_quick_reply: false,

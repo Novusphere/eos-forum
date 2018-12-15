@@ -8,6 +8,15 @@ import { PostAttachment } from "./attachment";
 import { PostJsonMetadata } from "./jsonmetadata";
 import { PostData } from "./data";
 
+// https://github.com/eoscanada/EEPs/blob/master/EEPS/eep-4.md
+const REFERENDUM_TYPES = [
+    'referendum-v1',
+    'poll-yn-v1',
+    'poll-yna-v1',
+    'options-v1',
+    'multi-select-v1',
+];
+
 var referendum_cache = null;
 
 async function GetReferendumCache() {
@@ -117,11 +126,27 @@ class Post {
             var data = post.data;
 
             post.referendum = {
+                type: post.data.proposal_json.type || REFERENDUM_TYPES[0],
                 name: post.data.proposal_name,
-                expired: Array.isArray(post.expired) ? (post.expired.length>0) : post.expired,
+                expired: Array.isArray(post.expired) ? (post.expired.length > 0) : post.expired,
                 expires_at: data.expires_at,
+                options: [],
                 details: null
             };
+
+            // set to default so we know how to display
+            if (!(post.referendum.type in REFERENDUM_TYPES)) {
+                post.referendum.type = REFERENDUM_TYPES[0];
+            }
+
+            if (post.referendum.type == REFERENDUM_TYPES[0] || post.referendum.type == REFERENDUM_TYPES[1]) // yn
+                post.referendum.options = ['no', 'yes'];
+            else if (post.referendum.type == REFERENDUM_TYPES[2]) // yna
+                post.referendum.options = ['no', 'yes', 'abstain'];
+            else if (post.referendum.type == REFERENDUM_TYPES[3]) // options
+                post.referendum.options = (post.proposal_json.options || ['no', 'yes']).slice(0, 255);
+            else if (post.referendum.type == REFERENDUM_TYPES[4]) // multi
+                post.referendum.options = (post.proposal_json.options || ['no', 'yes']).slice(0, 8);
 
             post.data = {
                 poster: data.proposer,
@@ -228,20 +253,45 @@ class Post {
             const eosvotes = rcache.active;
             const status = eosvotes[this.referendum.name];
 
-            var rfor = 0, ragainst = 0;
+            var votes = {};
             if (status) {
-                rfor = status.stats.staked['1'];
-                ragainst = status.stats.staked['0'];
+                for (var vote_value in status.stats.staked) {
+                    if (vote_value == 'total') {
+                        continue;
+                    }
 
-                rfor = (isNaN(rfor) ? 0 : parseInt(rfor)) / 10000;
-                ragainst = (isNaN(ragainst) ? 0 : parseInt(ragainst)) / 10000;
+                    var vote_result = status.stats.staked[vote_value];
+                    vote_result = (isNaN(vote_result) ? 0 : parseInt(vote_result)) / 10000;
+
+                    if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
+
+                        for (var i = 0; i < post.referendum.options.length; i++) {
+                            if (vote_value & (1 << i) != 0) {
+                                if (i in votes)
+                                    votes[i].value += vote_result;
+                                else
+                                    votes[i] = { value: vote_result, percent: 0 };
+                            }
+                        }
+
+                    }
+                    else {
+                        votes[vote_value] = {
+                            value: vote_result,
+                            percent: 0
+                        };
+                    }
+                }
+            }
+
+            for (var vote_value in votes) {
+                const vote_result = votes[vote_value].value;
+                const percent = (100 * vote_result / Math.max(1, status.stats.staked.total / 10000));
+                votes[vote_value].percent = percent.toFixed(0);
             }
 
             this.referendum.details = {
-                for: rfor,
-                against: ragainst,
-                for_percent: 100 * (rfor / Math.max(rfor + ragainst, 1)),
-                against_percent: 100 * (ragainst / Math.max(rfor + ragainst, 1)),
+                votes: votes,
                 total_participants: status ? status.stats.votes.total : 0,
                 total_eos: (status ? status.stats.staked.total : 0) / 10000,
             }
