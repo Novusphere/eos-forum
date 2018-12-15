@@ -6,6 +6,12 @@
           <span>Thread</span>
         </template>
         <template slot="content">
+          <div class="mb-1">
+            <router-link class="btn btm-sm btn-outline-primary" :to='{name: "Sub", params: { sub: opening_post.data.json_metadata.sub } }'>
+              <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
+              e/{{ opening_post.data.json_metadata.sub }}
+            </router-link>
+          </div>
           <post :post="main_post" :thread="opening_post"></post>
         </template>
         <template slot="sidebar">
@@ -30,7 +36,7 @@ import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Layout from "@/components/section/Layout";
 
 export default {
-  name: "Thread2",
+  name: "Thread",
   metaInfo() {
     const title = this.main_post.data.json_metadata.title;
     return {
