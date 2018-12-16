@@ -6,7 +6,10 @@
           <span>History</span>
         </template>
         <template slot="content">
-          <post :post="main_post" :thread="opening_post"></post>
+          <post v-if="opening_post.id" :post="main_post" :thread="opening_post"></post>
+          <div class="text-center" v-else>
+            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+          </div>
         </template>
         <template slot="sidebar">
             <div class="sidebarblock">

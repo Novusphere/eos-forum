@@ -19,14 +19,18 @@
             <div class="clearfix"></div>
           </div>
 
-          <div v-if="posts.length == 0">
-                <div class="text-center">
-                  <h1>No posts history found!</h1>
-                </div>
-          </div>
+          <div v-if="!loading">
+            <div v-if="posts.length == 0">
+                  <div class="text-center">
+                    <h1>No posts history found!</h1>
+                  </div>
+            </div>
 
-          <post v-for="p in posts" :key="p.o_id" 
-            :post="p"></post>
+            <post v-for="p in posts" :key="p.o_id" :post="p"></post>
+          </div>          
+          <div class="text-center" v-else>
+            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+          </div>
         </template>
         <template slot="sidebar">
             <div class="sidebarblock">
@@ -95,6 +99,8 @@ export default {
   },
   methods: {
     async load() {
+      this.loading = true;
+
       var profile = await ui.views.UserProfile(this.$route.query.page, this.$route.params.account, this.$refs.sorter.getSorter());
       
       this.current_page = profile.current_page;
@@ -107,6 +113,7 @@ export default {
       this.last_activity = profile.last_activity;
       this.posts = profile.posts;
       this.pages = profile.pages;
+      this.loading = false;
     },
     async toggleBlock() {
       await ui.actions.BlockUser(this.account, this.is_blocked);
@@ -115,6 +122,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       is_blocked: false,
       account: "",
       balances: {

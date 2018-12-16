@@ -8,7 +8,7 @@
         </template>
         <template slot="content">
           <div class="mb-1">
-            <div class="float-left" v-if="sub != 'referendum'">
+            <div class="float-left">
               <router-link :to="{ name: 'StartThread', params: { sub: sub ? sub : 'all' } }" class="btn btn-sm btn-outline-success">
                 new
               </router-link>
@@ -16,7 +16,7 @@
             <div class="ml-1 float-left">
               <post-sorter ref="sorter" :default_by="default_sorter" :options="sorter_options" :change="load"></post-sorter>
             </div>
-            <div class="ml-1 float-left">
+            <div class="ml-1 float-left" v-if="!loading">
               <button v-if="sub && !is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary">subscribe</button>
               <button v-if="sub && is_subscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger">unsubscribe</button>
             </div>
@@ -26,6 +26,7 @@
             <div class="clearfix"></div>
           </div>
 
+          <div v-if="!loading">
             <div v-if="posts.length == 0">
                   <div class="text-center">
                     <h1>There doesn't seem to be any posts here! Why not make one?</h1>
@@ -33,7 +34,10 @@
             </div>
 
             <post v-for="p in posts" :key="p.transaction" :post="p"></post>
-      
+          </div>
+          <div class="text-center" v-else>
+            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+          </div>
         </template>
         <template slot="sidebar">
             <div class="sidebarblock">
@@ -97,8 +101,10 @@ export default {
   },
   methods: {
     async load() {
-
+      this.loading = true;
       this.sub = this.$route.params.sub;
+      this.posts = [];
+      this.pages = 0;
 
       const novusphere = GetNovusphere();
       var home = await ui.views.Home(this.$route.query.page, this.sub, this.$refs.sorter.getSorter());
@@ -107,6 +113,7 @@ export default {
       this.pages = home.pages;
       this.current_page = home.current_page;
       this.sub = home.sub;
+      this.loading = false;
 
     },
     async newThread() {
@@ -127,6 +134,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       is_subscribed: false,
       current_page: 0,
       pages: 0,

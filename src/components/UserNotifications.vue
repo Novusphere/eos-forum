@@ -13,14 +13,18 @@
             <div class="clearfix"></div>
           </div>
 
-          <div v-if="posts.length == 0">
-                <div class="text-center">
-                  <h1>You have no notifications</h1>
-                </div>
-          </div>
+          <div v-if="!loading">
+            <div v-if="posts.length == 0">
+                  <div class="text-center">
+                    <h1>You have no notifications</h1>
+                  </div>
+            </div>
 
-          <post v-for="p in posts" :key="p.o_id" 
-            :post="p"></post>
+            <post v-for="p in posts" :key="p.o_id" :post="p"></post>
+          </div>          
+          <div class="text-center" v-else>
+            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+          </div>
         </template>
         <template slot="sidebar">
             <div class="sidebarblock">

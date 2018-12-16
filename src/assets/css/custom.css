@@ -399,6 +399,11 @@ td.chbox {
 
 
 /*--- Post --*/
+.referendumbar {
+    font-weight: bold;
+    color: black;
+}
+
 .post {
     background-color: #ffffff;
 

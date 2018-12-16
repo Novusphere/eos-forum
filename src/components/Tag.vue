@@ -16,14 +16,18 @@
             <div class="clearfix"></div>
           </div>
 
-          <div v-if="posts.length == 0">
-                <div class="text-center">
-                  <h1>No posts with #{{ tag }} found!</h1>
-                </div>
-          </div>
+          <div v-if="!loading">
+            <div v-if="posts.length == 0">
+                  <div class="text-center">
+                    <h1>No posts with #{{ tag }} found!</h1>
+                  </div>
+            </div>
 
-          <post v-for="p in posts" :key="p.o_id" 
-            :post="p"></post>
+            <post v-for="p in posts" :key="p.o_id" :post="p"></post>
+          </div>
+          <div class="text-center" v-else>
+            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+          </div>
         </template>
         <template slot="sidebar">
             <div class="sidebarblock">
@@ -43,6 +47,7 @@ import ui from "@/ui";
 import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
+import RecentlyVisited from "@/components/core/RecentlyVisited";
 
 import Layout from "@/components/section/Layout";
 
@@ -52,6 +57,7 @@ export default {
     Pager,
     Post,
     PostSorter,
+    RecentlyVisited,
     Layout
   },
   watch: {
@@ -67,17 +73,22 @@ export default {
   },
   methods: {
     async load() {
-      var tag = await ui.views.Tag(this.$route.query.page, this.$route.params.tag, this.$refs.sorter.getSorter());
+      this.loading = true;
+      this.tag = this.$route.params.tag;
+
+      var tag = await ui.views.Tag(this.$route.query.page, this.tag, this.$refs.sorter.getSorter());
 
       // push data to this
       this.posts = tag.posts;
       this.pages = tag.pages;
       this.current_page = tag.current_page;
       this.tag = tag.tag;
+      this.loading = false;
     },
   },
   data() {
     return {
+      loading: false,
       current_page: 0,
       pages: 0,
       tag: "",

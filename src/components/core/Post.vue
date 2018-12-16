@@ -52,13 +52,15 @@
                   <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
                     <input v-if="identity.account" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
                     <div class="progress">
-                      <div class="progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
+                      <div class="referendumbar progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
                         {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
                       </div>
                     </div>
                   </div>
-                  <div class="text-center" v-if="identity.account && !post.referendum.expired">
-                    <a href="javascript:void(0)" class="btn btn-primary" v-on:click="referendumVote()">vote</a>
+                  <div class="text-center" v-if="identity.account">
+                    <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary" v-on:click="referendumVote()" v-if="!post.referendum.expired">vote</a>
+                    <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary" v-on:click="referendumExpire()" v-if="!post.referendum.expired && post.data.poster == identity.account">expire</a>
+                    <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary" v-on:click="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
                   </div>
                 </div>
             </div>
@@ -352,7 +354,7 @@ export default {
             type: this.show_quick_edit ? attachment.type : "",
             display: this.show_quick_edit ? attachment.display : ""
           },
-          anon_id: anon ? (await ui.helpers.GenerateAnonData(content)) : null
+          anon_id: anon ? await ui.helpers.GenerateAnonData(content) : null
         })
       };
 
@@ -403,6 +405,12 @@ export default {
         ? this.referendum_colors[0]
         : this.referendum_colors[i];
     },
+    async referendumClean() {
+      await ui.actions.Referendum.CleanProposal(this.post.transaction);
+    },
+    async referendumExpire() {
+      await ui.actions.Referendum.Expire(this.post.transaction);
+    },
     async referendumVote() {
       if (!this.identity.account) {
         alert("You must be logged in to vote");
@@ -430,7 +438,16 @@ export default {
   data() {
     return {
       vote_value: 0,
-      referendum_colors: ["#dc3545", "#28a745"],
+      referendum_colors: [
+        "#dc3545",
+        "#28a745",
+        "#98FB98",
+        "#48D1CC",
+        "#A52A2A",
+        "#9932CC",
+        "#FFE4E1",
+        "#FFDAB9"
+      ],
       status: "",
       identity: {},
       show_quick_reply: false,

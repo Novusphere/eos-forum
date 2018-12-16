@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import ecc from "eosjs-ecc";
 
 import { MarkdownParser } from "@/markdown";
-import { storage } from "@/storage";
+import { storage, SaveStorage } from "@/storage";
 
 import { Post } from "@/types/post";
 

@@ -17,6 +17,9 @@ const REFERENDUM_TYPES = [
     'multi-select-v1',
 ];
 
+const REFERENDUM_OPTIONS_YN = [ 'no', 'yes' ];
+const REFERENDUM_OPTIONS_YNA = [ 'no', 'yes', 'abstain' ];
+
 var referendum_cache = null;
 
 async function GetReferendumCache() {
@@ -135,18 +138,18 @@ class Post {
             };
 
             // set to default so we know how to display
-            if (!(post.referendum.type in REFERENDUM_TYPES)) {
+            if (!REFERENDUM_TYPES.some(o => o == post.referendum.type)) {
                 post.referendum.type = REFERENDUM_TYPES[0];
             }
 
             if (post.referendum.type == REFERENDUM_TYPES[0] || post.referendum.type == REFERENDUM_TYPES[1]) // yn
-                post.referendum.options = ['no', 'yes'];
+                post.referendum.options = REFERENDUM_OPTIONS_YN;
             else if (post.referendum.type == REFERENDUM_TYPES[2]) // yna
-                post.referendum.options = ['no', 'yes', 'abstain'];
+                post.referendum.options = REFERENDUM_OPTIONS_YNA;
             else if (post.referendum.type == REFERENDUM_TYPES[3]) // options
-                post.referendum.options = (post.proposal_json.options || ['no', 'yes']).slice(0, 255);
+                post.referendum.options = (post.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 255);
             else if (post.referendum.type == REFERENDUM_TYPES[4]) // multi
-                post.referendum.options = (post.proposal_json.options || ['no', 'yes']).slice(0, 8);
+                post.referendum.options = (post.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 8);
 
             post.data = {
                 poster: data.proposer,
@@ -254,6 +257,11 @@ class Post {
             const status = eosvotes[this.referendum.name];
 
             var votes = {};
+
+            for (var i = 0; i < post.referendum.options.length; i++) {
+                votes[i] = { value: 0, percent: 0 };
+            }
+
             if (status) {
                 for (var vote_value in status.stats.staked) {
                     if (vote_value == 'total') {
@@ -276,18 +284,15 @@ class Post {
 
                     }
                     else {
-                        votes[vote_value] = {
-                            value: vote_result,
-                            percent: 0
-                        };
+                        votes[vote_value].value = vote_result;
                     }
                 }
-            }
 
-            for (var vote_value in votes) {
-                const vote_result = votes[vote_value].value;
-                const percent = (100 * vote_result / Math.max(1, status.stats.staked.total / 10000));
-                votes[vote_value].percent = percent.toFixed(0);
+                for (var vote_value in votes) {
+                    const vote_result = votes[vote_value].value;
+                    const percent = (100 * vote_result / Math.max(1, status.stats.staked.total / 10000));
+                    votes[vote_value].percent = percent.toFixed(0);
+                }
             }
 
             this.referendum.details = {
