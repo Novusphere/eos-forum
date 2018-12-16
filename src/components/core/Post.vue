@@ -352,7 +352,7 @@ export default {
             type: this.show_quick_edit ? attachment.type : "",
             display: this.show_quick_edit ? attachment.display : ""
           },
-          anon_id: anon ? ui.helpers.GenerateAnonData(content) : null
+          anon_id: anon ? (await ui.helpers.GenerateAnonData(content)) : null
         })
       };
 

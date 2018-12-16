@@ -219,7 +219,7 @@ export default {
             type: this.attachment.type,
             display: this.attachment.value ? this.attachment.display : ""
           },
-          anon_id: anon ? ui.helpers.GenerateAnonData(this.content) : null
+          anon_id: anon ? (await ui.helpers.GenerateAnonData(this.content)) : null
         })
       };
 

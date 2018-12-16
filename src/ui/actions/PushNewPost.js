@@ -38,12 +38,6 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
 
             }
 
-            // generate anon identity if we don't have one
-            if (!storage.anon_id.key) {
-                storage.anon_id.key = await ecc.randomKey();
-                SaveStorage();
-            }
-
             var eostx = await novusphere.anonymousPost(post);
             if (eostx.error) {
                 set_status(eostx.error);

@@ -297,7 +297,41 @@ class Post {
             }
         }
 
+        if (!this.data.json_metadata.attachment.value) {
+            await this.detectAttachment();
+        }
+
         await this.data.json_metadata.attachment.normalize();
+    }
+
+    async detectAttachment() {
+        var attachment = this.data.json_metadata.attachment;
+
+        var attach = (v, t, d) => {
+            attachment.value = v;
+            attachment.type = t;
+            attachment.display = d;
+        }
+        
+        const filters = [
+            { // youtube
+                match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/,
+                handle: (m) => attach(m[0], 'url', 'iframe')
+            },
+            { // youtube 2
+                match: /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/,
+                handle: (m) => attach(m[0], 'url', 'iframe')
+            }
+        ];
+
+        for (var i = 0; i < filters.length; i++) {
+            const f = filters[i];
+            const match = this.data.content.match(f.match);
+            if (match && match.length > 0) {
+                f.handle(match);
+                break;
+            }
+        }
     }
 
     async applyEdit(edit) {

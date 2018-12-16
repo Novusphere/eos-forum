@@ -30,12 +30,18 @@ function GetHost(href) {
     return parser.host.toLowerCase();
 }
 
-function GenerateAnonData(content) {
+async function GenerateAnonData(content) {
     var data = {
         name: storage.anon_id.name,
         pub: "",
         sig: ""
     };
+
+    // generate anon identity if we don't have one
+    if (!storage.anon_id.key) {
+        storage.anon_id.key = await ecc.randomKey();
+        SaveStorage();
+    }
 
     if (storage.anon_id.key && ecc.isValidPrivate(storage.anon_id.key)) {
         data.pub = ecc.privateToPublic(storage.anon_id.key);
