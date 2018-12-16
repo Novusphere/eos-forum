@@ -7,6 +7,12 @@
                 </div>
         </div>
 
+        <div class="text-center headersubs d-none d-sm-block">
+            <ul class="list-inline">
+                <li v-for="sub in subs" :key="sub" class="list-inline-item"><router-link :to="'/e/' + sub">{{sub}}</router-link></li>
+            </ul>
+        </div>
+
         <div class="headernav">
             <div class="container">
                 <div class="row">
@@ -58,7 +64,7 @@
                                     {{ identity.token }} {{ brand_symbol }}
                                 </li>
                                 <li class="dropdown-item">
-                                    <a role="menuitem" tabindex="-3" href="javascript:void(0)" v-on:click="logout()">Log Out</a>
+                                    <a role="menuitem" tabindex="-3" href="javascript:void(0)" v-on:click="logout()">disconnect</a>
                                 </li>
                             </ul>
                         </div>
@@ -69,7 +75,7 @@
                             </router-link>
                         </div>
                         <div v-if="!identity.account" class="env float-left">
-                            <button class="btn btn-sm btn-outline-primary" v-on:click="login()">login</button>
+                            <button class="btn btn-sm btn-outline-primary" v-on:click="login()">connect wallet</button>
                         </div>
                         <div class="env float-left">
                             <router-link :to="{ name: 'Settings' }">
@@ -197,7 +203,7 @@ export default {
       this.identity = await GetIdentity(true);
       if (!this.identity.account) {
         alert(
-          "Failed to find Scatter or get Scatter identity! Please see our FAQ!"
+          "Failed to detect an EOS wallet! However, you can still post to the forum anonymously for free!"
         );
       }
     },

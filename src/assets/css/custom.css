@@ -43,6 +43,7 @@ body {
     font-family: 'Open Sans Light', sans-serif;
     font-size: 14px;
     color: #989c9e;
+    padding-right: 0 !important;
 }
 
 a {
@@ -85,6 +86,11 @@ ul.socialicons li a:hover {
 
 /*-----------------------------------------------------------------*/
 /*--- Header ---*/
+.headersubs {
+    background-color: #f0f0f0;
+    font-size: 14px;
+}
+
 .headernav {
     height: 70px;
     background-color: white;

@@ -1,4 +1,5 @@
 import requests from "@/requests";
+import { storage, SaveStorage } from "@/storage";
 import { GetEOS, GetIdentity, ExecuteEOSActions, GetEOSService } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 
@@ -35,6 +36,12 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
                     return false;
                 }
 
+            }
+
+            // generate anon identity if we don't have one
+            if (!storage.anon_id.key) {
+                storage.anon_id.key = await ecc.randomKey();
+                SaveStorage();
             }
 
             var eostx = await novusphere.anonymousPost(post);

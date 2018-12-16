@@ -49,15 +49,15 @@
                 <p v-html="post_content_html"></p>
 
                 <div v-if="post.referendum">
-                  <div v-for="(o, i) in post.referendum.options" :key="i">
-                    <input class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
+                  <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
+                    <input v-if="identity.account" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
                     <div class="progress">
                       <div class="progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
                         {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
                       </div>
                     </div>
                   </div>
-                  <div class="text-center" v-if="!post.referendum.expired">
+                  <div class="text-center" v-if="identity.account && !post.referendum.expired">
                     <a href="javascript:void(0)" class="btn btn-primary" v-on:click="referendumVote()">vote</a>
                   </div>
                 </div>
@@ -70,7 +70,7 @@
                     <li class="list-inline-item">
                         <router-link v-if="!thread && post.transaction" :to="thread_link">
                             <font-awesome-icon :icon="['fas', 'reply']" ></font-awesome-icon>
-                            {{ post.total_replies }} comments
+                            <span v-if="!post.parent">{{ post.total_replies }} comments</span>
                         </router-link>
                         <a v-else href="javascript:void(0)" v-on:click="showQuickReply()">
                             <font-awesome-icon :icon="['fas', 'reply']" ></font-awesome-icon>
@@ -222,13 +222,17 @@ export default {
         : this.post.data.json_metadata.sub;
     },
     thread_link() {
+      const id = this.post.parent
+        ? this.post.parent.o_id
+        : this.thread
+          ? this.thread.o_id || this.thread.o_transaction
+          : this.post.o_id || this.post.o_transaction;
+
       return {
         name: "Thread",
         params: {
           sub: this.sub,
-          id: this.thread
-            ? this.thread.o_id || this.thread.o_transaction
-            : this.post.o_id || this.post.o_transaction,
+          id: id,
           title: this.thread
             ? this.thread.getUrlTitle()
             : this.post.getUrlTitle()
