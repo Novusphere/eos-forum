@@ -49,6 +49,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
 
         } else {
             const eos = GetEOS();
+            const json_metadata = JSON.parse(post.json_metadata);
 
             var tips_rx = post.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
             var actions = [
@@ -65,7 +66,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
             if (
                 tips_rx &&
                 tips_rx.length > 0 &&
-                !post.json_metadata.edit &&
+                !json_metadata.edit &&
                 parent_tx
             ) {
                 var tokens = JSON.parse(
@@ -82,7 +83,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
                     account: "eosio.token"
                 });
 
-                const tip_to = JSON.parse(post.json_metadata).parent_poster;
+                const tip_to = json_metadata.parent_poster;
 
                 for (var i = 0; i < tips_rx.length; i++) {
                     var tip_args = tips_rx[i].split(" ");

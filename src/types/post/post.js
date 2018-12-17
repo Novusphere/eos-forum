@@ -307,11 +307,6 @@ class Post {
                     const percent = staked_total > 0 ? (100 * vote_result / (staked_total / 10000)) : 0;
                     votes[vote_value].percent = percent.toFixed(1);
                 }
-
-                if (this.referendum.name == 'ueyvstzrbffu') {
-                    console.log(JSON.parse(JSON.stringify(votes)));
-                    console.log(staked_total);
-                }
             }
 
             this.referendum.details = {
