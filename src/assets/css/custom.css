@@ -426,7 +426,7 @@ td.chbox {
     padding-right: 30px;
     padding-top: 20px;
     padding-bottom: 15px;
-    word-break: break-word;
+    word-wrap: break-word;
     color: #989c9e;
     font-size: 14px;
     font-family: 'Open Sans Light', sans-serif;   

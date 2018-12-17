@@ -34,7 +34,8 @@
                 </p>
                 <p v-else>
                     <router-link v-if="post.id" :to="thread_link" class="title">
-                        {{ post.data.json_metadata.title }}
+                        <span v-if="post.referendum">[{{ post.referendum.name }}]</span>
+                        <span>{{ post.data.json_metadata.title }}</span>
                     </router-link>
                 </p>
                 
