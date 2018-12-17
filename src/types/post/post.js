@@ -265,6 +265,10 @@ class Post {
             if (status) {
                 var staked_total = status.stats.staked.total;
 
+                if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
+                    staked_total = 0;
+                }
+
                 for (var vote_value in status.stats.staked) {
                     if (vote_value == 'total') {
                         continue;
@@ -274,8 +278,6 @@ class Post {
                     vote_result = (isNaN(vote_result) ? 0 : parseInt(vote_result)) / 10000;
 
                     if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
-
-                        staked_total = 0;
 
                         for (var i = 0; i < post.referendum.options.length; i++) {
                             if ((vote_value & (1 << i)) != 0) {
@@ -303,7 +305,12 @@ class Post {
                 for (var vote_value in votes) {
                     const vote_result = votes[vote_value].value;
                     const percent = staked_total > 0 ? (100 * vote_result / (staked_total / 10000)) : 0;
-                    votes[vote_value].percent = percent.toFixed(0);
+                    votes[vote_value].percent = percent.toFixed(1);
+                }
+
+                if (this.referendum.name == 'ueyvstzrbffu') {
+                    console.log(JSON.parse(JSON.stringify(votes)));
+                    console.log(staked_total);
                 }
             }
 
