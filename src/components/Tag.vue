@@ -40,8 +40,6 @@
 </template>
 
 <script>
-import jQuery from "jquery";
-
 import ui from "@/ui";
 
 import Pager from "@/components/core/Pager";

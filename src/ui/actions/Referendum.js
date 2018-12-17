@@ -233,7 +233,6 @@ export default {
         const identity = await GetIdentity();
         const prop = await this.GetProposal(txid);
 
-        // NOTE & TO-DO: "vote" is changing to "vote_value"
         var action = {
             contract: REFERENDUM_CONTRACT,
             name: "vote",
@@ -241,7 +240,7 @@ export default {
                 voter: identity.account,
                 proposal_name: prop.data.proposal_name,
                 vote: vote,
-                vote_json: JSON.stringify({ src: "novusphere-forum" })
+                vote_json: "", //JSON.stringify({ src: "novusphere-forum" })
             }
         }
 

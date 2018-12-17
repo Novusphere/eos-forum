@@ -50,7 +50,8 @@
 
                 <div v-if="post.referendum">
                   <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
-                    <input v-if="identity.account" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
+                    <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
+                    <input v-if="identity.account && is_multi_referendum" class="form-check-input" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
                     <div class="progress">
                       <div class="referendumbar progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
                         {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
@@ -196,6 +197,18 @@ export default {
     }
   },
   computed: {
+    is_multi_referendum() {
+      return this.post.referendum && this.post.referendum.type == 'multi-select-v1';
+    },
+    multi_vote_value() {
+      var value = 0;
+      for (var i = 0; i < this.vote_value_multi.length; i++) {
+        if (this.vote_value_multi[i]) {
+          value |= (1 << i);
+        }
+      }
+      return value;
+    },
     is_edit() {
       return (
         this.post.data.json_metadata.edit && this.post.o_id != this.post.id
@@ -424,7 +437,7 @@ export default {
 
       var txid = await ui.actions.Referendum.Vote(
         this.post.transaction,
-        this.vote_value
+        this.is_multi_referendum ? this.multi_vote_value : this.vote_value
       );
       alert(
         `Snapshots are taken every hour, so it may take awhile before your vote is processed. Below is your transaction id. ${txid}`,
@@ -437,6 +450,7 @@ export default {
   },
   data() {
     return {
+      vote_value_multi: [ 0, 0, 0, 0, 0, 0, 0, 0 ],
       vote_value: 0,
       referendum_colors: [
         "#dc3545",

@@ -17,8 +17,8 @@ const REFERENDUM_TYPES = [
     'multi-select-v1',
 ];
 
-const REFERENDUM_OPTIONS_YN = [ 'no', 'yes' ];
-const REFERENDUM_OPTIONS_YNA = [ 'no', 'yes', 'abstain' ];
+const REFERENDUM_OPTIONS_YN = ['no', 'yes'];
+const REFERENDUM_OPTIONS_YNA = ['no', 'yes', 'abstain'];
 
 var referendum_cache = null;
 
@@ -263,6 +263,8 @@ class Post {
             }
 
             if (status) {
+                var staked_total = status.stats.staked.total;
+
                 for (var vote_value in status.stats.staked) {
                     if (vote_value == 'total') {
                         continue;
@@ -273,24 +275,34 @@ class Post {
 
                     if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
 
+                        staked_total = 0;
+
                         for (var i = 0; i < post.referendum.options.length; i++) {
-                            if (vote_value & (1 << i) != 0) {
+                            if ((vote_value & (1 << i)) != 0) {
                                 if (i in votes)
                                     votes[i].value += vote_result;
                                 else
                                     votes[i] = { value: vote_result, percent: 0 };
+
+                                staked_total += vote_result * 10000;
                             }
                         }
 
                     }
                     else {
-                        votes[vote_value].value = vote_result;
+                        if (vote_value in votes) {
+                            votes[vote_value].value = vote_result;
+                        }
+                        else {
+                            //console.log(status);
+                            //console.log(vote_value);
+                        }
                     }
                 }
 
                 for (var vote_value in votes) {
                     const vote_result = votes[vote_value].value;
-                    const percent = (100 * vote_result / Math.max(1, status.stats.staked.total / 10000));
+                    const percent = staked_total > 0 ? (100 * vote_result / (staked_total / 10000)) : 0;
                     votes[vote_value].percent = percent.toFixed(0);
                 }
             }
@@ -317,7 +329,7 @@ class Post {
             attachment.type = t;
             attachment.display = d;
         }
-        
+
         const filters = [
             { // youtube
                 match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/,

@@ -32,7 +32,7 @@
                                 <option value="poll-yn-v1">Poll (Y/N)</option>
                                 <option value="poll-yna-v1">Poll (Y/N/A)</option>
                                 <option value="options-v1">Options Poll</option>
-                                <option value="multi-select-v1" v-if="false">Multi-select Poll</option>
+                                <option value="multi-select-v1">Multi-select Poll</option>
                               </b-form-select>
                            </div>
                         </div>
