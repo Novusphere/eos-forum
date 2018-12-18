@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid px-0">
 
     <!-- brand banner -->
     <div class="tp-banner-container" v-if="brand_banner">

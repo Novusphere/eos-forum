@@ -932,9 +932,6 @@ a.down:hover {
 @media (max-width: 767px) {
 
     /*--- index.html ---*/
-    .container-fluid {
-        padding: 0;
-    }
 
     .post .userinfo {
         width: 30%;
@@ -1058,10 +1055,6 @@ a.down:hover {
 
 @media (min-width: 768px) and (max-width: 991px) {
 
-    .container-fluid {
-        padding: 0;
-    }
-
     .post .userinfo {
         width: 10%;
         padding: 15px 0 15px 15px;
@@ -1141,11 +1134,4 @@ a.down:hover {
 /*-----------------------------------------------------------------*/
 /*--- Large devices (more 1200px) ---*/
 @media (min-width: 1201px) {
-    .container-fluid {
-        padding: 0;
-    }
-
-    .container {
-        padding: 0;
-    }
 }
