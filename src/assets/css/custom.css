@@ -47,10 +47,10 @@ body {
 }
 
 a {
-    color: #363838;    
+    color: #363838;
 }
 a:hover {
-    color: #989c9e;    
+    color: #989c9e;
 }
 
 /*-----------------------------------------------------------------*/
@@ -68,7 +68,7 @@ footer .logo {
 
 ul.socialicons li {
     display: inline-block;
-    list-style: none;  
+    list-style: none;
     font-size: 18px;
     color:#bdc3c7;
     margin-left: 15px;
@@ -92,7 +92,7 @@ ul.socialicons li a:hover {
 }
 
 .headernav {
-    height: 70px;
+    /* height: 70px; */
     background-color: white;
     border-bottom: 1px solid #c9cccd;
 }
@@ -104,9 +104,7 @@ ul.socialicons li a:hover {
 }
 
 .selecttopic {
-    margin-top: 16px;
     font-family: 'Open Sans Semibold', sans-serif;
-    font-size: 16px;
     color: #363838;
 }
 
@@ -115,81 +113,40 @@ ul.socialicons li a:hover {
 }
 
 .selecttopic .dropdown-menu {
-    margin-top: -20px;
-}
-
-.headernav .search {
-    color: #363838;
-    font-size: 14px;
-    font-family: 'Open Sans Light', sans-serif;
-    margin-top: 16px;
-    height: 38px
-}
-
-.headernav .search  .wrap {
-    background-color: #f3f5f9;
-    border-radius: 3px;
-}
-
-.headernav .search .txt {
-    width: 85%;
-}
-
-.headernav .search input {
-    border: none;
-    box-shadow: none;
-    background-color: #f3f5f9;
-    color: #363838;
-    font-size: 14px;
-    padding: 8px 19px;
-    height: 38px;
-
-}
-
-
-.headernav .search button {
-    border: solid 1px #697683;
-    box-shadow: none;
-    background-color: #697683;
-    color: #ffffff;
-    font-size: 18px;
+    /* margin-top: -20px; */
 }
 
 /*--- Avatar ---*/
 .avt {
-    margin-top: 16px;
-    height: 38px;
+    /* height: 38px; */
 }
 
 .avt button {
-    height: 38px;
-    border: none;
-    box-shadow: none;
+    /* border: none; */
+    /* box-shadow: none; */
     color: #ffffff;
-    font-size: 14px;
     font-family: 'Open Sans Bold', sans-serif;
-    padding-left: 30px;
-    padding-right: 30px;
     background-color: #1abc9c;
+    border: 1px solid;
+    border-color: #1abc9c;
 }
 
-.avt .btn-primary:hover, 
-.avt .btn-primary:focus, 
-.avt .btn-primary:active, 
+.avt .btn-primary:hover,
+.avt .btn-primary:focus,
+.avt .btn-primary:active,
 .avt .btn-primary.active{
     background-color: #1abc9c;
 
-
-    border: none;
     box-shadow: none;
 
 }
 
 .env {
-    font-size: 18px;
+    font-size: 20px;
     color:#cfd5d7;
     line-height: 38px;
-    padding: 0 20px;
+    min-width: 20px;
+    padding: 0 10px;
 }
 
 .postthumbnail {
@@ -379,7 +336,7 @@ table.poll {
 }
 
 .poll input[type="radio"] {
-    display:none;   
+    display:none;
 }
 
 .poll input[type="radio"] + label {
@@ -429,7 +386,7 @@ td.chbox {
     word-wrap: break-word;
     color: #989c9e;
     font-size: 14px;
-    font-family: 'Open Sans Light', sans-serif;   
+    font-family: 'Open Sans Light', sans-serif;
     line-height: 25px;
 }
 
@@ -467,7 +424,7 @@ td.chbox {
 .post h2 {
     color: #363838;
     font-size: 18px;
-    font-family: 'Open Sans', sans-serif;   
+    font-family: 'Open Sans', sans-serif;
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -491,7 +448,7 @@ td.chbox {
     padding: 12px 17px;
     color: #ffffff;
     font-size: 14px;
-    font-family: 'Open Sans Bold', sans-serif; 
+    font-family: 'Open Sans Bold', sans-serif;
     position: relative;
 }
 
@@ -512,7 +469,7 @@ td.chbox {
     border-bottom: solid 1px #f1f1f1;
     color:#9da6aa;
     font-size: 12px;
-    font-family: 'Open Sans Regular', sans-serif; 
+    font-family: 'Open Sans Regular', sans-serif;
     text-align: center;
     line-height: 29px;
 }
@@ -524,7 +481,7 @@ td.chbox {
 .post .time {
     color:#9da6aa;
     font-size: 12px;
-    font-family: 'Open Sans Regular', sans-serif; 
+    font-family: 'Open Sans Regular', sans-serif;
     text-align: center;
     line-height: 29px;
 
@@ -547,7 +504,7 @@ td.chbox {
 .breadcrumbf a , .breadcrumbf {
     color: #bdc3c7;
     font-size: 12px;
-    font-family: 'Open Sans Regular', sans-serif; 
+    font-family: 'Open Sans Regular', sans-serif;
     line-height: 62px;
 }
 
@@ -586,7 +543,7 @@ td.chbox {
     margin-left: 18px;
     font-size: 12px;
     color: #bdc3c7;
-    font-family: 'Open Sans Regular', sans-serif; 
+    font-family: 'Open Sans Regular', sans-serif;
 }
 
 .postinfobot .posted i {
@@ -651,7 +608,7 @@ a.down:hover {
     font-size: 12px;
     color: #bdc3c7;
     display: block;
-    font-family: 'Open Sans Regular', sans-serif; 
+    font-family: 'Open Sans Regular', sans-serif;
 }
 
 .textwraper textarea {
@@ -688,7 +645,7 @@ a.down:hover {
 .postinfobot label {
     color: #bdc3c7;
     font-size: 12px;
-    font-family: 'Open Sans Regular', sans-serif; 
+    font-family: 'Open Sans Regular', sans-serif;
 
 }
 
@@ -708,7 +665,7 @@ a.down:hover {
     padding: 10px 15px;
     color: #ffffff;
     font-size: 14px;
-    font-family: 'Open Sans Bold', sans-serif; 
+    font-family: 'Open Sans Bold', sans-serif;
     border: none;
 
 }
@@ -736,7 +693,7 @@ a.down:hover {
     padding: 20px;
     font-size: 14px;
     color: #989c9e;
-    font-family: 'Open Sans Light', sans-serif; 
+    font-family: 'Open Sans Light', sans-serif;
     margin-bottom: 20px;
     height: 50px;
 }
@@ -749,7 +706,7 @@ a.down:hover {
 
     font-size: 14px;
     color: #989c9e;
-    font-family: 'Open Sans Light', sans-serif; 
+    font-family: 'Open Sans Light', sans-serif;
     margin-bottom: 20px;
     height: 50px;
 }
@@ -769,7 +726,7 @@ a.down:hover {
     padding: 20px;
     font-size: 14px;
     color: #989c9e;
-    font-family: 'Open Sans Light', sans-serif; 
+    font-family: 'Open Sans Light', sans-serif;
     margin-bottom: 20px;
     height: 150px;
 }
@@ -783,7 +740,7 @@ a.down:hover {
 .newtopic p {
     font-size: 14px;
     color: #363838;
-    font-family: 'Open Sans Light', sans-serif; 
+    font-family: 'Open Sans Light', sans-serif;
 }
 
 
@@ -853,7 +810,7 @@ a.down:hover {
 .postinfotop h2 {
     color: #363838;
     font-size: 14px;
-    font-family: 'Open Sans Bold', sans-serif; 
+    font-family: 'Open Sans Bold', sans-serif;
     padding: 20px;
     margin: 0;
     border-bottom: solid 1px #f1f1f1;
@@ -914,7 +871,7 @@ a.down:hover {
 
 .accsection .htext {
     width: 40%;
-    float: left; 
+    float: left;
 }
 
 .accsection .hnotice {
@@ -973,7 +930,7 @@ a.down:hover {
 /*--- Extra small devices (less 767px) ---*/
 
 @media (max-width: 767px) {
-    
+
     /*--- index.html ---*/
     .container-fluid {
         padding: 0;
@@ -1013,16 +970,6 @@ a.down:hover {
     .post .time,
     .post .views,
     .post .views {
-    }
-
-
-    .headernav {
-        height: auto;
-    }
-
-    .avt {
-        height: auto; 
-        margin-bottom: 15px;
     }
 
     .selecttopic select {
@@ -1084,7 +1031,7 @@ a.down:hover {
         margin-bottom: 20px;
     }
 
-    .accsection .htext, 
+    .accsection .htext,
     .accsection .hnotice {
         width: 100%;
     }
@@ -1146,15 +1093,6 @@ a.down:hover {
         left: 36%;
     }
 
-    .headernav {
-        height: auto;
-    }
-
-    .avt {
-        height: auto; 
-        margin-bottom: 15px;
-    }
-
     .selecttopic select {
         width: 100%;
     }
@@ -1175,20 +1113,13 @@ a.down:hover {
     .dropdown.avatar b.caret {
         color: #363838;
     }
-    
+
 }
 
 
 /*-----------------------------------------------------------------*/
 /*--- Medium devices (992-1200px) ---*/
 @media (min-width: 992px) and (max-width: 1200px) {
-    .container-fluid {
-        padding: 0;
-    }
-
-    .headernav .search .txt {
-        width: 75%;
-    }
 
     .avatar .dropdown-menu {
         left: auto;
