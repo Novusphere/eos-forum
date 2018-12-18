@@ -16,10 +16,10 @@
         <div class="headernav">
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-1 col-3 col-md-2 col-lg-2 logo "> 
+                    <div class="col-xl-1 col-lg-2 col-3 col-md-2 logo">
                         <router-link :to="{ name: 'Index' }"><img :src="brand_logo" alt="" class="img-fluid"></router-link>
                     </div>
-                    <div class="col-xl-3 col-9 col-md-5 col-lg-3 selecttopic">
+                    <div class="col-xl-3 col-lg-3 col-9 col-md-5 selecttopic">
                         <div class="dropdown d-inline-block">
                             <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
                                 <slot name="topic"></slot>
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4 search col-lg-3 d-none d-md-block">
+                    <div class="col-xl-4 col-lg-3 d-none d-md-block search">
                         <div class="wrap">
                             <form v-if="false" action="#" method="post" class="form">
                                 <div class="float-left txt">
@@ -46,8 +46,8 @@
                             </form>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-12 col-md-5 col-lg-4 avt">
-                        <div v-if="identity.account" class="env float-left dropdown"> 
+                    <div class="col-xl-4 col-lg-4 col-12 col-md-5 avt">
+                        <div v-if="identity.account" class="env float-left dropdown">
                             <a data-toggle="dropdown" href="#">
                                 <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
                             </a>
@@ -113,13 +113,13 @@
                     <div class="col-xl-12 col-12 col-md-12 ">
                         <p class="text-center">
                             This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>.
-                            Special thanks to 
-                            <a href="https://www.eoscanada.com/">EOS Canada</a>, 
-                            <a href="https://greymass.com/">Greymass</a>, 
-                            <a href="https://www.genereos.io/">GenerEOS</a>, 
+                            Special thanks to
+                            <a href="https://www.eoscanada.com/">EOS Canada</a>,
+                            <a href="https://greymass.com/">Greymass</a>,
+                            <a href="https://www.genereos.io/">GenerEOS</a>,
                             <a href="https://get-scatter.com/">Scatter</a>,
                             <a href="https://eosflare.io/">>EOS Flare</a>.
-                        </p> 
+                        </p>
                         <p class="text-center">
                             This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub Pages</a> and is fully <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
                             The developers of this software take no responsibility for the content displayed.
