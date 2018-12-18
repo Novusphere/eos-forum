@@ -16,58 +16,65 @@
         <div class="headernav">
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-1 col-lg-2 col-3 col-md-2 logo">
-                        <router-link :to="{ name: 'Index' }"><img :src="brand_logo" alt="" class="img-fluid"></router-link>
+                    <div class="col-xl-1 col-lg-2 col-3 col-md-2">
+                        <div class="logo">
+                            <router-link :to="{ name: 'Index' }"><img :src="brand_logo" alt="" class="img-fluid"></router-link>
+                        </div>
                     </div>
-                    <div class="col-xl-7 col-lg-6 col-9 col-md-5 selecttopic">
-                        <div class="dropdown d-inline-block">
-                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
-                                <slot name="topic"></slot>
-                            </button>
-                            <div class="dropdown-menu">
-                                <router-link class="dropdown-item" :to="{name: 'Index' }">Home</router-link>
-                                <router-link v-if="eos_referendum" class="dropdown-item" :to="{name: 'Sub', params: { sub: 'referendum' } }">Referendum</router-link>
-                                <router-link v-for="sub in subs" :key="sub" class="dropdown-item" :to="{ name: 'Sub', params: { sub: sub } }">e/{{ sub }}</router-link>
+                    <div class="col-xl-7 col-lg-6 col-9 col-md-5">
+                        <div class="selecttopic">
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
+                                    <slot name="topic"></slot>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" :to="{name: 'Index' }">Home</router-link>
+                                    <router-link v-if="eos_referendum" class="dropdown-item" :to="{name: 'Sub', params: { sub: 'referendum' } }">Referendum</router-link>
+                                    <router-link v-for="sub in subs" :key="sub" class="dropdown-item" :to="{ name: 'Sub', params: { sub: sub } }">e/{{ sub }}</router-link>
+                                </div>
                             </div>
                         </div>
+
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-12 col-md-5 avt">
-                        <div v-if="identity.account" class="env float-left dropdown">
-                            <a data-toggle="dropdown" href="#">
-                                <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
-                            </a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li class="dropdown-item">
-                                    <router-link :to="{ name: 'UserProfile', params: { account: identity.account } }">
-                                        {{ identity.account }}
-                                    </router-link>
-                                </li>
-                                <li class="dropdown-item">
-                                    {{ identity.atmos }} ATMOS
-                                </li>
-                                <li v-if="brand_symbol != 'ATMOS'" class="dropdown-item">
-                                    {{ identity.token }} {{ brand_symbol }}
-                                </li>
-                                <li class="dropdown-item">
-                                    <a role="menuitem" tabindex="-3" href="javascript:void(0)" v-on:click="logout()">disconnect</a>
-                                </li>
-                            </ul>
+                    <div class="col-xl-4 col-lg-4 col-12 col-md-5">
+                        <div class="avt">
+                            <div v-if="identity.account" class="env float-left dropdown">
+                                <a data-toggle="dropdown" href="#">
+                                    <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="dropdown-item">
+                                        <router-link :to="{ name: 'UserProfile', params: { account: identity.account } }">
+                                            {{ identity.account }}
+                                        </router-link>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        {{ identity.atmos }} ATMOS
+                                    </li>
+                                    <li v-if="brand_symbol != 'ATMOS'" class="dropdown-item">
+                                        {{ identity.token }} {{ brand_symbol }}
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <a role="menuitem" tabindex="-3" href="javascript:void(0)" v-on:click="logout()">disconnect</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-if="identity.account" class="env float-left">
+                                <router-link :to="{ name: 'UserNotifications' }" :class="(identity.notifications>0) ? 'text-danger' : ''">
+                                    <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
+                                    {{ identity.notifications }}
+                                </router-link>
+                            </div>
+                            <div v-if="!identity.account" class="env float-left">
+                                <button class="btn btn-sm btn-outline-primary" v-on:click="login()">connect wallet</button>
+                            </div>
+                            <div class="env float-left">
+                                <router-link :to="{ name: 'Settings' }">
+                                    <font-awesome-icon :icon="['fas', 'cog']" ></font-awesome-icon>
+                                </router-link>
+                            </div>
+                            <div class="clearfix"></div>
                         </div>
-                        <div v-if="identity.account" class="env float-left">
-                            <router-link :to="{ name: 'UserNotifications' }" :class="(identity.notifications>0) ? 'text-danger' : ''">
-                                <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
-                                {{ identity.notifications }}
-                            </router-link>
-                        </div>
-                        <div v-if="!identity.account" class="env float-left">
-                            <button class="btn btn-sm btn-outline-primary" v-on:click="login()">connect wallet</button>
-                        </div>
-                        <div class="env float-left">
-                            <router-link :to="{ name: 'Settings' }">
-                                <font-awesome-icon :icon="['fas', 'cog']" ></font-awesome-icon>
-                            </router-link>
-                        </div>
-                        <div class="clearfix"></div>
                     </div>
                 </div>
             </div>
