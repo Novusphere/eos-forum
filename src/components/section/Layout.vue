@@ -90,6 +90,7 @@
             <slot name="content-full"></slot>
           </div>
         </div>
+
         <div class="row">
           <div class="col-lg-8 col-xl-8">
             <slot name="content"></slot>
@@ -101,33 +102,36 @@
       </div>
     </section>
 
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-md-12 col-xl-12">
-            <p class="text-center">
-              This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>.
-              Special thanks to
-              <a href="https://www.eoscanada.com/">EOS Canada</a>,
-              <a href="https://greymass.com/">Greymass</a>,
-              <a href="https://www.genereos.io/">GenerEOS</a>,
-              <a href="https://get-scatter.com/">Scatter</a>,
-              <a href="https://eosflare.io/">>EOS Flare</a>.
-            </p>
-            <p class="text-center">
-                This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub Pages</a> and is fully <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
-                The developers of this software take no responsibility for the content displayed.
-                No images, files or media are hosted by the forum, please contact the respective site owners hosting content in breach of DMCA.
-            </p>
-            <div class="row">
-              <div class="col-12">
-                <div class="text-center">
-                  <img src="https://cdn.novusphere.io/static/atmos.svg" style="width: 12.5%">
-                  <img src="https://cdn.novusphere.io/static/eos3.svg" style="width: 12.5%">
-                </div>
-              </div>
-            </div>
+    <footer class="container">
+      <div class="row">
+        <div class="col-12">
+
+          <p class="text-center">
+            This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>.
+            <br/>
+            Special thanks to
+            <a href="https://www.eoscanada.com/">EOS Canada</a>,
+            <a href="https://greymass.com/">Greymass</a>,
+            <a href="https://www.genereos.io/">GenerEOS</a>,
+            <a href="https://get-scatter.com/">Scatter</a>,
+            <a href="https://eosflare.io/">>EOS Flare</a>.
+          </p>
+
+          <p class="text-center">
+              This site is hosted entirely from <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">GitHub Pages</a> and is fully <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
+              <br/>
+              The developers of this software take no responsibility for the content displayed.
+              <br/>
+              No images, files or media are hosted by the forum,
+              <br/>
+              please contact the respective site owners hosting content in breach of DMCA.
+          </p>
+
+          <div class="text-center">
+            <img src="https://cdn.novusphere.io/static/atmos.svg" style="width: 12.5%">
+            <img src="https://cdn.novusphere.io/static/eos3.svg" style="width: 12.5%">
           </div>
+
         </div>
       </div>
     </footer>
