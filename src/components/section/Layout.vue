@@ -19,7 +19,7 @@
                     <div class="col-xl-1 col-lg-2 col-3 col-md-2 logo">
                         <router-link :to="{ name: 'Index' }"><img :src="brand_logo" alt="" class="img-fluid"></router-link>
                     </div>
-                    <div class="col-xl-3 col-lg-3 col-9 col-md-5 selecttopic">
+                    <div class="col-xl-7 col-lg-6 col-9 col-md-5 selecttopic">
                         <div class="dropdown d-inline-block">
                             <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
                                 <slot name="topic"></slot>
@@ -29,21 +29,6 @@
                                 <router-link v-if="eos_referendum" class="dropdown-item" :to="{name: 'Sub', params: { sub: 'referendum' } }">Referendum</router-link>
                                 <router-link v-for="sub in subs" :key="sub" class="dropdown-item" :to="{ name: 'Sub', params: { sub: sub } }">e/{{ sub }}</router-link>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-lg-3 d-none d-md-block search">
-                        <div class="wrap">
-                            <form v-if="false" action="#" method="post" class="form">
-                                <div class="float-left txt">
-                                    <input type="text" class="form-control" placeholder="Search Topics">
-                                </div>
-                                <div class="float-right">
-                                    <button class="btn btn-secondary" type="button">
-                                        <font-awesome-icon :icon="['fas', 'search']" ></font-awesome-icon>
-                                    </button>
-                                </div>
-                                <div class="clearfix"></div>
-                            </form>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-12 col-md-5 avt">
