@@ -8,7 +8,7 @@
         </div>
 
         <div class="text-center headersubs d-none d-sm-block">
-            <ul class="list-inline">
+            <ul class="list-inline mb-0">
                 <li v-for="sub in subs" :key="sub" class="list-inline-item"><router-link :to="'/e/' + sub">{{sub}}</router-link></li>
             </ul>
         </div>
@@ -16,13 +16,11 @@
         <div class="headernav">
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-1 col-lg-2 col-3 col-md-2">
-                        <div class="logo">
-                            <router-link :to="{ name: 'Index' }"><img :src="brand_logo" alt="" class="img-fluid"></router-link>
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-8 col-xl-8">
+                        <div class="logo d-inline-block pr-2">
+                            <router-link :to="{ name: 'Index' }"><img :src="brand_logo" style="height: 60px;"></router-link>
                         </div>
-                    </div>
-                    <div class="col-xl-7 col-lg-6 col-9 col-md-5">
-                        <div class="selecttopic">
+                        <div class="selecttopic d-inline-block">
                             <div class="dropdown d-inline-block">
                                 <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
                                     <slot name="topic"></slot>
@@ -34,9 +32,8 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-12 col-md-5">
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                         <div class="avt">
                             <div v-if="identity.account" class="env float-left dropdown">
                                 <a data-toggle="dropdown" href="#">
@@ -82,7 +79,7 @@
         <section class="content">
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-12 col-12 col-lg-12">
+                    <div class="col-12 col-lg-12 col-xl-12">
                         <div class="mt-1 mb-1"></div>
                         <slot name="content-full"></slot>
                     </div>
@@ -90,10 +87,10 @@
             </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-8 col-lg-8">
+                    <div class="col-lg-8 col-xl-8">
                         <slot name="content"></slot>
                     </div>
-                    <div class="col-xl-4 col-lg-4">
+                    <div class="col-lg-4 col-xl-4">
                         <slot name="sidebar"></slot>
                     </div>
                 </div>
@@ -102,7 +99,7 @@
         <footer>
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-12 col-12 col-md-12 ">
+                    <div class="col-12 col-md-12 col-xl-12">
                         <p class="text-center">
                             This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>.
                             Special thanks to
