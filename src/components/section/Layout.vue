@@ -44,6 +44,12 @@
                 connect wallet
               </button>
 
+              <div class="d-inline-block env">
+                <router-link :to="{ name: 'StartThread', params: { sub: sub ? sub : 'all' } }">
+                  <font-awesome-icon :icon="['fas', 'pen']" ></font-awesome-icon>
+                </router-link>
+              </div>
+
               <div v-if="identity.account" class="d-inline-block env dropdown">
                 <a data-toggle="dropdown" href="#">
                     <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>

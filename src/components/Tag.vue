@@ -1,7 +1,5 @@
 <template>
-  <div>
-    
-    <layout :load="load">
+  <layout :load="load">
         <template slot="topic">
           <span>#{{ tag }}</span>
         </template>
@@ -34,9 +32,7 @@
                 <recently-visited></recently-visited>
             </div>
         </template>
-    </layout>
-
-  </div>
+  </layout>
 </template>
 
 <script>

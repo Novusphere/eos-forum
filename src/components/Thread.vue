@@ -1,30 +1,26 @@
 <template>
-  <div>
-    
-    <layout :load="load">
-        <template slot="topic">
-          <span>Thread</span>
-        </template>
-        <template slot="content">
-          <div class="mb-1" v-if="opening_post.id">
-            <router-link class="btn btn-sm btn-outline-primary" :to='{name: "Sub", params: { sub: opening_post.data.json_metadata.sub } }'>
-              <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
-              e/{{ opening_post.data.json_metadata.sub }}
-            </router-link>
+  <layout :load="load">
+      <template slot="topic">
+        <span>Thread</span>
+      </template>
+      <template slot="content">
+        <div class="mb-1" v-if="opening_post.id">
+          <router-link class="btn btn-sm btn-outline-primary" :to='{name: "Sub", params: { sub: opening_post.data.json_metadata.sub } }'>
+            <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
+            e/{{ opening_post.data.json_metadata.sub }}
+          </router-link>
+        </div>
+        <post v-if="opening_post.id" :post="main_post" :thread="opening_post"></post>
+        <div class="text-center" v-else>
+          <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+        </div>
+      </template>
+      <template slot="sidebar">
+          <div class="sidebarblock">
+              <recently-visited></recently-visited>
           </div>
-          <post v-if="opening_post.id" :post="main_post" :thread="opening_post"></post>
-          <div class="text-center" v-else>
-            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
-          </div>
-        </template>
-        <template slot="sidebar">
-            <div class="sidebarblock">
-                <recently-visited></recently-visited>
-            </div>
-        </template>
-    </layout>
-
-  </div>
+      </template>
+  </layout>
 </template>
 
 <script>
