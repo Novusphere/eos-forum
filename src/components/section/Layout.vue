@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <!-- top subs -->
+    <!-- featured subs at the top -->
     <div class="text-center d-none d-sm-block FeaturedSubs">
       <ul class="list-inline mb-0">
         <li v-for="sub in subs"
@@ -24,11 +24,13 @@
       <div class="container py-2">
         <div class="row no-gutters">
           <div class="col-3 col-sm-6 col-md-6 col-lg-8 col-xl-8">
+
             <div class="d-inline-block px-2 px-lg-4">
               <router-link :to="{ name: 'Index' }">
                 <img :src="brand_logo" style="height: 38px;">
               </router-link>
             </div>
+
             <div class="d-none d-sm-inline-block">
               <div class="dropdown d-inline-block">
                 <button class="btn btn-outline-primary dropdown-toggle"
@@ -59,62 +61,59 @@
           </div>
 
           <div class="col-9 col-sm-6 col-md-6 col-lg-4 col-xl-4 text-right">
-            <div class="avt">
-              <button class="btn btn-outline-primary mx-2 mx-lg-4 ConnectButton"
-                v-if="!identity.account"
-                v-on:click="login()">
-                connect wallet
-              </button>
+            <button class="btn btn-outline-primary mx-2 mx-lg-4 ConnectButton"
+              v-if="!identity.account"
+              v-on:click="login()">
+              connect wallet
+            </button>
 
-              <div class="d-inline-block MenuIconButton">
-                <router-link :to="{ name: 'StartThread', params: { sub: $route.params.sub ? $route.params.sub : 'all' } }">
-                  <font-awesome-icon :icon="['fas', 'pen']" ></font-awesome-icon>
-                </router-link>
-              </div>
+            <div class="d-inline-block MenuIconButton">
+              <router-link :to="{ name: 'StartThread', params: { sub: $route.params.sub ? $route.params.sub : 'all' } }">
+                <font-awesome-icon :icon="['fas', 'pen']" ></font-awesome-icon>
+              </router-link>
+            </div>
 
-              <div v-if="identity.account" class="d-inline-block MenuIconButton">
-                <router-link :to="{ name: 'UserNotifications' }"
-                  :class="(identity.notifications>0) ? 'text-danger' : ''">
-                  <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
-                  <span v-if="identity.notifications > 0">
-                    {{ identity.notifications }}
-                  </span>
-                </router-link>
-              </div>
+            <div v-if="identity.account" class="d-inline-block MenuIconButton">
+              <router-link :to="{ name: 'UserNotifications' }"
+                :class="(identity.notifications>0) ? 'text-danger' : ''">
+                <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
+                <span v-if="identity.notifications > 0">
+                  {{ identity.notifications }}
+                </span>
+              </router-link>
+            </div>
 
-              <div v-if="identity.account" class="d-inline-block dropdown MenuIconButton">
-                <a data-toggle="dropdown" href="#">
-                    <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                  <li class="dropdown-item">
-                    <router-link :to="{ name: 'UserProfile', params: { account: identity.account } }">
-                        {{ identity.account }}
-                    </router-link>
-                  </li>
-                  <li class="dropdown-item">
-                      {{ identity.atmos }} ATMOS
-                  </li>
-                  <li v-if="brand_symbol != 'ATMOS'" class="dropdown-item">
-                      {{ identity.token }} {{ brand_symbol }}
-                  </li>
-                  <li class="dropdown-item">
-                      <a role="menuitem"
-                        tabindex="-3"
-                        href="javascript:void(0)"
-                        v-on:click="logout()">
-                        disconnect
-                      </a>
-                  </li>
-                </ul>
-              </div>
+            <div v-if="identity.account" class="d-inline-block dropdown MenuIconButton">
+              <a data-toggle="dropdown" href="#">
+                  <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <li class="dropdown-item">
+                  <router-link :to="{ name: 'UserProfile', params: { account: identity.account } }">
+                      {{ identity.account }}
+                  </router-link>
+                </li>
+                <li class="dropdown-item">
+                    {{ identity.atmos }} ATMOS
+                </li>
+                <li v-if="brand_symbol != 'ATMOS'" class="dropdown-item">
+                    {{ identity.token }} {{ brand_symbol }}
+                </li>
+                <li class="dropdown-item">
+                    <a role="menuitem"
+                      tabindex="-3"
+                      href="javascript:void(0)"
+                      v-on:click="logout()">
+                      disconnect
+                    </a>
+                </li>
+              </ul>
+            </div>
 
-              <div class="d-inline-block MenuIconButton">
-                <router-link :to="{ name: 'Settings' }">
-                  <font-awesome-icon :icon="['fas', 'cog']" ></font-awesome-icon>
-                </router-link>
-              </div>
-
+            <div class="d-inline-block MenuIconButton">
+              <router-link :to="{ name: 'Settings' }">
+                <font-awesome-icon :icon="['fas', 'cog']" ></font-awesome-icon>
+              </router-link>
             </div>
           </div>
         </div>
