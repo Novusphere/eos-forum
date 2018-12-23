@@ -15,6 +15,7 @@
       </ul>
     </div>
 
+    <!-- header navigation -->
     <div class="headernav py-2">
       <div class="container">
         <div class="row no-gutters">
@@ -45,7 +46,7 @@
               </button>
 
               <div class="d-inline-block env">
-                <router-link :to="{ name: 'StartThread', params: { sub: sub ? sub : 'all' } }">
+                <router-link :to="{ name: 'StartThread', params: { sub: $route.params.sub ? $route.params.sub : 'all' } }">
                   <font-awesome-icon :icon="['fas', 'pen']" ></font-awesome-icon>
                 </router-link>
               </div>
@@ -91,6 +92,7 @@
       </div>
     </div>
 
+    <!-- content block -->
     <section class="content">
       <div class="container">
         <div class="row">
