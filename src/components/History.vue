@@ -1,7 +1,7 @@
 <template>
 
   <layout>
-    
+
     <template slot="topic">
       <span>History</span>
     </template>
@@ -13,10 +13,10 @@
       </div>
     </template>
 
-    <template slot="sidebar">
-        <div class="sidebarblock">
-            <recently-visited></recently-visited>
-        </div>
+    <template slot="right_sidebar">
+      <div class="sidebarblock">
+        <recently-visited></recently-visited>
+      </div>
     </template>
 
   </layout>

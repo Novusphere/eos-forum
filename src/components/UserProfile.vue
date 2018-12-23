@@ -8,32 +8,33 @@
     <template slot="content">
       <div class="mb-1">
         <div class="float-left">
-          <post-sorter ref="sorter" :change="load"></post-sorter>
+          <pager :pages="pages" :current_page="current_page"></pager>
         </div>
         <div class="float-left ml-1">
-          <button class="btn btn-sm btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
+          <button class="btn btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
         </div>
         <div class="float-right">
-          <pager :pages="pages" :current_page="current_page"></pager>
+          <post-sorter ref="sorter" :change="load"></post-sorter>
         </div>
         <div class="clearfix"></div>
       </div>
 
       <div v-if="!loading">
         <div v-if="posts.length == 0">
-              <div class="text-center">
-                <h1>No posts history found!</h1>
-              </div>
+          <div class="text-center">
+            <h1>No posts history found!</h1>
+          </div>
         </div>
 
         <post v-for="p in posts" :key="p.o_id" :post="p"></post>
       </div>
+      
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
       </div>
     </template>
 
-    <template slot="sidebar">
+    <template slot="right_sidebar">
       <div class="sidebarblock">
         <div>
           <h3>{{ account }}</h3>

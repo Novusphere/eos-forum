@@ -17,7 +17,7 @@
       </div>
     </template>
 
-    <template slot="sidebar">
+    <template slot="right_sidebar">
       <div class="sidebarblock">
         <recently-visited></recently-visited>
       </div>

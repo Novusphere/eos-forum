@@ -11,7 +11,11 @@
     <!-- top subs -->
     <div class="text-center headersubs d-none d-sm-block">
       <ul class="list-inline mb-0">
-        <li v-for="sub in subs" :key="sub" class="list-inline-item"><router-link :to="'/e/' + sub">{{sub}}</router-link></li>
+        <li v-for="sub in subs"
+          :key="sub"
+          class="list-inline-item">
+          <router-link :to="'/e/' + sub">{{sub}}</router-link>
+        </li>
       </ul>
     </div>
 
@@ -21,17 +25,34 @@
         <div class="row no-gutters">
           <div class="col-3 col-sm-6 col-md-6 col-lg-8 col-xl-8">
             <div class="logo d-inline-block px-2 px-lg-4">
-              <router-link :to="{ name: 'Index' }"><img :src="brand_logo" style="height: 38px;"></router-link>
+              <router-link :to="{ name: 'Index' }">
+                <img :src="brand_logo" style="height: 38px;">
+              </router-link>
             </div>
             <div class="selecttopic d-none d-sm-inline-block">
               <div class="dropdown d-inline-block">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle"
+                  type="button"
+                  id="sortBy"
+                  data-toggle="dropdown">
                   <slot name="topic"></slot>
                 </button>
                 <div class="dropdown-menu">
-                  <router-link class="dropdown-item" :to="{name: 'Index' }">Home</router-link>
-                  <router-link v-if="eos_referendum" class="dropdown-item" :to="{name: 'Sub', params: { sub: 'referendum' } }">Referendum</router-link>
-                  <router-link v-for="sub in subs" :key="sub" class="dropdown-item" :to="{ name: 'Sub', params: { sub: sub } }">e/{{ sub }}</router-link>
+                  <router-link class="dropdown-item"
+                    :to="{name: 'Index' }">
+                    Home
+                  </router-link>
+                  <router-link v-if="eos_referendum"
+                    class="dropdown-item"
+                    :to="{name: 'Sub', params: { sub: 'referendum' } }">
+                    Referendum
+                  </router-link>
+                  <router-link v-for="sub in subs"
+                    :key="sub"
+                    class="dropdown-item"
+                    :to="{ name: 'Sub', params: { sub: sub } }">
+                    e/{{ sub }}
+                  </router-link>
                 </div>
               </div>
             </div>
@@ -52,9 +73,12 @@
               </div>
 
               <div v-if="identity.account" class="d-inline-block env">
-                <router-link :to="{ name: 'UserNotifications' }" :class="(identity.notifications>0) ? 'text-danger' : ''">
+                <router-link :to="{ name: 'UserNotifications' }"
+                  :class="(identity.notifications>0) ? 'text-danger' : ''">
                   <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
-                  <span v-if="identity.notifications > 0">{{ identity.notifications }}</span>
+                  <span v-if="identity.notifications > 0">
+                    {{ identity.notifications }}
+                  </span>
                 </router-link>
               </div>
 
@@ -64,9 +88,9 @@
                 </a>
                 <ul class="dropdown-menu" role="menu">
                   <li class="dropdown-item">
-                      <router-link :to="{ name: 'UserProfile', params: { account: identity.account } }">
-                          {{ identity.account }}
-                      </router-link>
+                    <router-link :to="{ name: 'UserProfile', params: { account: identity.account } }">
+                        {{ identity.account }}
+                    </router-link>
                   </li>
                   <li class="dropdown-item">
                       {{ identity.atmos }} ATMOS
@@ -75,7 +99,12 @@
                       {{ identity.token }} {{ brand_symbol }}
                   </li>
                   <li class="dropdown-item">
-                      <a role="menuitem" tabindex="-3" href="javascript:void(0)" v-on:click="logout()">disconnect</a>
+                      <a role="menuitem"
+                        tabindex="-3"
+                        href="javascript:void(0)"
+                        v-on:click="logout()">
+                        disconnect
+                      </a>
                   </li>
                 </ul>
               </div>
@@ -103,11 +132,14 @@
         </div>
 
         <div class="row">
-          <div class="col-lg-8 col-xl-8">
+          <div class="col-0 col-lg-3 col-xl-3">
+            <slot name="left_sidebar"></slot>
+          </div>
+          <div class="col-12 col-lg-6 col-xl-6">
             <slot name="content"></slot>
           </div>
-          <div class="col-lg-4 col-xl-4">
-            <slot name="sidebar"></slot>
+          <div class="col-0 col-lg-3 col-xl-3">
+            <slot name="right_sidebar"></slot>
           </div>
         </div>
       </div>
@@ -115,7 +147,7 @@
 
     <footer class="container">
       <div class="row">
-        <div class="col-12">
+        <div class="col-12 pt-2">
 
           <p class="text-center">
             This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>.
