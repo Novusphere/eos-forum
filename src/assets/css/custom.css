@@ -86,67 +86,41 @@ ul.socialicons li a:hover {
 
 /*-----------------------------------------------------------------*/
 /*--- Header ---*/
-.headersubs {
+.FeaturedSubs {
     background-color: #f0f0f0;
     font-size: 14px;
 }
 
-.headernav {
+.HeaderNavigation {
     /* height: 70px; */
     background-color: white;
     border-bottom: 1px solid #c9cccd;
 }
 
-
-.content {
-    background-color: #ecf0f1;
-    border-top: solid 1px #e0e4e5;
+.ConnectButton {
+  color: #ffffff;
+  background-color: #1abc9c;
+  border: 1px solid;
+  border-color: #1abc9c;
 }
 
-.selecttopic {
-    font-family: 'Open Sans Semibold', sans-serif;
-    color: #363838;
+.ConnectButton:hover,
+.ConnectButton:focus,
+.ConnectButton:active {
+  box-shadow: none;
 }
 
-.selecttopic select {
-    border: none;
-}
-
-.selecttopic .dropdown-menu {
-    /* margin-top: -20px; */
-}
-
-/*--- Avatar ---*/
-.avt {
-    /* height: 38px; */
-}
-
-.avt button {
-    /* border: none; */
-    /* box-shadow: none; */
-    color: #ffffff;
-    font-family: 'Open Sans Bold', sans-serif;
-    background-color: #1abc9c;
-    border: 1px solid;
-    border-color: #1abc9c;
-}
-
-.avt .btn-primary:hover,
-.avt .btn-primary:focus,
-.avt .btn-primary:active,
-.avt .btn-primary.active{
-    background-color: #1abc9c;
-
-    box-shadow: none;
-
-}
-
-.env {
+.MenuIconButton {
     font-size: 20px;
     color:#cfd5d7;
     line-height: 38px;
     min-width: 20px;
     padding: 0 10px;
+}
+
+.Content {
+    background-color: #ecf0f1;
+    /* border-top: solid 1px #e0e4e5; */
 }
 
 .postthumbnail {
@@ -969,17 +943,9 @@ a.down:hover {
     .post .views {
     }
 
-    .selecttopic select {
-        width: 100%;
-    }
-
     .avatar .dropdown-menu {
         left: auto;
         right: 0;
-    }
-
-    .selecttopic .dropdown-menu {
-        margin-top: -20px;
     }
 
     .dropdown.avatar .status {
@@ -1086,17 +1052,9 @@ a.down:hover {
         left: 36%;
     }
 
-    .selecttopic select {
-        width: 100%;
-    }
-
     .avatar .dropdown-menu {
         left: auto;
         right: 0;
-    }
-
-    .selecttopic .dropdown-menu {
-        margin-top: -20px;
     }
 
     .dropdown.avatar .status {

@@ -2,14 +2,14 @@
   <div class="container-fluid px-0">
 
     <!-- brand banner -->
-    <div class="tp-banner-container" v-if="brand_banner">
-      <div class="tp-banner" >
-        <img :src="brand_banner">
+    <div class="BrandBanner__Container" v-if="brand_banner">
+      <div class="BrandBanner__Banner">
+        <img class="BrandBanner__Image" :src="brand_banner">
       </div>
     </div>
 
     <!-- top subs -->
-    <div class="text-center headersubs d-none d-sm-block">
+    <div class="text-center d-none d-sm-block FeaturedSubs">
       <ul class="list-inline mb-0">
         <li v-for="sub in subs"
           :key="sub"
@@ -20,16 +20,16 @@
     </div>
 
     <!-- header navigation -->
-    <div class="headernav py-2">
-      <div class="container">
+    <div class="HeaderNavigation">
+      <div class="container py-2">
         <div class="row no-gutters">
           <div class="col-3 col-sm-6 col-md-6 col-lg-8 col-xl-8">
-            <div class="logo d-inline-block px-2 px-lg-4">
+            <div class="d-inline-block px-2 px-lg-4">
               <router-link :to="{ name: 'Index' }">
                 <img :src="brand_logo" style="height: 38px;">
               </router-link>
             </div>
-            <div class="selecttopic d-none d-sm-inline-block">
+            <div class="d-none d-sm-inline-block">
               <div class="dropdown d-inline-block">
                 <button class="btn btn-outline-primary dropdown-toggle"
                   type="button"
@@ -58,21 +58,21 @@
             </div>
           </div>
 
-          <div class="col-9 col-sm-6 col-md-6 col-lg-4 col-xl-4">
-            <div class="avt text-right">
-              <button class="btn btn-outline-primary mx-2 mx-lg-4"
+          <div class="col-9 col-sm-6 col-md-6 col-lg-4 col-xl-4 text-right">
+            <div class="avt">
+              <button class="btn btn-outline-primary mx-2 mx-lg-4 ConnectButton"
                 v-if="!identity.account"
                 v-on:click="login()">
                 connect wallet
               </button>
 
-              <div class="d-inline-block env">
+              <div class="d-inline-block MenuIconButton">
                 <router-link :to="{ name: 'StartThread', params: { sub: $route.params.sub ? $route.params.sub : 'all' } }">
                   <font-awesome-icon :icon="['fas', 'pen']" ></font-awesome-icon>
                 </router-link>
               </div>
 
-              <div v-if="identity.account" class="d-inline-block env">
+              <div v-if="identity.account" class="d-inline-block MenuIconButton">
                 <router-link :to="{ name: 'UserNotifications' }"
                   :class="(identity.notifications>0) ? 'text-danger' : ''">
                   <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
@@ -82,7 +82,7 @@
                 </router-link>
               </div>
 
-              <div v-if="identity.account" class="d-inline-block env dropdown">
+              <div v-if="identity.account" class="d-inline-block dropdown MenuIconButton">
                 <a data-toggle="dropdown" href="#">
                     <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
                 </a>
@@ -109,7 +109,7 @@
                 </ul>
               </div>
 
-              <div class="d-inline-block env">
+              <div class="d-inline-block MenuIconButton">
                 <router-link :to="{ name: 'Settings' }">
                   <font-awesome-icon :icon="['fas', 'cog']" ></font-awesome-icon>
                 </router-link>
@@ -122,7 +122,7 @@
     </div>
 
     <!-- content block -->
-    <section class="content">
+    <section class="Content">
       <div class="container">
         <div class="row">
           <div class="col-12 col-lg-12 col-xl-12">
