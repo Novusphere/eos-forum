@@ -8,13 +8,13 @@
     <template slot="content">
       <div class="mb-1">
         <div class="float-left">
-          <pager :pages="pages" :current_page="current_page"></pager>
+          <post-sorter ref="sorter" :change="load"></post-sorter>
         </div>
         <div class="float-left ml-1">
           <button class="btn btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
         </div>
         <div class="float-right">
-          <post-sorter ref="sorter" :change="load"></post-sorter>
+          <pager :pages="pages" :current_page="current_page"></pager>
         </div>
         <div class="clearfix"></div>
       </div>
@@ -28,7 +28,7 @@
 
         <post v-for="p in posts" :key="p.o_id" :post="p"></post>
       </div>
-      
+
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
       </div>

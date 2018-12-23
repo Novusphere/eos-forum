@@ -8,6 +8,13 @@
 
     <template slot="content">
       <div class="mt-1 mb-3">
+        <div class="ml-1 float-left">
+          <post-sorter ref="sorter"
+            :default_by="default_sorter"
+            :options="sorter_options"
+            :change="load">
+          </post-sorter>
+        </div>
         <div class="ml-1 float-left" v-if="!loading">
           <button v-if="sub && !is_subscribed"
             v-on:click="subscribe(true)"
@@ -22,11 +29,10 @@
             unsubscribe
           </button>
         </div>
-        <div class="float-left">
-          <pager :pages="pages" :current_page="current_page"></pager>
-        </div>
-        <div class="ml-1 float-right">
-          <post-sorter ref="sorter" :default_by="default_sorter" :options="sorter_options" :change="load"></post-sorter>
+        <div class="float-right">
+          <pager :pages="pages"
+            :current_page="current_page">
+          </pager>
         </div>
         <div class="clearfix"></div>
       </div>
