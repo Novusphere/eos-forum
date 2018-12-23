@@ -50,6 +50,13 @@
                 </router-link>
               </div>
 
+              <div v-if="identity.account" class="d-inline-block env">
+                <router-link :to="{ name: 'UserNotifications' }" :class="(identity.notifications>0) ? 'text-danger' : ''">
+                  <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
+                  <span v-if="identity.notifications > 0">{{ identity.notifications }}</span>
+                </router-link>
+              </div>
+
               <div v-if="identity.account" class="d-inline-block env dropdown">
                 <a data-toggle="dropdown" href="#">
                     <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
@@ -71,17 +78,13 @@
                   </li>
                 </ul>
               </div>
-              <div v-if="identity.account" class="d-inline-block env">
-                <router-link :to="{ name: 'UserNotifications' }" :class="(identity.notifications>0) ? 'text-danger' : ''">
-                  <font-awesome-icon :icon="['fas', 'envelope']" ></font-awesome-icon>
-                  <span v-if="identity.notifications > 0">{{ identity.notifications }}</span>
-                </router-link>
-              </div>
+
               <div class="d-inline-block env">
                 <router-link :to="{ name: 'Settings' }">
                   <font-awesome-icon :icon="['fas', 'cog']" ></font-awesome-icon>
                 </router-link>
               </div>
+
             </div>
           </div>
         </div>
