@@ -2,13 +2,14 @@
   <div class="dropdown d-inline-block">
     <button
       class="btn btn-outline-primary dropdown-toggle"
-      type="button" id="sortBy"
+      type="button"
+      id="sortBy"
       data-toggle="dropdown">
       {{ by }}
     </button>
     <div class="dropdown-menu">
       <a v-for="o in options"
-        :key="o" 
+        :key="o"
         class="dropdown-item"
         href="javascript:void(0)"
         v-on:click="setBy(o)">{{ o }}</a>

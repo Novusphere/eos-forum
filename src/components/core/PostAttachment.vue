@@ -1,39 +1,43 @@
 <template>
-    <div v-if="this.attachment && this.attachment.value" 
-        :id="this.id" 
-        :class="this.collapse ? 'row collapse' : 'row'">
+  <div v-if="this.attachment && this.attachment.value"
+    :id="this.id"
+    :class="this.collapse ? 'row collapse' : 'row'">
 
-        <div class="col-md-12">
-            <div v-if="iframe" class="text-center">
-              <iframe :src="this.show_iframe ? attachment.value : ''" 
-                    style="max-width: 100%" 
-                    :height="attachment.height" 
-                    :width="attachment.width" 
-                    frameborder="0" 
-                    allow="encrypted-media" 
-                    allowfullscreen>
-              </iframe>
-            </div>
-            <div v-if="img" class="text-center">
-                <a :href="attachment.value"><img :src="attachment.value"></a>
-            </div>
-            <div v-if="mp4" class="text-center">
-                <video style="width: 100%" controls>
-                    <source :src="attachment.value" type="video/mp4">
-                </video>
-            </div>
-            <div v-if="mp3" class="text-center">
-                <audio style="width: 100%" controls>
-                    <source :src="attachment.value" type="audio/mpeg">
-                </audio>
-            </div>
-            <div v-if="link">
-                <div class="text-center">
-                    <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
-                </div>
-            </div>
+    <div class="col-md-12">
+      <div v-if="iframe" class="text-center">
+        <iframe :src="this.show_iframe ? attachment.value : ''"
+          style="max-width: 100%"
+          :height="attachment.height"
+          :width="attachment.width"
+          frameborder="0"
+          allow="encrypted-media"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div v-if="img" class="text-center">
+        <a :href="attachment.value">
+          <img :src="attachment.value">
+        </a>
+      </div>
+      <div v-if="mp4" class="text-center">
+        <video style="width: 100%" controls>
+          <source :src="attachment.value" type="video/mp4">
+        </video>
+      </div>
+
+      <div v-if="mp3" class="text-center">
+        <audio style="width: 100%" controls>
+          <source :src="attachment.value" type="audio/mpeg">
+        </audio>
+      </div>
+
+      <div v-if="link">
+        <div class="text-center">
+          <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
         </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -91,4 +95,3 @@ export default {
   }
 };
 </script>
-
