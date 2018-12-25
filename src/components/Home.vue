@@ -1,52 +1,64 @@
 <template>
-  <div>
-    
-    <layout ref="layout" :load="load">
-        <template slot="topic">
-          <span v-if="sub">e/{{sub}}</span>
-          <span v-else>Home</span>
-        </template>
-        <template slot="content">
-          <div class="mb-1">
-            <div class="float-left">
-              <router-link :to="{ name: 'StartThread', params: { sub: sub ? sub : 'all' } }" class="btn btn-sm btn-outline-success">
-                new
-              </router-link>
-            </div>
-            <div class="ml-1 float-left">
-              <post-sorter ref="sorter" :default_by="default_sorter" :options="sorter_options" :change="load"></post-sorter>
-            </div>
-            <div class="ml-1 float-left" v-if="!loading">
-              <button v-if="sub && !is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary">subscribe</button>
-              <button v-if="sub && is_subscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger">unsubscribe</button>
-            </div>
-            <div class="float-right">
-              <pager :pages="pages" :current_page="current_page"></pager>
-            </div>
-            <div class="clearfix"></div>
-          </div>
+  <layout ref="layout" :load="load">
 
-          <div v-if="!loading">
-            <div v-if="posts.length == 0">
-                  <div class="text-center">
-                    <h1>There doesn't seem to be any posts here! Why not make one?</h1>
-                  </div>
-            </div>
+    <template slot="topic">
+      <span v-if="sub">e/{{sub}}</span>
+      <span v-else>Home</span>
+    </template>
 
-            <post v-for="p in posts" :key="p.transaction" :post="p"></post>
-          </div>
-          <div class="text-center" v-else>
-            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
-          </div>
-        </template>
-        <template slot="sidebar">
-            <div class="sidebarblock">
-                <recently-visited></recently-visited>
-            </div>
-        </template>
-    </layout>
+    <template slot="content">
+      <div class="mt-1 mb-3">
+        <div class="ml-1 float-left">
+          <post-sorter ref="sorter"
+            :default_by="default_sorter"
+            :options="sorter_options"
+            :change="load">
+          </post-sorter>
+        </div>
+        <div class="ml-1 float-left" v-if="!loading">
+          <button v-if="sub && !is_subscribed"
+            v-on:click="subscribe(true)"
+            type="button"
+            class="btn btn-outline-primary mr-1">
+            subscribe
+          </button>
+          <button v-if="sub && is_subscribed"
+            v-on:click="subscribe(false)"
+            type="button"
+            class="btn btn-outline-danger mr-1">
+            unsubscribe
+          </button>
+        </div>
+        <div class="float-right">
+          <pager :pages="pages"
+            :current_page="current_page">
+          </pager>
+        </div>
+        <div class="clearfix"></div>
+      </div>
 
-  </div>
+      <div v-if="!loading">
+        <div v-if="posts.length == 0">
+          <div class="text-center">
+            <h1>There doesn't seem to be any posts here! Why not make one?</h1>
+          </div>
+        </div>
+
+        <post v-for="p in posts" :key="p.transaction" :post="p"></post>
+      </div>
+
+      <div class="text-center" v-else>
+        <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+      </div>
+    </template>
+
+    <template slot="right_sidebar">
+      <div class="sidebarblock">
+        <recently-visited></recently-visited>
+      </div>
+    </template>
+
+  </layout>
 </template>
 
 <script>
@@ -90,7 +102,7 @@ export default {
       return 'popular';
     },
     sorter_options() {
-      if (this.sub == 'referendum') 
+      if (this.sub == 'referendum')
         return ['active', 'old'];
 
       return ['popular', 'time'];

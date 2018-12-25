@@ -2,26 +2,19 @@
 	-	SETTINGS FOR BANNER CONTAINERS	-
 **********************************************/
 
-.tp-banner-container{
+.BrandBanner__Container {
 	width:100%;
 	position:relative;
 	padding:0;
 
 }
 
-.tp-banner {
+.BrandBanner__Banner {
 	width:100%;
 	position:relative;
 }
 
-.tp-banner img {
+.BrandBanner__Image {
 	width: 100%;
 	max-height: 278px;
 }
-
-.tp-banner-fullscreen-container {
-		width:100%;
-		position:relative;
-		padding:0;
-}
-
