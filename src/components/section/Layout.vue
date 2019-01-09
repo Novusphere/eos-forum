@@ -31,7 +31,7 @@
               </router-link>
             </div>
 
-            <div class="d-none d-sm-inline-block">
+            <!-- <div class="d-none d-sm-inline-block">
               <div class="dropdown d-inline-block">
                 <button class="btn btn-outline-primary dropdown-toggle"
                   type="button"
@@ -57,7 +57,7 @@
                   </router-link>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
 
           <div class="col-9 col-sm-6 col-md-6 col-lg-4 col-xl-4 text-right">

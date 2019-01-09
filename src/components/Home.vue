@@ -6,6 +6,26 @@
       <span v-else>Home</span>
     </template>
 
+    <template slot="left_sidebar">
+      <div class="sidebarblock">
+        <router-link class="dropdown-item"
+          :to="{name: 'Index' }">
+          Home
+        </router-link>
+        <router-link v-if="eos_referendum"
+          class="dropdown-item"
+          :to="{name: 'Sub', params: { sub: 'referendum' } }">
+          Referendum
+        </router-link>
+        <router-link v-for="sub in subs"
+          :key="sub"
+          class="dropdown-item"
+          :to="{ name: 'Sub', params: { sub: sub } }">
+          e/{{ sub }}
+        </router-link>
+      </div>
+    </template>
+
     <template slot="content">
       <div class="mt-1 mb-3">
         <div class="ml-1 float-left">
@@ -81,7 +101,7 @@ import Pager from "@/components/core/Pager";
 import PostSorter from "@/components/core/PostSorter";
 import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Post from "@/components/core/Post";
-
+import { storage } from "@/storage";
 import Layout from "@/components/section/Layout";
 import Modal from "@/components/modal/Modal.vue";
 import ThreadContainer from "@/components/ThreadContainer.vue";
@@ -122,7 +142,10 @@ export default {
         return ['active', 'old'];
 
       return ['popular', 'time'];
-    }
+    },
+    subs() {
+      return storage.subscribed_subs;
+    },
   },
   async mounted() {
     this.load();
@@ -169,6 +192,7 @@ export default {
       sub: "",
       posts: [], // for posts being displayed
       selectedPostID: undefined,
+      eos_referendum: storage.eos_referendum,
     };
   }
 };
