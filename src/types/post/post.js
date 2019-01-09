@@ -363,12 +363,12 @@ class Post {
                         amount: amount,
                         memo: memo,
                         symbol: asset_name,
-                        contract: actions[i].name
+                        contract: actions[i].account
                     });
                 }
             }
 
-            console.log(JSON.stringify(this.tips));
+            //console.log(JSON.stringify(this.tips));
         }
     }
 
