@@ -110,6 +110,9 @@ ul.socialicons li a:hover {
     /* height: 70px; */
     background-color: white;
     border-bottom: 1px solid #c9cccd;
+    position: sticky;
+    top: 0;
+    z-index: 999;
 }
 
 .ConnectButton {
@@ -215,6 +218,8 @@ ul.socialicons li a:hover {
     border-radius: 2px;
     box-shadow: 0 1px 2px #c9cccd;
     margin-bottom: 20px;
+    position: sticky;
+    top: 70px;
 }
 
 .sidebarblock h3 {
