@@ -37,14 +37,26 @@
         <div class="clearfix"></div>
       </div>
 
-      <div v-if="!loading">
+      <div class="post-container" v-if="!loading">
         <div v-if="posts.length == 0">
           <div class="text-center">
             <h1>There doesn't seem to be any posts here! Why not make one?</h1>
           </div>
         </div>
 
-        <post v-for="p in posts" :key="p.transaction" :post="p"></post>
+        <post
+          v-for="p in posts"
+          class="post-parent"
+          :key="p.transaction"
+          @openPost="(x) => selectedPostID = x"
+          :post="p"
+        />
+        <modal @click.native="selectedPostID = undefined" v-if="selectedPostID">
+          <thread-container
+            @click.native.stop
+            :id="selectedPostID"
+          />
+        </modal>
       </div>
 
       <div class="text-center" v-else>
@@ -71,6 +83,8 @@ import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Post from "@/components/core/Post";
 
 import Layout from "@/components/section/Layout";
+import Modal from "@/components/modal/Modal.vue";
+import ThreadContainer from "@/components/ThreadContainer.vue";
 
 export default {
   name: "Home2",
@@ -85,7 +99,9 @@ export default {
     PostSorter,
     RecentlyVisited,
     Post,
-    Layout
+    Layout,
+    Modal,
+    ThreadContainer,
   },
   watch: {
     "$route.query.page": function() {
@@ -151,7 +167,8 @@ export default {
       current_page: 0,
       pages: 0,
       sub: "",
-      posts: [] // for posts being displayed
+      posts: [], // for posts being displayed
+      selectedPostID: undefined,
     };
   }
 };

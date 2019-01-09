@@ -9,7 +9,7 @@
     </div>
 
     <!-- featured subs at the top -->
-    <div class="text-center d-none d-sm-block FeaturedSubs">
+    <!-- <div class="text-center d-none d-sm-block FeaturedSubs">
       <ul class="list-inline mb-0">
         <li v-for="sub in subs"
           :key="sub"
@@ -17,7 +17,7 @@
           <router-link :to="'/e/' + sub">{{sub}}</router-link>
         </li>
       </ul>
-    </div>
+    </div> -->
 
     <!-- header navigation -->
     <div class="HeaderNavigation">

@@ -1,6 +1,6 @@
 <template>
   <!-- POST -->
-  <div class="post">
+  <div @click="$emit('openPost', selectedPostID)" class="post">
     <div class="topwrap">
 
       <div class="userinfo float-left">
@@ -13,46 +13,67 @@
 
         <div v-if="!post.referendum"
           class="text-center">
-          <a href="javascript:void(0)"
+          <a
             class="up"
-            v-on:click="upvote()">
-            <font-awesome-icon :icon="['far', 'thumbs-up']" ></font-awesome-icon>
+            @click.stop="upvote()">
+            <font-awesome-icon :icon="['far', 'thumbs-up']" />
             {{ post.up }}
           </a>
         </div>
 
         <div v-else class="text-center">
           <div>
-            <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
+            <font-awesome-icon :icon="['fas', 'user']" />
             {{ post.referendum.details.total_participants }}
           </div>
         </div>
 
         <div class="text-center">
-          <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" ></font-awesome-icon>
-          <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" ></font-awesome-icon>
-          <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" ></font-awesome-icon>
+          <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
+          <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
+          <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
         </div>
 
       </div>
 
       <div class="posttext float-left">
-        <p v-if="offsite">
-            <a :href="post.o_attachment.value" class="title">
+        <div>
+            <a class="title">
                {{ post.data.json_metadata.title }}
             </a>
-            <span class="offsite" v-if="offsite">
+            <a v-if="offsite" :href="post.o_attachment.value" class="offsite">
               ({{ offsite }})
-            </span>
-        </p>
-        <p v-else>
-          <router-link v-if="post.id"
-            :to="thread_link"
-            class="title">
-            <span v-if="post.referendum">[{{ post.referendum.name }}]</span>
-            <span>{{ post.data.json_metadata.title }}</span>
-          </router-link>
-        </p>
+            </a>
+            <div>
+              <li class="list-inline-item">
+                <a v-if="reddit.author"
+                  @click.stop
+                  :href="`https://www.reddit.com/user/${reddit.author}`">
+                  by
+                  <font-awesome-icon :icon="['fab', 'reddit']" />
+                  {{ poster_name }}
+                </a>
+                <router-link
+                  v-else-if="post.transaction"
+                  @click.stop
+                  :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+                  by
+                  <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
+                  {{ poster_name }}
+                </router-link>
+              </li>
+              <li v-if="!thread || post.depth == 0"
+                class="list-inline-item">
+                in
+                <router-link
+                  @click.stop
+                  v-if="post.id"
+                  :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
+                  {{ post.data.json_metadata.sub }}
+                </router-link>
+              </li>
+            </div>
+        </div>
 
         <post-attachment
           v-if="thread"
@@ -62,7 +83,7 @@
           :collapse="false">
         </post-attachment>
 
-        <p v-html="post_content_html"></p>
+        <p v-if="post_content_html" v-html="post_content_html" />
 
         <div v-if="post.referendum">
           <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
@@ -76,9 +97,9 @@
           </div>
 
           <div class="text-center" v-if="identity.account">
-            <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary" v-on:click="referendumVote()" v-if="!post.referendum.expired">vote</a>
-            <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary" v-on:click="referendumExpire()" v-if="!post.referendum.expired && post.data.poster == identity.account">expire</a>
-            <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary" v-on:click="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
+            <a class="btn btn-sm btn-outline-primary" @click.stop="referendumVote()" v-if="!post.referendum.expired">vote</a>
+            <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumExpire()" v-if="!post.referendum.expired && post.data.poster == identity.account">expire</a>
+            <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
           </div>
         </div>
       </div>
@@ -88,12 +109,12 @@
       <div class="posted">
         <ul class="list-inline">
           <li class="list-inline-item">
-            <router-link v-if="!thread && post.transaction" :to="thread_link">
-                <font-awesome-icon :icon="['fas', 'reply']" ></font-awesome-icon>
+            <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
+                <font-awesome-icon :icon="['fas', 'reply']" />
                 <span v-if="!post.parent">{{ post.total_replies }} comments</span>
             </router-link>
-            <a v-else href="javascript:void(0)" v-on:click="showQuickReply()">
-              <font-awesome-icon :icon="['fas', 'reply']" ></font-awesome-icon>
+            <a v-else @click.stop="showQuickReply()">
+              <font-awesome-icon :icon="['fas', 'reply']" />
               reply
             </a>
           </li>
@@ -102,62 +123,49 @@
             {{ post.referendum.details.total_eos.toFixed(4) }}
           </li>
           <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
-            <router-link v-if="is_op" :to="{ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction } }">
-              <font-awesome-icon :icon="['fas', 'edit']" ></font-awesome-icon>
+            <router-link @click.stop v-if="is_op" :to="{ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction } }">
+              <font-awesome-icon :icon="['fas', 'edit']" />
               edit
             </router-link>
-            <a v-else href="javascript:void(0)" v-on:click="showQuickEdit()">
-              <font-awesome-icon :icon="['fas', 'edit']" ></font-awesome-icon>
+            <a v-else @click.stop="showQuickEdit()">
+              <font-awesome-icon :icon="['fas', 'edit']" />
               edit
             </a>
           </li>
           <li class="list-inline-item" v-if="!post.referendum">
-            <font-awesome-icon :icon="['fas', 'clock']" ></font-awesome-icon>
+            <font-awesome-icon :icon="['fas', 'clock']" />
             {{ new Date(post.createdAt * 1000).toLocaleString() }}
 
-            <router-link v-if="post.id && is_edit"
+            <router-link
+              @click.stop
+              v-if="post.id && is_edit"
               :to="{ name: 'History', params: { id: post.o_transaction } }">
-              <font-awesome-icon :icon="['fas', 'history']" ></font-awesome-icon>
+              <font-awesome-icon :icon="['fas', 'history']" />
             </router-link>
           </li>
           <li v-else class="list-inline-item">
             <span v-if="post.referendum.expired" class="text-danger">expired</span>
             <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
           </li>
-          <li class="list-inline-item">
-              <a v-if="reddit.author"
-                :href="`https://www.reddit.com/user/${reddit.author}`">
-                by
-                <font-awesome-icon :icon="['fab', 'reddit']" ></font-awesome-icon>
-                {{ poster_name }}
-              </a>
-              <router-link v-else-if="post.transaction"
-                :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-                by
-                <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" ></font-awesome-icon>
-                {{ poster_name }}
-              </router-link>
-          </li>
-          <li v-if="!thread || post.depth == 0"
-            class="list-inline-item">
-            in
-            <router-link v-if="post.id" :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
-              {{ post.data.json_metadata.sub }}
-            </router-link>
-          </li>
           <li v-if="post.depth > 0"
             class="list-inline-item">
-            <a v-if="reddit.author" :href="reddit.permalink">
-              <font-awesome-icon :icon="['fab', 'reddit']" ></font-awesome-icon>
+            <a
+              @click.stop
+              v-if="reddit.author"
+              :href="reddit.permalink">
+              <font-awesome-icon :icon="['fab', 'reddit']" />
               permalink
             </a>
-            <router-link v-else-if="post.transaction" :to="perma_link">
+            <router-link
+              @click.stop
+              v-else-if="post.transaction"
+              :to="perma_link">
               permalink
             </router-link>
           </li>
           <li class="list-inline-item">
-            <a :href="`https://eosq.app/tx/${post.transaction}`">
-              <font-awesome-icon :icon="['fas', 'link']" ></font-awesome-icon>
+            <a @click.stop :href="`https://eosq.app/tx/${post.transaction}`">
+              <font-awesome-icon :icon="['fas', 'link']" />
             </a>
           </li>
         </ul>
@@ -172,19 +180,19 @@
           <span>{{ status }}</span>
         </div>
         <div class="col-sm-12 mt-1 mb-2">
-          <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
-          <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-outline-primary" v-on:click="quickReply(true)">post anon</button>
+          <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
+          <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(true)">post anon</button>
         </div>
       </div>
 
       <div class="clearfix"></div>
     </div>
 
-    <div style="margin-left:5px; margin-bottom: 1px;"
+    <div
       v-for="child in post.children"
       :key="child.o_id">
       <div v-if="!(child.hide)">
-        <post :post="child" :thread="thread"></post>
+        <post class="post-child" :post="child" :thread="thread" />
       </div>
     </div>
 
@@ -207,7 +215,7 @@ import { Post } from "@/types/post";
 export default {
   name: "Post",
   components: {
-    PostAttachment
+    PostAttachment,
   },
   props: {
     post: {
@@ -260,21 +268,21 @@ export default {
         ? this.thread.data.json_metadata.sub
         : this.post.data.json_metadata.sub;
     },
+    selectedPostID() {
+      return this.post.parent ? this.post.parent.o_id : this.thread
+      ? this.thread.o_id || this.thread.o_transaction : this.post.o_id || this.post.o_transaction;
+    },
+    selectedPostTitle() {
+      return this.thread ? this.thread.getUrlTitle() : this.post.getUrlTitle();
+    },
     thread_link() {
-      const id = this.post.parent
-        ? this.post.parent.o_id
-        : this.thread
-          ? this.thread.o_id || this.thread.o_transaction
-          : this.post.o_id || this.post.o_transaction;
-
+      const id = this.selectedPostID;
       return {
         name: "Thread",
         params: {
           sub: this.sub,
           id: id,
-          title: this.thread
-            ? this.thread.getUrlTitle()
-            : this.post.getUrlTitle()
+          title: this.selectedPostTitle,
         }
       };
     },
