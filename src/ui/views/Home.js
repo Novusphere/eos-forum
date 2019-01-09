@@ -63,9 +63,10 @@ export default async function Home(current_page, sub, sorter) {
                 $project: novusphere.query.project.post({
                     normalize_my_vote: true,
                     recent_edit: true,
-                    total_replies: true
+                    total_replies: true,
+                    score: false
                 })
-            }
+            },
         ]
     })).cursor.firstBatch;
 

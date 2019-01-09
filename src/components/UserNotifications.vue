@@ -67,6 +67,8 @@ export default {
   },
   methods: {
     async load() {
+      this.loading = true;
+
       var notifications = await ui.views.UserNotifications(this.$route.query.page);
 
       this.current_page = notifications.current_page;
@@ -74,10 +76,13 @@ export default {
       this.posts = notifications.posts;
 
       await ui.actions.MarkNotificationsAsRead();
+
+      this.loading = false;
     }
   },
   data() {
     return {
+      loading: false,
       posts: [],
       current_page: 1,
       pages: 0

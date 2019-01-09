@@ -14,7 +14,7 @@ export default async function Tag(current_page, tag, sorter) {
 
     var n_posts = (await novusphere.api({
         count: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 5000,
         query: novusphere.query.match.postsByTag(tag)
     })).n;
 

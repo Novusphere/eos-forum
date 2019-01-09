@@ -20,12 +20,13 @@
             {{ post.up }}
           </a>
         </div>
-
         <div v-else class="text-center">
-          <div>
-            <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
-            {{ post.referendum.details.total_participants }}
-          </div>
+          <font-awesome-icon :icon="['fas', 'user']" ></font-awesome-icon>
+          {{ post.referendum.details.total_participants }}
+        </div>
+
+        <div class="text-center" v-if="false">
+          {{ post.score.toFixed(4) }}
         </div>
 
         <div class="text-center">
@@ -37,22 +38,58 @@
       </div>
 
       <div class="posttext float-left">
-        <p v-if="offsite">
-            <a :href="post.o_attachment.value" class="title">
+        <div v-if="offsite">
+            <a :href="post.o_attachment.value" target="_blank" class="title">
                {{ post.data.json_metadata.title }}
             </a>
             <span class="offsite" v-if="offsite">
               ({{ offsite }})
             </span>
-        </p>
-        <p v-else>
+        </div>
+        <div v-else>
           <router-link v-if="post.id"
             :to="thread_link"
             class="title">
             <span v-if="post.referendum">[{{ post.referendum.name }}]</span>
             <span>{{ post.data.json_metadata.title }}</span>
           </router-link>
-        </p>
+        </div>
+
+        <ul class="list-inline">
+          <li class="list-inline-item" v-if="!post.referendum">
+            <font-awesome-icon :icon="['fas', 'clock']" ></font-awesome-icon>
+            {{ new Date(post.createdAt * 1000).toLocaleString() }}
+
+            <router-link v-if="post.id && is_edit"
+              :to="{ name: 'History', params: { id: post.o_transaction } }">
+              <font-awesome-icon :icon="['fas', 'history']" ></font-awesome-icon>
+            </router-link>
+          </li>
+          <li v-else class="list-inline-item">
+            <span v-if="post.referendum.expired" class="text-danger">expired</span>
+            <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
+          </li>
+          <li class="list-inline-item">
+              by
+              <a v-if="reddit.author"
+                :href="`https://www.reddit.com/user/${reddit.author}`">
+                <font-awesome-icon :icon="['fab', 'reddit']" ></font-awesome-icon>
+                {{ poster_name }}
+              </a>
+              <router-link v-else-if="post.transaction"
+                :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+                <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" ></font-awesome-icon>
+                {{ poster_name }}
+              </router-link>
+          </li>
+          <li v-if="!thread || post.depth == 0"
+            class="list-inline-item">
+            in
+            <router-link v-if="post.id" :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
+              {{ post.data.json_metadata.sub }}
+            </router-link>
+          </li>
+        </ul>
 
         <post-attachment
           v-if="thread"
@@ -62,7 +99,7 @@
           :collapse="false">
         </post-attachment>
 
-        <p v-html="post_content_html"></p>
+        <p v-if="!preview" v-html="post_content_html"></p>
 
         <div v-if="post.referendum">
           <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
@@ -110,40 +147,6 @@
               <font-awesome-icon :icon="['fas', 'edit']" ></font-awesome-icon>
               edit
             </a>
-          </li>
-          <li class="list-inline-item" v-if="!post.referendum">
-            <font-awesome-icon :icon="['fas', 'clock']" ></font-awesome-icon>
-            {{ new Date(post.createdAt * 1000).toLocaleString() }}
-
-            <router-link v-if="post.id && is_edit"
-              :to="{ name: 'History', params: { id: post.o_transaction } }">
-              <font-awesome-icon :icon="['fas', 'history']" ></font-awesome-icon>
-            </router-link>
-          </li>
-          <li v-else class="list-inline-item">
-            <span v-if="post.referendum.expired" class="text-danger">expired</span>
-            <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
-          </li>
-          <li class="list-inline-item">
-              <a v-if="reddit.author"
-                :href="`https://www.reddit.com/user/${reddit.author}`">
-                by
-                <font-awesome-icon :icon="['fab', 'reddit']" ></font-awesome-icon>
-                {{ poster_name }}
-              </a>
-              <router-link v-else-if="post.transaction"
-                :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-                by
-                <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" ></font-awesome-icon>
-                {{ poster_name }}
-              </router-link>
-          </li>
-          <li v-if="!thread || post.depth == 0"
-            class="list-inline-item">
-            in
-            <router-link v-if="post.id" :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
-              {{ post.data.json_metadata.sub }}
-            </router-link>
           </li>
           <li v-if="post.depth > 0"
             class="list-inline-item">
@@ -210,6 +213,11 @@ export default {
     PostAttachment
   },
   props: {
+    preview: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     post: {
       type: Object,
       required: true

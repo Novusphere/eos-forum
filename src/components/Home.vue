@@ -44,7 +44,7 @@
           </div>
         </div>
 
-        <post v-for="p in posts" :key="p.transaction" :post="p"></post>
+        <post v-for="p in posts" :key="p.transaction" :post="p" :preview="true"></post>
       </div>
 
       <div class="text-center" v-else>

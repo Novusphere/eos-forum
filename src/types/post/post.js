@@ -1,7 +1,7 @@
 import { storage } from "@/storage";
 import requests from "@/requests";
 
-import { GetEOS, EOSBinaryReader } from "@/eos";
+import { GetEOS, EOSBinaryReader, GetTokensInfo, GetTokenPrecision } from "@/eos";
 
 import { PostReddit } from "./reddit";
 import { PostAttachment } from "./attachment";
@@ -175,7 +175,7 @@ class Post {
         }
 
         post = Object.assign({
-
+            score: 0,
             createdAt: 0,
             transaction: "",
             name: "post",
@@ -194,6 +194,7 @@ class Post {
 
         this._post = post;
 
+        this.score = post.score;
         this.parent = null;
         this.depth = 0;
         this.is_pinned = false;
@@ -207,6 +208,7 @@ class Post {
         this.my_vote = post.my_vote;
         this.referendum = post.referendum;
         this.tags = post.tags;
+        this.tips = [];
 
         if (storage.settings.atmos_upvotes) {
             this.up = Math.floor(this.up + (post.up_atmos ? post.up_atmos : 0));
@@ -321,6 +323,53 @@ class Post {
         }
 
         await this.data.json_metadata.attachment.normalize();
+        await this.detectTip();
+    }
+
+    async detectTip() {
+        if (this.data.json_metadata.edit) {
+            return;
+        }
+
+        if (this.tags.includes('tip')) {
+            const eos = GetEOS();
+            const tx = await eos.getTransaction(this.transaction);
+            const actions = tx.trx.trx.actions;
+            
+            for (var i = 0; i < actions.length; i++) {
+                if (actions[i].name == 'transfer') {
+
+                    var rdr = new EOSBinaryReader(actions[i].hex_data);
+
+                    const from = rdr.readName();
+                    const to = rdr.readName();
+                    
+                    // this should really be an i64
+                    var amount = rdr.readInt32();
+                    rdr.readInt32();
+
+                    rdr.readByte(); // ?
+                    const asset_name = rdr.readString(7).replace(/\0/g, '');
+
+                    const memo = rdr.readString();
+
+                    const precision = await GetTokenPrecision(eos, actions[i].account, asset_name);
+
+                    amount = (amount / Math.pow(10, precision)).toFixed(precision);
+
+                    this.tips.push({
+                        from: from,
+                        to: to,
+                        amount: amount,
+                        memo: memo,
+                        symbol: asset_name,
+                        contract: actions[i].name
+                    });
+                }
+            }
+
+            console.log(JSON.stringify(this.tips));
+        }
     }
 
     async detectAttachment() {

@@ -1,6 +1,6 @@
 import requests from "@/requests";
 import { storage, SaveStorage } from "@/storage";
-import { GetEOS, GetIdentity, ExecuteEOSActions, GetEOSService } from "@/eos";
+import { GetEOS, GetIdentity, ExecuteEOSActions, GetEOSService, GetTokensInfo, GetTokenPrecision } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 
 import {
@@ -69,19 +69,8 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
                 !json_metadata.edit &&
                 parent_tx
             ) {
-                var tokens = JSON.parse(
-                    await requests.get(
-                        "https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/tokens.json"
-                    )
-                );
 
-                tokens.splice(0, 0, {
-                    name: "EOS",
-                    logo: "",
-                    logo_lg: "",
-                    symbol: "EOS",
-                    account: "eosio.token"
-                });
+                var tokens = await GetTokensInfo();
 
                 const tip_to = json_metadata.parent_poster;
 
@@ -96,13 +85,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
                         return false;
                     }
 
-                    const stats = await eos.getCurrencyStats(
-                        token.account,
-                        token.symbol
-                    );
-                    const precision = stats[token.symbol].max_supply
-                        .split(" ")[0]
-                        .split(".")[1].length;
+                    const precision = GetTokenPrecision(eos, token.account, token.symbol);
 
                     var adjusted_amount = parseFloat(tip_args[1]).toFixed(precision);
                     var tip_action = {
