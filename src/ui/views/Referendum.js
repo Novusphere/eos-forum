@@ -58,7 +58,10 @@ export default async function Referendum(current_page, by) {
             { $match: MATCH_CONDITION },
             { $count: "n" }
         ]
-    })).cursor.firstBatch[0].n;
+    })).cursor.firstBatch[0];
+
+    // handle zero case
+    n_proposals = n_proposals ? n_proposals.n : 0;
 
     var num_pages = Math.ceil(n_proposals / MAX_ITEMS_PER_PAGE);
 
