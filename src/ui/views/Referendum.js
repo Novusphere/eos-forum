@@ -16,7 +16,7 @@ export default async function Referendum(current_page, by) {
 
     var MATCH_QUERY = {
         name: "propose",
-        createdAt: { $gte: 1537221139 }
+        createdAt: { $gte: 1547183719 } // eosio.forum deploy time
     };
 
     var LOOKUP_EXPIRED = {

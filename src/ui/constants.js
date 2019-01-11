@@ -1,4 +1,4 @@
-const FORUM_CONTRACT = "eosforumrcpp";
+const FORUM_CONTRACT = "eosio.forum";
 const MAX_ITEMS_PER_PAGE = 25;
 const UPVOTE_ATMOS_RATE = 10; // 1 upvote in ATMOS
 var HEADER_TEXTS = [

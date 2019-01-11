@@ -12,6 +12,12 @@ var our_tokens = [{
     logo_lg: "",
     symbol: "CRASH",
     account: "eoscrashplay"
+}, {
+    name: "PIXEOS",
+    logo: "",
+    logo_lg: "",
+    symbol: "PIXEOS",
+    account: "pixeos1token"
 }];
 
 async function GetTokensInfo() {

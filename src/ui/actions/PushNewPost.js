@@ -85,7 +85,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
                         return false;
                     }
 
-                    const precision = GetTokenPrecision(eos, token.account, token.symbol);
+                    const precision = await GetTokenPrecision(eos, token.account, token.symbol);
 
                     var adjusted_amount = parseFloat(tip_args[1]).toFixed(precision);
                     var tip_action = {

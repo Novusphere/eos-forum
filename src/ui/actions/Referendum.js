@@ -6,7 +6,7 @@ import { GetEOS, GetIdentity, ExecuteEOSActions } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 
 const REFERENDUM_COLLECTION = "eosforum";
-const REFERENDUM_CONTRACT = "eosforumrcpp";
+const REFERENDUM_CONTRACT = "eosio.forum";
 
 export default {
     async GetProposal(txid) {
