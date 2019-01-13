@@ -105,7 +105,7 @@ import Post from "@/components/core/Post";
 import { storage } from "@/storage";
 import Layout from "@/components/section/Layout";
 import Modal from "@/components/modal/Modal.vue";
-import ThreadContainer from "@/components/ThreadContainer.vue";
+import ThreadModal from "@/components/ThreadModal.vue";
 
 export default {
   name: "Home2",
@@ -122,7 +122,7 @@ export default {
     Post,
     Layout,
     Modal,
-    ThreadContainer,
+    ThreadModal,
   },
   watch: {
     "$route.query.page": function() {

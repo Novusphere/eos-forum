@@ -24,7 +24,7 @@ import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Layout from "@/components/section/Layout";
 
 export default {
-  name: "ThreadContainer",
+  name: "ThreadModal",
   metaInfo() {
     const title = this.main_post.data.json_metadata.title;
     return {
