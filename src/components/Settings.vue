@@ -7,6 +7,10 @@
     </template>
 
     <template slot="content-full">
+      <b-button @click="$router.go(-1)" class="btn btn-sm btn-outline-primary mb-1">
+        <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
+        back
+      </b-button>
       <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
           <a class="nav-link active"
