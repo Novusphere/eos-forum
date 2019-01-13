@@ -17,6 +17,7 @@
           :to="{name: 'Sub', params: { sub: 'referendum' } }">
           Referendum
         </router-link>
+        <div class="divline" />
         <router-link v-for="sub in subs"
           :key="sub"
           class="dropdown-item"
