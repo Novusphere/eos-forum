@@ -1,6 +1,6 @@
 <template>
   <!-- POST -->
-  <div @click="$emit('openPost', selectedPostID)" class="post">
+  <div @click="$emit('openPost', selectedPostID, post.data.json_metadata.sub)" class="post">
     <div class="topwrap">
 
       <div class="userinfo float-left">

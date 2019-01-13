@@ -69,11 +69,13 @@
           v-for="p in posts"
           class="post-parent"
           :key="p.transaction"
-          @openPost="(x) => selectedPostID = x"
+          @openPost="openPost"
           :post="p"
         />
-        <modal @click.native="selectedPostID = undefined" v-if="selectedPostID">
-          <thread-container
+        <modal
+          @click.native="closePost"
+          v-if="selectedPostID">
+          <thread-modal
             @click.native.stop
             :id="selectedPostID"
           />
@@ -182,6 +184,15 @@ export default {
     },
     async subscribe(sub) {
       this.is_subscribed = await ui.actions.Subscribe(sub, this.sub);
+    },
+    openPost (postID, sub){
+      this.selectedPostID = postID;
+      console.log(this.$route);
+      history.pushState({},"","#/e/" + sub + "/" + postID);
+    },
+    closePost () {
+      this.selectedPostID = undefined;
+      history.pushState({},"","#/");
     }
   },
   data() {
