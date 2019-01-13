@@ -350,7 +350,7 @@ td.chbox {
     padding-bottom: 25px;
 }
 
-.postinfobot {
+.post-parent .postinfobot {
     position: absolute;
     bottom: 0px;
     z-index: 1;
@@ -358,11 +358,11 @@ td.chbox {
     width: 100%;
 }
 
-.post-parent:after {
+.post-parent .posttext p:after {
     content: '';
-    height: 60px;
+    height: 80px;
     position: absolute;
-    bottom: 20px;
+    bottom: 0;
     left: 0;
     width: 100%;
     background-image: linear-gradient(transparent, white);
