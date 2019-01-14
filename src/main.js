@@ -30,6 +30,11 @@ new Vue({
   el: '#app',
   router,
   components: { App },
+  data() {
+    return {
+      icons: [],
+    }
+  },
   template: '<App/>'
 });
 
