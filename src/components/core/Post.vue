@@ -1,220 +1,217 @@
 <template>
   <!-- POST -->
-  <div @click="$emit('openPost', selectedPostID, post.data.json_metadata.sub)" class="post">
-    <div class="topwrap">
-
-      <div class="userinfo float-left">
-        <div v-if="!thread && !post.referendum"
-          class="postthumbnail">
-          <img :src="thumbnail"
-            class="img-fluid"
-            alt="thumbnail">
-        </div>
-
-        <div v-if="!post.referendum"
-          class="text-center">
-          <a
-            class="up"
-            @click.stop="upvote()">
-            <font-awesome-icon :icon="['far', 'thumbs-up']" />
-            {{ post.up }}
-          </a>
-        </div>
-
-        <div v-else class="text-center">
-          <div>
-            <font-awesome-icon :icon="['fas', 'user']" />
-            {{ post.referendum.details.total_participants }}
-          </div>
-        </div>
-
-        <div class="text-center">
-          <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
-          <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
-          <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
-        </div>
-
+  <div
+    @click="$emit('openPost', selectedPostID, post.data.json_metadata.sub)"
+    class="post">
+    <template v-if="post.depth !== 0">
+      <div
+        @click.stop="togglePost"
+        class="show-post">
+        <font-awesome-icon :icon="['fas', hide ? 'plus-circle' : 'minus-circle']" ></font-awesome-icon>
+        <font-awesome-icon :icon="['fas', 'user-secret']" />
+        {{ post.data.poster }}
       </div>
+    </template>
+    <div :class="{'hidden': hide === true && post.depth !== 0}">
+      <div class="topwrap">
 
-      <div class="posttext float-left">
-        <div>
-            <a class="title">
-               {{ post.data.json_metadata.title }}
+        <div class="userinfo float-left">
+          <div v-if="!thread && !post.referendum"
+            class="postthumbnail">
+            <img :src="thumbnail"
+              class="img-fluid"
+              alt="thumbnail">
+          </div>
+
+          <div v-if="!post.referendum"
+            class="text-center">
+            <a
+              class="up"
+              @click.stop="upvote()">
+              <font-awesome-icon :icon="['far', 'thumbs-up']" />
+              {{ post.up }}
             </a>
-            <a v-if="offsite" :href="post.o_attachment.value" class="offsite">
-              ({{ offsite }})
-            </a>
+          </div>
+
+          <div v-else class="text-center">
             <div>
-              <li class="list-inline-item">
-                <a v-if="reddit.author"
-                  @click.stop
-                  :href="`https://www.reddit.com/user/${reddit.author}`">
-                  <font-awesome-icon :icon="['fab', 'reddit']" />
-                  {{ poster_name }}
-                </a>
-                <router-link
-                  v-else-if="post.transaction"
-                  @click.stop
-                  :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-                  <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
-                  {{ poster_name }}
-                </router-link>
-              </li>
-              <li v-if="!thread || post.depth == 0"
-                class="list-inline-item">
-                in
-                <router-link
-                  @click.stop
-                  v-if="post.id"
-                  :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
-                  {{ post.data.json_metadata.sub }}
-                </router-link>
-              </li>
+              <font-awesome-icon :icon="['fas', 'user']" />
+              {{ post.referendum.details.total_participants }}
             </div>
+          </div>
+
+          <div class="text-center">
+            <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
+            <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
+            <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
+          </div>
+
         </div>
 
-        <post-attachment
-          v-if="thread"
-          ref="post_attachment"
-          :attachment="post.data.json_metadata.attachment"
-          :id="'content-' + post.data.post_uuid"
-          :collapse="false">
-        </post-attachment>
+        <div class="posttext float-left">
+          <div>
+              <a class="title">
+                {{ post.data.json_metadata.title }}
+              </a>
+              <a v-if="offsite" :href="post.o_attachment.value" class="offsite">
+                ({{ offsite }})
+              </a>
+              <div v-if="post.depth === 0">
+                <li class="list-inline-item">
+                  <a v-if="reddit.author"
+                    @click.stop
+                    :href="`https://www.reddit.com/user/${reddit.author}`">
+                    <font-awesome-icon :icon="['fab', 'reddit']" />
+                    {{ poster_name }}
+                  </a>
+                  <router-link
+                    v-else-if="post.transaction"
+                    @click.stop
+                    :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+                    <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
+                    {{ poster_name }}
+                  </router-link>
+                </li>
+                <li v-if="!thread || post.depth == 0"
+                  class="list-inline-item">
+                  in
+                  <router-link
+                    @click.stop
+                    v-if="post.id"
+                    :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
+                    {{ post.data.json_metadata.sub }}
+                  </router-link>
+                </li>
+              </div>
+          </div>
 
-        <p v-if="post_content_html" v-html="post_content_html" />
+          <post-attachment
+            v-if="thread"
+            ref="post_attachment"
+            :attachment="post.data.json_metadata.attachment"
+            :id="'content-' + post.data.post_uuid"
+            :collapse="false">
+          </post-attachment>
 
-        <div v-if="post.referendum">
-          <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
-            <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
-            <input v-if="identity.account && is_multi_referendum" class="form-check-input" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
-            <div class="progress">
-              <div class="referendumbar progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
-                {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
+          <p v-if="post_content_html" v-html="post_content_html" />
+
+          <div v-if="post.referendum">
+            <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
+              <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
+              <input v-if="identity.account && is_multi_referendum" class="form-check-input" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
+              <div class="progress">
+                <div class="referendumbar progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
+                  {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="text-center" v-if="identity.account">
-            <a class="btn btn-sm btn-outline-primary" @click.stop="referendumVote()" v-if="!post.referendum.expired">vote</a>
-            <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumExpire()" v-if="!post.referendum.expired && post.data.poster == identity.account">expire</a>
-            <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
+            <div class="text-center" v-if="identity.account">
+              <a class="btn btn-sm btn-outline-primary" @click.stop="referendumVote()" v-if="!post.referendum.expired">vote</a>
+              <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumExpire()" v-if="!post.referendum.expired && post.data.poster == identity.account">expire</a>
+              <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
+            </div>
           </div>
         </div>
+        <div class="clearfix"></div>
       </div>
-      <div class="clearfix"></div>
-    </div>
-    <div class="postinfobot">
-      <div class="posted">
-        <ul class="list-inline">
-          <li class="list-inline-item">
-            <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
+      <div class="postinfobot">
+        <div class="posted">
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
+                  <font-awesome-icon :icon="['fas', 'reply']" />
+                  <span v-if="!post.parent">{{ post.total_replies }} comments</span>
+              </router-link>
+              <a v-else @click.stop="showQuickReply()">
                 <font-awesome-icon :icon="['fas', 'reply']" />
-                <span v-if="!post.parent">{{ post.total_replies }} comments</span>
-            </router-link>
-            <a v-else @click.stop="showQuickReply()">
-              <font-awesome-icon :icon="['fas', 'reply']" />
-              reply
-            </a>
-          </li>
-          <li v-if="post.referendum" class="list-inline-item">
-            <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
-            {{ post.referendum.details.total_eos.toFixed(4) }}
-          </li>
-          <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
-            <router-link @click.stop v-if="is_op" :to="{ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction } }">
-              <font-awesome-icon :icon="['fas', 'edit']" />
-              edit
-            </router-link>
-            <a v-else @click.stop="showQuickEdit()">
-              <font-awesome-icon :icon="['fas', 'edit']" />
-              edit
-            </a>
-          </li>
-          <li class="list-inline-item" v-if="!post.referendum">
-            <font-awesome-icon :icon="['fas', 'clock']" />
-            {{ new Date(post.createdAt * 1000).toLocaleString() }}
+                reply
+              </a>
+            </li>
+            <li v-if="post.referendum" class="list-inline-item">
+              <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
+              {{ post.referendum.details.total_eos.toFixed(4) }}
+            </li>
+            <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
+              <router-link @click.stop v-if="is_op" :to="{ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction } }">
+                <font-awesome-icon :icon="['fas', 'edit']" />
+                edit
+              </router-link>
+              <a v-else @click.stop="showQuickEdit()">
+                <font-awesome-icon :icon="['fas', 'edit']" />
+                edit
+              </a>
+            </li>
+            <li class="list-inline-item" v-if="!post.referendum">
+              <font-awesome-icon :icon="['fas', 'clock']" />
+              {{ new Date(post.createdAt * 1000).toLocaleString() }}
 
-            <router-link
-              @click.stop
-              v-if="post.id && is_edit"
-              :to="{ name: 'History', params: { id: post.o_transaction } }">
-              <font-awesome-icon :icon="['fas', 'history']" />
-            </router-link>
-          </li>
-          <li v-else class="list-inline-item">
-            <span v-if="post.referendum.expired" class="text-danger">expired</span>
-            <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
-          </li>
-          <li v-if="post.depth > 0"
-            class="list-inline-item">
-            <a
-              @click.stop
-              v-if="reddit.author"
-              :href="reddit.permalink">
-              <font-awesome-icon :icon="['fab', 'reddit']" />
-              permalink
-            </a>
-            <router-link
-              @click.stop
-              v-else-if="post.transaction"
-              :to="perma_link">
-              permalink
-            </router-link>
-          </li>
-          <li class="list-inline-item">
-            <a @click.stop :href="`https://eosq.app/tx/${post.transaction}`">
-              <font-awesome-icon :icon="['fas', 'link']" />
-            </a>
-          </li>
-        </ul>
-      </div>
+              <router-link
+                @click.stop
+                v-if="post.id && is_edit"
+                :to="{ name: 'History', params: { id: post.o_transaction } }">
+                <font-awesome-icon :icon="['fas', 'history']" />
+              </router-link>
+            </li>
+            <li v-else class="list-inline-item">
+              <span v-if="post.referendum.expired" class="text-danger">expired</span>
+              <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
+            </li>
+            <li v-if="post.depth > 0"
+              class="list-inline-item">
+              <a
+                @click.stop
+                v-if="reddit.author"
+                :href="reddit.permalink">
+                <font-awesome-icon :icon="['fab', 'reddit']" />
+                permalink
+              </a>
+              <router-link
+                @click.stop
+                v-else-if="post.transaction"
+                :to="perma_link">
+                permalink
+              </router-link>
+            </li>
+            <li class="list-inline-item">
+              <a @click.stop :href="`https://eosq.app/tx/${post.transaction}`">
+                <font-awesome-icon :icon="['fas', 'link']" />
+              </a>
+            </li>
+          </ul>
+        </div>
 
-      <div :class="'row quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
-        :id="'qreply-' + post.data.post_uuid">
-        <div class="col-sm-12">
-          <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
+        <div :class="'row quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
+          :id="'qreply-' + post.data.post_uuid">
+          <div class="col-sm-12">
+            <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
+          </div>
+          <div class="col-sm-12 text-center" v-if="status">
+            <span>{{ status }}</span>
+          </div>
+          <div class="col-sm-12 mt-1 mb-2">
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
+            <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(true)">post anon</button>
+          </div>
         </div>
-        <div class="col-sm-12 text-center" v-if="status">
-          <span>{{ status }}</span>
-        </div>
-        <div class="col-sm-12 mt-1 mb-2">
-          <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
-          <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(true)">post anon</button>
-        </div>
-      </div>
 
-      <div class="clearfix"></div>
-    </div>
-
-    <div
-      v-for="child in post.children"
-      :key="child.o_id">
-      <div>
-        <div
-          @click.stop="showPost(child)"
-          v-if="child.hide === true"
-          class="show-post">
-          <font-awesome-icon :icon="['fas', 'plus-circle']" ></font-awesome-icon>
-          <font-awesome-icon :icon="['fas', 'user-secret']" />
-          {{ child.data.poster }}
-        </div>
-        <div
-          @click.stop="hidePost(child)"
-          v-else
-          class="show-post">
-          <font-awesome-icon :icon="['fas', 'minus-circle']" ></font-awesome-icon>
-          <font-awesome-icon :icon="['fas', 'user-secret']" />
-          {{ child.data.poster }}
-        </div>
-        <post
-          @click.native.stop="hidePost(child)"
-          :class="{'hidden': child.hide === true}"
-          class="post-child"
-          :post="child"
-          :thread="thread"
-        />
+        <div class="clearfix"></div>
       </div>
     </div>
+    <template v-if="post.depth <= 5">
+      <div
+        v-for="child in post.children"
+        :key="child.o_id">
+        <div>
+          <post
+            @click.native.stop="hidePost(child)"
+            class="post-child"
+            :post="child"
+            :thread="thread"
+          />
+        </div>
+      </div>
+    </template>
 
   </div>
   <!-- POST -->
@@ -346,6 +343,7 @@ export default {
     }
   },
   async mounted() {
+    this.hide = this.is_spam ? false : true;
     this.identity = await GetIdentity();
 
     this.is_spam = await moderation.isBlocked(
@@ -499,14 +497,10 @@ export default {
         }
       );
     },
-    hidePost(post) {
-      post.hide = true;
+    togglePost() {
+      this.hide = !this.hide;
       this.$forceUpdate();
     },
-    showPost(post) {
-      post.hide = false;
-      this.$forceUpdate();
-    }
   },
   data() {
     return {
@@ -528,7 +522,8 @@ export default {
       show_quick_edit: false,
       quick_reply: "",
       is_nsfw: false,
-      is_spam: false
+      is_spam: false,
+      hide: false,
     };
   }
 };
