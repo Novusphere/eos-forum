@@ -368,7 +368,7 @@ td.chbox {
     left: 7px;
     top: 20px;
     content: '';
-    border-left: 2px solid grey;
+    border-left: 2px solid black;
     height: calc(100% - 20px);
 }
 

@@ -3,21 +3,18 @@
   <div
     @click="$emit('openPost', selectedPostID, post.data.json_metadata.sub)"
     class="post">
-    <div
-      v-if="post.depth !== 0"
-      @click.stop="togglePost"
-      class="flex-center post-toggle"
-    >
+    <template v-if="post.depth !== 0">
       <div
-        class="show-post">
+        @click.stop="togglePost"
+        class="post-toggle">
         <font-awesome-icon :icon="['fas', hide ? 'plus-circle' : 'minus-circle']" ></font-awesome-icon>
-        <font-awesome-icon :icon="['fas', 'user-secret']" />
+        <font-awesome-icon class="user" :icon="['fas', reddit.author ? 'reddit' : 'user-secret']" />
         {{ post.data.poster }}
+        <div class="date">
+          {{ new Date(post.createdAt * 1000).toLocaleString() }}
+        </div>
       </div>
-      <div class="date">
-        {{ new Date(post.createdAt * 1000).toLocaleString() }}
-      </div>
-    </div>
+    </template>
     <div class="post-body" :class="{'hidden': hide === true && post.depth !== 0}">
       <div class="topwrap">
 
@@ -62,6 +59,18 @@
               <a v-if="offsite" :href="post.o_attachment.value" class="offsite">
                 ({{ offsite }})
               </a>
+              <span v-for="(tip, key) in received_tips">
+                <object
+                  class="tip-icon"
+                  v-if="isSvg(key)"
+                  :data="$root.icons[key].logo"
+                  type="image/svg+xml">
+                </object>
+                <template v-else>
+                  <img class="tip-icon" :src="$root.icons[key].logo" />
+                </template>
+                x {{ tip }}
+              </span>
               <div v-if="post.depth === 0">
                 <li class="list-inline-item">
                   <a v-if="reddit.author"
@@ -124,7 +133,7 @@
       <div class="postinfobot">
         <div class="posted">
           <ul class="list-inline">
-            <li class="list-inline-item reply">
+            <li class="list-inline-item">
               <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
                   <font-awesome-icon :icon="['fas', 'reply']" />
                   <span v-if="!post.parent">{{ post.total_replies }} comments</span>
@@ -148,11 +157,10 @@
                 edit
               </a>
             </li>
-            <li class="list-inline-item" v-if="!post.referendum">
-              <template v-if="post.depth === 0">
-                <font-awesome-icon :icon="['fas', 'clock']" />
-                {{ new Date(post.createdAt * 1000).toLocaleString() }}
-              </template>
+            <li class="list-inline-item" v-if="post.depth === 0">
+              <font-awesome-icon :icon="['fas', 'clock']" />
+              {{ new Date(post.createdAt * 1000).toLocaleString() }}
+
               <router-link
                 @click.stop
                 v-if="post.id && is_edit"
@@ -160,7 +168,7 @@
                 <font-awesome-icon :icon="['fas', 'history']" />
               </router-link>
             </li>
-            <li v-else class="list-inline-item">
+            <li v-if="post.referendum" class="list-inline-item">
               <span v-if="post.referendum.expired" class="text-danger">expired</span>
               <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
             </li>
@@ -188,7 +196,7 @@
           </ul>
         </div>
 
-        <div :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
+        <div :class="'row quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
           :id="'qreply-' + post.data.post_uuid">
           <div class="col-sm-12">
             <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
@@ -211,7 +219,6 @@
         :key="child.o_id">
         <div>
           <post
-            v-if="!hide || post.depth === 0"
             @click.native.stop="hidePost(child)"
             class="post-child"
             :post="child"
@@ -229,10 +236,9 @@
 import { FORUM_BRAND } from "@/ui/constants";
 import ui from "@/ui";
 import requests from "@/requests";
-import { GetIdentity } from "@/eos";
+import { GetIdentity, GetTokensInfo } from "@/eos";
 import { MarkdownParser } from "@/markdown";
 import { moderation } from "@/moderation";
-import eos from 'eosjs';
 import PostAttachment from "@/components/core/PostAttachment.vue";
 
 import { Post } from "@/types/post";
@@ -259,6 +265,21 @@ export default {
     }
   },
   computed: {
+    received_tips() {
+      const tips = {};
+      this.post.children.forEach(child => {
+        if (child.tips) {
+          child.tips.forEach(tip => {
+            if (tips[tip.symbol] === undefined) {
+              tips[tip.symbol] = Number(tip.amount);
+            } else {
+              tips[tip.symbol] += Number(tip.amount);
+            }
+          })
+        }
+      })
+      return tips;
+    },
     is_multi_referendum() {
       return this.post.referendum && this.post.referendum.type == 'multi-select-v1';
     },
@@ -356,7 +377,15 @@ export default {
     }
   },
   async mounted() {
-    console.log(eos.gettokensinfo);
+    console.log(this.received_tips);
+    if (this.$root.icons.length === 0) {
+      const response = await GetTokensInfo();
+      const icons = {};
+      response.forEach(x => {
+        icons[x.symbol] = x;
+      })
+      this.$root.icons = icons;
+    }
     this.hide = this.is_spam ? true : false;
     this.identity = await GetIdentity();
 
@@ -375,6 +404,21 @@ export default {
         )));
   },
   methods: {
+    isSvg(key) {
+      const currency = this.$root.icons[key];
+      console.log(currency);
+      if (currency.logo.split('.') !== undefined) {
+        const length = currency.logo.split('.').length;
+        const extension = currency.logo.split('.')[length - 1];
+        if (extension === 'svg') {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    },
     showQuickEdit() {
       this.show_quick_edit = !this.show_quick_edit;
       this.quick_reply = this.show_quick_edit ? this.post.data.content : "";
@@ -547,11 +591,22 @@ export default {
 .post-toggle {
   height: 20px;
   color: black;
+  display: flex;
+  align-items: center;
 }
-.show-post:hover, .hide-post:hover, .post-toggle:hover, .reply:hover{
+.post-toggle:hover {
   cursor:pointer;
 }
-.date {
+
+.post-toggle .user {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.tip-icon {
+  height: 25px!important;
+  width: 25px!important;
+}
+.post-body, .date {
   margin-left: 15px;
 }
 </style>
