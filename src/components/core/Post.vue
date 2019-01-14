@@ -3,16 +3,22 @@
   <div
     @click="$emit('openPost', selectedPostID, post.data.json_metadata.sub)"
     class="post">
-    <template v-if="post.depth !== 0">
+    <div
+      v-if="post.depth !== 0"
+      @click.stop="togglePost"
+      class="flex-center post-toggle"
+    >
       <div
-        @click.stop="togglePost"
         class="show-post">
         <font-awesome-icon :icon="['fas', hide ? 'plus-circle' : 'minus-circle']" ></font-awesome-icon>
         <font-awesome-icon :icon="['fas', 'user-secret']" />
         {{ post.data.poster }}
       </div>
-    </template>
-    <div :class="{'hidden': hide === true && post.depth !== 0}">
+      <div class="date">
+        {{ new Date(post.createdAt * 1000).toLocaleString() }}
+      </div>
+    </div>
+    <div class="post-body" :class="{'hidden': hide === true && post.depth !== 0}">
       <div class="topwrap">
 
         <div class="userinfo float-left">
@@ -118,7 +124,7 @@
       <div class="postinfobot">
         <div class="posted">
           <ul class="list-inline">
-            <li class="list-inline-item">
+            <li class="list-inline-item reply">
               <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
                   <font-awesome-icon :icon="['fas', 'reply']" />
                   <span v-if="!post.parent">{{ post.total_replies }} comments</span>
@@ -143,9 +149,10 @@
               </a>
             </li>
             <li class="list-inline-item" v-if="!post.referendum">
-              <font-awesome-icon :icon="['fas', 'clock']" />
-              {{ new Date(post.createdAt * 1000).toLocaleString() }}
-
+              <template v-if="post.depth === 0">
+                <font-awesome-icon :icon="['fas', 'clock']" />
+                {{ new Date(post.createdAt * 1000).toLocaleString() }}
+              </template>
               <router-link
                 @click.stop
                 v-if="post.id && is_edit"
@@ -181,7 +188,7 @@
           </ul>
         </div>
 
-        <div :class="'row quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
+        <div :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
           :id="'qreply-' + post.data.post_uuid">
           <div class="col-sm-12">
             <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
@@ -204,6 +211,7 @@
         :key="child.o_id">
         <div>
           <post
+            v-if="!hide || post.depth === 0"
             @click.native.stop="hidePost(child)"
             class="post-child"
             :post="child"
@@ -224,7 +232,7 @@ import requests from "@/requests";
 import { GetIdentity } from "@/eos";
 import { MarkdownParser } from "@/markdown";
 import { moderation } from "@/moderation";
-
+import eos from 'eosjs';
 import PostAttachment from "@/components/core/PostAttachment.vue";
 
 import { Post } from "@/types/post";
@@ -343,7 +351,8 @@ export default {
     }
   },
   async mounted() {
-    this.hide = this.is_spam ? false : true;
+    console.log(eos.gettokensinfo);
+    this.hide = this.is_spam ? true : false;
     this.identity = await GetIdentity();
 
     this.is_spam = await moderation.isBlocked(
@@ -530,11 +539,14 @@ export default {
 </script>
 
 <style scoped>
-.show-post {
-  height: 10px;
-  margin: 15px;
+.post-toggle {
+  height: 20px;
+  color: black;
 }
-.show-post:hover, .hide-post:hover {
+.show-post:hover, .hide-post:hover, .post-toggle:hover, .reply:hover{
   cursor:pointer;
+}
+.date {
+  margin-left: 15px;
 }
 </style>

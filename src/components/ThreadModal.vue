@@ -7,7 +7,7 @@
       </div>
       <h1>
         <font-awesome-icon :icon="['fas', 'spinner']" spin />
-      </h1> 
+      </h1>
     </div>
   </div>
 </template>
@@ -93,6 +93,7 @@ export default {
 }
 .post {
     max-height: 80vh;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 </style>
