@@ -49,7 +49,6 @@
                 <a v-if="reddit.author"
                   @click.stop
                   :href="`https://www.reddit.com/user/${reddit.author}`">
-                  by
                   <font-awesome-icon :icon="['fab', 'reddit']" />
                   {{ poster_name }}
                 </a>
@@ -57,7 +56,6 @@
                   v-else-if="post.transaction"
                   @click.stop
                   :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-                  by
                   <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
                   {{ poster_name }}
                 </router-link>
@@ -191,8 +189,30 @@
     <div
       v-for="child in post.children"
       :key="child.o_id">
-      <div v-if="!(child.hide)">
-        <post class="post-child" :post="child" :thread="thread" />
+      <div>
+        <div
+          @click.stop="showPost(child)"
+          v-if="child.hide === true"
+          class="show-post">
+          <font-awesome-icon :icon="['fas', 'plus-circle']" ></font-awesome-icon>
+          <font-awesome-icon :icon="['fas', 'user-secret']" />
+          {{ child.data.poster }}
+        </div>
+        <div
+          @click.stop="hidePost(child)"
+          v-else
+          class="show-post">
+          <font-awesome-icon :icon="['fas', 'minus-circle']" ></font-awesome-icon>
+          <font-awesome-icon :icon="['fas', 'user-secret']" />
+          {{ child.data.poster }}
+        </div>
+        <post
+          @click.native.stop="hidePost(child)"
+          :class="{'hidden': child.hide === true}"
+          class="post-child"
+          :post="child"
+          :thread="thread"
+        />
       </div>
     </div>
 
@@ -478,6 +498,14 @@ export default {
           text_class: "text-success"
         }
       );
+    },
+    hidePost(post) {
+      post.hide = true;
+      this.$forceUpdate();
+    },
+    showPost(post) {
+      post.hide = false;
+      this.$forceUpdate();
     }
   },
   data() {
@@ -505,3 +533,13 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.show-post {
+  height: 10px;
+  margin: 15px;
+}
+.show-post:hover, .hide-post:hover {
+  cursor:pointer;
+}
+</style>
