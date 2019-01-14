@@ -51,8 +51,8 @@ export default class EOSBinaryReader {
         return res;
     }
 
-    readString() {
-        var len = this.readVarInt();
+    readString(len) {
+        var len = len ? len : this.readVarInt();
         var bytes = this.readBytes(len);
         return String.fromCharCode.apply(null, bytes);
     }

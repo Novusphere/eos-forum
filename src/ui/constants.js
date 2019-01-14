@@ -1,4 +1,4 @@
-const FORUM_CONTRACT = "eosforumrcpp";
+const FORUM_CONTRACT = "eosio.forum";
 const MAX_ITEMS_PER_PAGE = 25;
 const UPVOTE_ATMOS_RATE = 10; // 1 upvote in ATMOS
 var HEADER_TEXTS = [
@@ -27,7 +27,7 @@ var BRANDS = {
         "title": "A decentralized coffee lover's forum",
         "logo": "https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png",
         "icon": "https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png",
-        "banner": "https://cdn.discordapp.com/attachments/522320367293825036/523167806607589386/image0.jpg",
+        "banner": "https://cdn.novusphere.io/static/eoscafe.svg",
         "token_symbol": "EOS",
         "token_contract": "eosio.token"
     },

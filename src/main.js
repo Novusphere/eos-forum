@@ -32,3 +32,10 @@ new Vue({
   components: { App },
   template: '<App/>'
 });
+
+router.afterEach((to, from) => {
+  var ga = window.ga || (function () { /*console.log('ga');*/ });
+
+  ga('set', 'page', to.path);
+  ga('send', 'pageview');
+});

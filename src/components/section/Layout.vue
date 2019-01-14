@@ -4,7 +4,8 @@
     <!-- brand banner -->
     <div class="BrandBanner__Container" v-if="brand_banner">
       <div class="BrandBanner__Banner">
-        <img class="BrandBanner__Image" :src="brand_banner">
+        <object class="BrandBanner__Image" v-if="brand_banner.endsWith('.svg')" :data="brand_banner" type="image/svg+xml"></object>
+        <img v-else class="BrandBanner__Image" :src="brand_banner">
       </div>
     </div>
 
@@ -23,7 +24,7 @@
     <div class="HeaderNavigation">
       <div class="container py-2">
         <div class="row no-gutters">
-          <div class="col-3 col-sm-6 col-md-6 col-lg-8 col-xl-8">
+          <div class="col-4 col-sm-6 col-md-6 col-lg-8 col-xl-8">
 
             <div class="d-inline-block px-2 px-lg-4">
               <router-link :to="{ name: 'Index' }">
@@ -37,7 +38,7 @@
                   type="button"
                   id="sortBy"
                   data-toggle="dropdown">
-                  <slot name="topic"></slot>
+                  <span class="d-none d-sm-inline-block"><slot name="topic"></slot></span>
                 </button>
                 <div class="dropdown-menu">
                   <router-link class="dropdown-item"
@@ -60,7 +61,7 @@
             </div> -->
           </div>
 
-          <div class="col-9 col-sm-6 col-md-6 col-lg-4 col-xl-4 text-right">
+          <div class="col-8 col-sm-6 col-md-6 col-lg-4 col-xl-4 text-right">
             <button class="btn btn-outline-primary mx-2 mx-lg-4 ConnectButton"
               v-if="!identity.account"
               v-on:click="login()">
@@ -156,7 +157,7 @@
             <a href="https://greymass.com/">Greymass</a>,
             <a href="https://www.genereos.io/">GenerEOS</a>,
             <a href="https://get-scatter.com/">Scatter</a>,
-            <a href="https://eosflare.io/">>EOS Flare</a>.
+            <a href="https://eosflare.io/">EOS Flare</a>.
           </p>
 
           <p class="text-center">

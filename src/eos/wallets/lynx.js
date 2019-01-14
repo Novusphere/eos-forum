@@ -25,6 +25,8 @@ export default class LynxWallet {
         this.identity.notifications = 0;
         
         await this.identity.update(true);
+
+        _alert('lynx 5');
     }
 
     async forgetIdentity() {
@@ -43,7 +45,21 @@ export default class LynxWallet {
             };
         });
 
-        var eostx = await lynx.transact(lynx_actions);
-        return eostx.transaction_id;
+        try { 
+            var eostx = await lynx.transact(lynx_actions);
+            if (eostx == null) {
+                _alert('eostx is null');
+            }
+            else if (!eostx.transaction_id) {
+                _alert('eostx.transaction_id is not set');
+            }
+            return eostx.transaction_id;
+        }
+        catch (err) {
+            _alert('An error occured from transact()');
+            _alert(err);
+
+            throw err;
+        }
     }
 }

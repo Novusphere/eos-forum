@@ -243,6 +243,11 @@ export default {
     PostAttachment,
   },
   props: {
+    preview: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     post: {
       type: Object,
       required: true
