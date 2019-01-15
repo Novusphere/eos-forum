@@ -366,6 +366,10 @@ td.chbox {
     width: 100%;
 }
 
+.post-parent .posttext {
+    pointer-events: none!important;
+}
+
 .post-parent .posttext p:after {
     content: '';
     height: 80px;
