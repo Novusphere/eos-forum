@@ -6,7 +6,7 @@
       <span>Settings</span>
     </template>
 
-    <template slot="content-full">
+    <template slot="content">
       <b-button @click="$router.go(-1)" class="btn btn-sm btn-outline-primary mb-1">
         <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
         back
