@@ -594,7 +594,7 @@ export default {
 }
 
 .tip-icon {
-  height: 25px!important;
+  height: 25px !important;
   width: 25px!important;
 }
 .date {
