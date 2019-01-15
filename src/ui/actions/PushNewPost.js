@@ -1,12 +1,13 @@
 import requests from "@/requests";
-import { GetEOS, GetIdentity, ExecuteEOSActions, GetEOSService } from "@/eos";
+import { storage, SaveStorage } from "@/storage";
+import { GetEOS, GetIdentity, ExecuteEOSActions, GetEOSService, GetTokensInfo, GetTokenPrecision } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 
 import {
     FORUM_CONTRACT,
 } from "@/ui/constants";
 
-export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_status) {
+export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_status, skip_index) {
     if (!post) {
         return false;
     }
@@ -19,7 +20,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
     const identity = await GetIdentity();
 
     // if anon, service will set poster
-    post.poster = (anon) ? "" : identity.account;
+    post.poster = (anon) ? post.poster : identity.account;
 
     var txid;
 
@@ -48,6 +49,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
 
         } else {
             const eos = GetEOS();
+            const json_metadata = JSON.parse(post.json_metadata);
 
             var tips_rx = post.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
             var actions = [
@@ -64,24 +66,13 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
             if (
                 tips_rx &&
                 tips_rx.length > 0 &&
-                !post.json_metadata.edit &&
+                !json_metadata.edit &&
                 parent_tx
             ) {
-                var tokens = JSON.parse(
-                    await requests.get(
-                        "https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/tokens.json"
-                    )
-                );
 
-                tokens.splice(0, 0, {
-                    name: "EOS",
-                    logo: "",
-                    logo_lg: "",
-                    symbol: "EOS",
-                    account: "eosio.token"
-                });
+                var tokens = await GetTokensInfo();
 
-                const tip_to = JSON.parse(post.json_metadata).parent_poster;
+                const tip_to = json_metadata.parent_poster;
 
                 for (var i = 0; i < tips_rx.length; i++) {
                     var tip_args = tips_rx[i].split(" ");
@@ -94,13 +85,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
                         return false;
                     }
 
-                    const stats = await eos.getCurrencyStats(
-                        token.account,
-                        token.symbol
-                    );
-                    const precision = stats[token.symbol].max_supply
-                        .split(" ")[0]
-                        .split(".")[1].length;
+                    const precision = await GetTokenPrecision(eos, token.account, token.symbol);
 
                     var adjusted_amount = parseFloat(tip_args[1]).toFixed(precision);
                     var tip_action = {
@@ -122,8 +107,8 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
             // https://github.com/eoscanada/eosio.forum/blob/master/src/forum.cpp#L157
             const MAX_CONTENT = 1024 * 10;
             if (post.content.length >= MAX_CONTENT) {
-                var overflow = post.content.substring(MAX_CONTENT-1);
-                var underflow = post.content.substring(0, MAX_CONTENT-1);
+                var overflow = post.content.substring(MAX_CONTENT - 1);
+                var underflow = post.content.substring(0, MAX_CONTENT - 1);
 
                 post.content = underflow; // update underflow
                 actions.push({ // push overflow to nsdb contract
@@ -152,8 +137,12 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
         return false;
     }
 
-    set_status("Waiting for Novusphere to index...");
-    await novusphere.waitTx(txid, 500, 1000);
+    if (!skip_index) {
+
+        set_status("Waiting for Novusphere to index...");
+        await novusphere.waitTx(txid, 500, 1000);
+
+    }
 
     // reset default
     set_status("");

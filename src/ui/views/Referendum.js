@@ -16,7 +16,7 @@ export default async function Referendum(current_page, by) {
 
     var MATCH_QUERY = {
         name: "propose",
-        createdAt: { $gte: 1537221139 }
+        createdAt: { $gte: 1547183719 } // eosio.forum deploy time
     };
 
     var LOOKUP_EXPIRED = {
@@ -44,17 +44,9 @@ export default async function Referendum(current_page, by) {
     };
 
     var now = (new Date().getTime()) / 1000;
-    var MATCH_CONDITION;
-    if (by == 'active') {
-        MATCH_CONDITION = {
-            "expired.0": { "$exists": false }
-        };
-    }   
-    else {
-        MATCH_CONDITION = {
-            "expired.0": { "$exists": true }
-        }
-    }
+    var MATCH_CONDITION = {
+        "expired.0": { "$exists": (by == 'old') }
+    };
 
     var n_proposals = (await novusphere.api({
         aggregate: REFERENDUM_COLLECTION,
@@ -66,7 +58,10 @@ export default async function Referendum(current_page, by) {
             { $match: MATCH_CONDITION },
             { $count: "n" }
         ]
-    })).cursor.firstBatch[0].n;
+    })).cursor.firstBatch[0];
+
+    // handle zero case
+    n_proposals = n_proposals ? n_proposals.n : 0;
 
     var num_pages = Math.ceil(n_proposals / MAX_ITEMS_PER_PAGE);
 
@@ -96,10 +91,11 @@ export default async function Referendum(current_page, by) {
         var p = new Post(payload[i]);
 
         await p.normalize();
-        payload[i] = p; 
+        payload[i] = p;
     }
 
     return {
+        sub: 'referendum',
         posts: payload,
         pages: num_pages,
         current_page: current_page

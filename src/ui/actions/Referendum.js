@@ -1,10 +1,12 @@
+import sha256 from "sha256";
+
 import requests from "@/requests";
 
 import { GetEOS, GetIdentity, ExecuteEOSActions } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 
 const REFERENDUM_COLLECTION = "eosforum";
-const REFERENDUM_CONTRACT = "eosforumrcpp";
+const REFERENDUM_CONTRACT = "eosio.forum";
 
 export default {
     async GetProposal(txid) {
@@ -153,18 +155,30 @@ export default {
             throw ("Post is too long, over limit by " + (30000 - post.content.length) + " characters");
         }
 
+        function generateName(identity, content) {
+            var hash = sha256(identity + content);
+            var name = "";
+            for (var i = 0; i < 12; i++) {
+              var cc = hash.charCodeAt(i);
+              if (cc >= 48 && cc <= 57) name += String.fromCharCode(122 - (cc - 48));
+              else name += String.fromCharCode(cc);
+            }
+            return name;
+          }
+
         const identity = await GetIdentity();
 
         var proposal = {
             proposer: identity.account,
-            proposal_name: this.generateName(identity.account, post.content),
+            proposal_name: generateName(identity.account, post.content),
             title: post.title,
             proposal_json: JSON.stringify({
-                type: "referendum-v1",
+                type: post.type,
                 content: post.content,
+                options: post.options
                 //src: "novusphere-forum"
             }),
-            expires_at: new Date(post.expiry).getTime() / 1000
+            expires_at: new Date(post.expires_at).getTime() / 1000
         };
 
         var txid;
@@ -181,6 +195,8 @@ export default {
 
         const novusphere = GetNovusphere();
         await novusphere.waitTx(txid, 500, 1000, REFERENDUM_COLLECTION);
+
+        return txid;
     },
     async CleanProposal(txid) {
         const prop = await this.GetProposal(txid);
@@ -217,7 +233,6 @@ export default {
         const identity = await GetIdentity();
         const prop = await this.GetProposal(txid);
 
-        // NOTE & TO-DO: "vote" is changing to "vote_value"
         var action = {
             contract: REFERENDUM_CONTRACT,
             name: "vote",
@@ -225,7 +240,7 @@ export default {
                 voter: identity.account,
                 proposal_name: prop.data.proposal_name,
                 vote: vote,
-                vote_json: JSON.stringify({ src: "novusphere-forum" })
+                vote_json: "", //JSON.stringify({ src: "novusphere-forum" })
             }
         }
 

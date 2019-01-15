@@ -92,8 +92,11 @@ export default async function Thread(id, child_id) {
 
     // only count non-edits for new_posts length
     storage.new_posts[main_post.data.post_uuid] = {
+        title: main_post.data.json_metadata.title,
+        sub: main_post.data.json_metadata.sub,
+        id: main_post.o_id,
         replies: new_posts,
-        seen: new Date().getTime() / 1000
+        seen: parseInt(new Date().getTime() / 1000)
     };
     SaveStorage();
 

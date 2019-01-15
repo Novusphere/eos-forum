@@ -11,8 +11,6 @@ function GetHost(href) {
 }
 
 async function OEmbed(url) {
-    console.log(url);
-
     const novusphere = GetNovusphere();
 
     var oembed = null; 

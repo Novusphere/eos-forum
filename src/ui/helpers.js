@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import ecc from "eosjs-ecc";
 
 import { MarkdownParser } from "@/markdown";
-import { storage } from "@/storage";
+import { storage, SaveStorage } from "@/storage";
 
 import { Post } from "@/types/post";
 
@@ -11,7 +11,9 @@ import {
     MAX_ITEMS_PER_PAGE,
     UPVOTE_ATMOS_RATE,
     HEADER_TEXTS,
-    DEFAULT_SUB
+    DEFAULT_SUB,
+    FORUM_BRAND,
+    BRANDS
 } from "@/ui/constants";
 
 function GetRandomHeaderText() {
@@ -28,12 +30,18 @@ function GetHost(href) {
     return parser.host.toLowerCase();
 }
 
-function GenerateAnonData(content) {
+async function GenerateAnonData(content) {
     var data = {
         name: storage.anon_id.name,
         pub: "",
         sig: ""
     };
+
+    // generate anon identity if we don't have one
+    if (!storage.anon_id.key) {
+        storage.anon_id.key = await ecc.randomKey();
+        SaveStorage();
+    }
 
     if (storage.anon_id.key && ecc.isValidPrivate(storage.anon_id.key)) {
         data.pub = ecc.privateToPublic(storage.anon_id.key);
@@ -81,6 +89,14 @@ function Route($route, delta) {
     return { name: name, query: query, params: params };
 }
 
+function UpdateBrand(sub) {
+    if (sub) {
+        sub = sub.toLowerCase();
+    }
+    const brand = (sub && (sub in BRANDS)) ? BRANDS[sub] : BRANDS["novusphere"];
+    Object.assign(FORUM_BRAND, brand);
+}
+
 export default {
     GetRandomHeaderText,
     GenerateAnonData,
@@ -92,4 +108,5 @@ export default {
     ParseMarkdown,
     GetHost,
     Route,
+    UpdateBrand
 }

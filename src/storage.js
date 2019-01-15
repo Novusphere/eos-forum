@@ -1,4 +1,5 @@
 import jQuery from "jquery";
+import ecc from "eosjs-ecc";
 
 const MAX_TRACK_NEW_POSTS = 1000;
 
@@ -132,7 +133,7 @@ function SaveStorage() {
     //console.log(storage);
 }
 
-function LoadStorage() {
+async function LoadStorage() {
     var oldStorageJson = window.localStorage.getItem('eosforum');
     var oldStorage;
     try {
@@ -146,9 +147,7 @@ function LoadStorage() {
     catch (ex) {
         console.log('Failed to load storage');
         console.log(ex);
-        return;
     }
-
 }
 
 export { DEFAULT_STORAGE, storage, SaveStorage, LoadStorage };

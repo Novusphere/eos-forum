@@ -1,12 +1,20 @@
 <template>
-      <div class="dropdown d-inline-block">
-        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="sortBy" data-toggle="dropdown">
-          {{ by }}
-        </button>
-        <div class="dropdown-menu">
-          <a v-for="o in options" :key="o" class="dropdown-item" href="javascript:void(0)" v-on:click="setBy(o)">{{ o }}</a>
-        </div>
-      </div>
+  <div class="dropdown d-inline-block">
+    <button
+      class="btn btn-outline-primary dropdown-toggle"
+      type="button"
+      id="sortBy"
+      data-toggle="dropdown">
+      {{ by }}
+    </button>
+    <div class="dropdown-menu">
+      <a v-for="o in options"
+        :key="o"
+        class="dropdown-item"
+        href="javascript:void(0)"
+        v-on:click="setBy(o)">{{ o }}</a>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -36,6 +44,12 @@ export default {
     this.load();
   },
   watch: {
+    "default_by": function() {
+      this.load();
+      if (this.change) {
+        this.change(this.by);
+      }
+    },
     "$route.query.sort": function() {
       this.load();
       if (this.change) {
@@ -59,7 +73,10 @@ export default {
       if (this.by == "popular") {
         return novusphere.query.sort.score();
       }
-      return novusphere.query.sort.time();
+      else if (this.by == "time") {
+        return novusphere.query.sort.time();
+      }
+      return this.by;
     }
   },
   data() {

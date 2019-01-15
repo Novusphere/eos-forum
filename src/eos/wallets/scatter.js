@@ -96,8 +96,9 @@ export default class ScatterWallet {
 
         var eostx = await eos.transaction(actions.map(a => a.contract), contracts => {
             for (var i = 0; i < actions.length; i++) {
-                var act = actions[i];
-                contracts[act.contract][act.name](act.data, auth);
+                const act = actions[i];
+                const act_contract = act.contract.replace(/\./g, "_");
+                contracts[act_contract][act.name](act.data, auth);
             }   
         });
     

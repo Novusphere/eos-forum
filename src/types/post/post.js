@@ -1,12 +1,24 @@
 import { storage } from "@/storage";
 import requests from "@/requests";
 
-import { GetEOS, EOSBinaryReader } from "@/eos";
+import { GetEOS, EOSBinaryReader, GetTokensInfo, GetTokenPrecision } from "@/eos";
 
 import { PostReddit } from "./reddit";
 import { PostAttachment } from "./attachment";
 import { PostJsonMetadata } from "./jsonmetadata";
 import { PostData } from "./data";
+
+// https://github.com/eoscanada/EEPs/blob/master/EEPS/eep-4.md
+const REFERENDUM_TYPES = [
+    'referendum-v1',
+    'poll-yn-v1',
+    'poll-yna-v1',
+    'options-v1',
+    'multi-select-v1',
+];
+
+const REFERENDUM_OPTIONS_YN = ['no', 'yes'];
+const REFERENDUM_OPTIONS_YNA = ['no', 'yes', 'abstain'];
 
 var referendum_cache = null;
 
@@ -117,11 +129,27 @@ class Post {
             var data = post.data;
 
             post.referendum = {
+                type: post.data.proposal_json.type || REFERENDUM_TYPES[0],
                 name: post.data.proposal_name,
-                expired: Array.isArray(post.expired) ? (post.expired.length>0) : post.expired,
+                expired: Array.isArray(post.expired) ? (post.expired.length > 0) : post.expired,
                 expires_at: data.expires_at,
+                options: [],
                 details: null
             };
+
+            // set to default so we know how to display
+            if (!REFERENDUM_TYPES.some(o => o == post.referendum.type)) {
+                post.referendum.type = REFERENDUM_TYPES[0];
+            }
+
+            if (post.referendum.type == REFERENDUM_TYPES[0] || post.referendum.type == REFERENDUM_TYPES[1]) // yn
+                post.referendum.options = REFERENDUM_OPTIONS_YN;
+            else if (post.referendum.type == REFERENDUM_TYPES[2]) // yna
+                post.referendum.options = REFERENDUM_OPTIONS_YNA;
+            else if (post.referendum.type == REFERENDUM_TYPES[3]) // options
+                post.referendum.options = (post.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 255);
+            else if (post.referendum.type == REFERENDUM_TYPES[4]) // multi
+                post.referendum.options = (post.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 8);
 
             post.data = {
                 poster: data.proposer,
@@ -133,7 +161,7 @@ class Post {
                 json_metadata: {
                     title: data.title,
                     type: "novusphere-forum",
-                    sub: 'eos-referendum',
+                    sub: 'referendum',
                     parent_uuid: '',
                     parent_poster: '',
                     edit: false,
@@ -147,7 +175,7 @@ class Post {
         }
 
         post = Object.assign({
-
+            score: 0,
             createdAt: 0,
             transaction: "",
             name: "post",
@@ -166,6 +194,7 @@ class Post {
 
         this._post = post;
 
+        this.score = post.score;
         this.parent = null;
         this.depth = 0;
         this.is_pinned = false;
@@ -179,6 +208,7 @@ class Post {
         this.my_vote = post.my_vote;
         this.referendum = post.referendum;
         this.tags = post.tags;
+        this.tips = [];
 
         if (storage.settings.atmos_upvotes) {
             this.up = Math.floor(this.up + (post.up_atmos ? post.up_atmos : 0));
@@ -228,26 +258,148 @@ class Post {
             const eosvotes = rcache.active;
             const status = eosvotes[this.referendum.name];
 
-            var rfor = 0, ragainst = 0;
-            if (status) {
-                rfor = status.stats.staked['1'];
-                ragainst = status.stats.staked['0'];
+            var votes = {};
 
-                rfor = (isNaN(rfor) ? 0 : parseInt(rfor)) / 10000;
-                ragainst = (isNaN(ragainst) ? 0 : parseInt(ragainst)) / 10000;
+            for (var i = 0; i < post.referendum.options.length; i++) {
+                votes[i] = { value: 0, percent: 0 };
+            }
+
+            if (status) {
+                var staked_total = status.stats.staked.total;
+
+                if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
+                    staked_total = 0;
+                }
+
+                for (var vote_value in status.stats.staked) {
+                    if (vote_value == 'total') {
+                        continue;
+                    }
+
+                    var vote_result = status.stats.staked[vote_value];
+                    vote_result = (isNaN(vote_result) ? 0 : parseInt(vote_result)) / 10000;
+
+                    if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
+
+                        for (var i = 0; i < post.referendum.options.length; i++) {
+                            if ((vote_value & (1 << i)) != 0) {
+                                if (i in votes)
+                                    votes[i].value += vote_result;
+                                else
+                                    votes[i] = { value: vote_result, percent: 0 };
+
+                                staked_total += vote_result * 10000;
+                            }
+                        }
+
+                    }
+                    else {
+                        if (vote_value in votes) {
+                            votes[vote_value].value = vote_result;
+                        }
+                        else {
+                            //console.log(status);
+                            //console.log(vote_value);
+                        }
+                    }
+                }
+
+                for (var vote_value in votes) {
+                    const vote_result = votes[vote_value].value;
+                    const percent = staked_total > 0 ? (100 * vote_result / (staked_total / 10000)) : 0;
+                    votes[vote_value].percent = percent.toFixed(1);
+                }
             }
 
             this.referendum.details = {
-                for: rfor,
-                against: ragainst,
-                for_percent: 100 * (rfor / Math.max(rfor + ragainst, 1)),
-                against_percent: 100 * (ragainst / Math.max(rfor + ragainst, 1)),
+                votes: votes,
                 total_participants: status ? status.stats.votes.total : 0,
                 total_eos: (status ? status.stats.staked.total : 0) / 10000,
             }
         }
 
+        if (!this.data.json_metadata.attachment.value) {
+            await this.detectAttachment();
+        }
+
         await this.data.json_metadata.attachment.normalize();
+        await this.detectTip();
+    }
+
+    async detectTip() {
+        if (this.data.json_metadata.edit) {
+            return;
+        }
+
+        if (this.tags.includes('tip')) {
+            const eos = GetEOS();
+            const tx = await eos.getTransaction(this.transaction);
+            const actions = tx.trx.trx.actions;
+            
+            for (var i = 0; i < actions.length; i++) {
+                if (actions[i].name == 'transfer') {
+
+                    var rdr = new EOSBinaryReader(actions[i].hex_data);
+
+                    const from = rdr.readName();
+                    const to = rdr.readName();
+                    
+                    // this should really be an i64
+                    var amount = rdr.readInt32();
+                    rdr.readInt32();
+
+                    rdr.readByte(); // ?
+                    const asset_name = rdr.readString(7).replace(/\0/g, '');
+
+                    const memo = rdr.readString();
+
+                    const precision = await GetTokenPrecision(eos, actions[i].account, asset_name);
+
+                    amount = (amount / Math.pow(10, precision)).toFixed(precision);
+
+                    this.tips.push({
+                        from: from,
+                        to: to,
+                        amount: amount,
+                        memo: memo,
+                        symbol: asset_name,
+                        contract: actions[i].account
+                    });
+                }
+            }
+
+            //console.log(JSON.stringify(this.tips));
+        }
+    }
+
+    async detectAttachment() {
+        var attachment = this.data.json_metadata.attachment;
+
+        var attach = (v, t, d) => {
+            attachment.value = v;
+            attachment.type = t;
+            attachment.display = d;
+        }
+
+        const filters = [
+            { // youtube
+                match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/,
+                handle: (m) => attach(m[0], 'url', 'iframe')
+            },
+            { // youtube 2
+                match: /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/,
+                handle: (m) => attach(m[0], 'url', 'iframe')
+            }
+        ];
+
+        for (var i = 0; i < filters.length; i++) {
+            const f = filters[i];
+            const match = this.data.content.match(f.match);
+            if (match && match.length > 0) {
+                f.handle(match);
+                break;
+            }
+        }
     }
 
     async applyEdit(edit) {
@@ -289,7 +441,7 @@ class Post {
 
     getUrlTitle() {
         var title = this.getTitle();
-        var friendly = title.replace(/[^a-zA-Z0-9 ]/g, "");
+        var friendly = title;
         friendly = friendly.replace(/ /g, "_");
         return friendly;
     }

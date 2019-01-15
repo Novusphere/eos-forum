@@ -9,7 +9,13 @@ import {
     MAX_ITEMS_PER_PAGE,
 } from "@/ui/constants";
 
+import Referendum from "./Referendum";
+
 export default async function Home(current_page, sub, sorter) {
+
+    if (sub && sub.toLowerCase() == 'referendum') {
+        return Referendum(current_page, sorter);
+    }
 
     current_page = parseInt(current_page ? current_page : 1);
 
@@ -57,9 +63,10 @@ export default async function Home(current_page, sub, sorter) {
                 $project: novusphere.query.project.post({
                     normalize_my_vote: true,
                     recent_edit: true,
-                    total_replies: true
+                    total_replies: true,
+                    score: false
                 })
-            }
+            },
         ]
     })).cursor.firstBatch;
 

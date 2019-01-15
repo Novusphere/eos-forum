@@ -31,6 +31,7 @@ export default {
     // override alert
     //
     var _this = this;
+    window._alert = window.alert;
     window.alert = function(message, args) {
       _this.text = message;
       _this.title = (args && args.title) ? args.title : 'Error';
