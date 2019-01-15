@@ -57,7 +57,6 @@
             <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
             <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
           </div>
-
         </div>
 
         <div class="posttext float-left">
