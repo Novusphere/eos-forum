@@ -6,6 +6,27 @@
       <span v-else>Home</span>
     </template>
 
+    <template slot="left_sidebar">
+      <div class="sidebarblock">
+        <router-link class="dropdown-item"
+          :to="{name: 'Index' }">
+          Home
+        </router-link>
+        <router-link v-if="eos_referendum"
+          class="dropdown-item"
+          :to="{name: 'Sub', params: { sub: 'referendum' } }">
+          Referendum
+        </router-link>
+        <div class="divline" />
+        <router-link v-for="sub in subs"
+          :key="sub"
+          class="dropdown-item"
+          :to="{ name: 'Sub', params: { sub: sub } }">
+          e/{{ sub }}
+        </router-link>
+      </div>
+    </template>
+
     <template slot="content">
       <div class="mt-1 mb-3">
         <div class="ml-1 float-left">
@@ -37,14 +58,28 @@
         <div class="clearfix"></div>
       </div>
 
-      <div v-if="!loading">
+      <div class="post-container" v-if="!loading">
         <div v-if="posts.length == 0">
           <div class="text-center">
             <h1>There doesn't seem to be any posts here! Why not make one?</h1>
           </div>
         </div>
 
-        <post v-for="p in posts" :key="p.transaction" :post="p" :preview="true"></post>
+        <post
+          v-for="p in posts"
+          class="post-parent"
+          :key="p.transaction"
+          @openPost="openPost"
+          :post="p"
+        />
+        <modal
+          @click.native="closePost"
+          v-if="selectedPostID">
+          <thread-modal
+            @click.native.stop
+            :id="selectedPostID"
+          />
+        </modal>
       </div>
 
       <div class="text-center" v-else>
@@ -69,8 +104,10 @@ import Pager from "@/components/core/Pager";
 import PostSorter from "@/components/core/PostSorter";
 import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Post from "@/components/core/Post";
-
+import { storage } from "@/storage";
 import Layout from "@/components/section/Layout";
+import Modal from "@/components/modal/Modal.vue";
+import ThreadModal from "@/components/ThreadModal.vue";
 
 export default {
   name: "Home2",
@@ -85,7 +122,9 @@ export default {
     PostSorter,
     RecentlyVisited,
     Post,
-    Layout
+    Layout,
+    Modal,
+    ThreadModal,
   },
   watch: {
     "$route.query.page": function() {
@@ -106,7 +145,10 @@ export default {
         return ['active', 'old'];
 
       return ['popular', 'time'];
-    }
+    },
+    subs() {
+      return storage.subscribed_subs;
+    },
   },
   async mounted() {
     this.load();
@@ -142,6 +184,15 @@ export default {
     },
     async subscribe(sub) {
       this.is_subscribed = await ui.actions.Subscribe(sub, this.sub);
+    },
+    openPost (postID, sub){
+      this.selectedPostID = postID;
+      console.log(this.$route);
+      history.pushState({},"","#/e/" + sub + "/" + postID);
+    },
+    closePost () {
+      this.selectedPostID = undefined;
+      history.pushState({},"","#/");
     }
   },
   data() {
@@ -151,7 +202,9 @@ export default {
       current_page: 0,
       pages: 0,
       sub: "",
-      posts: [] // for posts being displayed
+      posts: [], // for posts being displayed
+      selectedPostID: undefined,
+      eos_referendum: storage.eos_referendum,
     };
   }
 };

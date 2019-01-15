@@ -36,7 +36,7 @@
 /*--- General ---*/
 
 html {
-    overflow-y:scroll;
+    overflow-y: overlay;
 }
 
 body {
@@ -51,6 +51,16 @@ a {
 }
 a:hover {
     color: #989c9e;
+}
+
+.hidden {
+    display: none;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 /*-----------------------------------------------------------------*/
@@ -337,10 +347,30 @@ td.chbox {
 
 .post {
     background-color: #ffffff;
-
-    border-radius: 2px;
-    box-shadow: 0 1px 2px #c9cccd;
     margin-bottom: 20px;
+    padding: 1px;
+}
+
+.post-container .post-parent.post:hover {
+    outline: 1px solid grey;
+    cursor: pointer;
+}
+
+.post-child.post .userinfo.float-left, .root.post .userinfo.float-left {
+    width: 65px;
+}
+.post-child.post {
+    margin-left: 15px;
+    position: relative;
+}
+
+.post-child .post-body:before {
+    position: absolute;
+    left: 7px;
+    top: 20px;
+    content: '';
+    border-left: 2px solid grey;
+    height: calc(100% - 20px);
 }
 
 .post .wrap-ut {
@@ -371,6 +401,7 @@ td.chbox {
 .post .posttext .title {
     font-size: larger;
     color: black;
+    line-height: 16px;
 }
 
 .post .posttext .offsite {
@@ -496,7 +527,7 @@ td.chbox {
 }
 
 .postinfobot {
-    padding: 0 30px 5px 94px;
+    /* padding: 0 30px 5px 94px; */
 }
 
 

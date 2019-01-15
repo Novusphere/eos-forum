@@ -28,7 +28,8 @@ async function GetTokensInfo() {
     );
 
     tokens = our_tokens.concat(tokens);
-
+    let atmos = tokens.find(t => t.symbol == 'ATMOS');
+    atmos.logo = atmos.logo_lg = 'https://cdn.novusphere.io/static/atmos.svg';
     return tokens;
 }
 

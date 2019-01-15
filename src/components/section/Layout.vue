@@ -9,17 +9,6 @@
       </div>
     </div>
 
-    <!-- featured subs at the top -->
-    <div class="text-center d-none d-sm-block FeaturedSubs">
-      <ul class="list-inline mb-0">
-        <li v-for="sub in subs"
-          :key="sub"
-          class="list-inline-item">
-          <router-link :to="'/e/' + sub">{{sub}}</router-link>
-        </li>
-      </ul>
-    </div>
-
     <!-- header navigation -->
     <div class="HeaderNavigation">
       <div class="container py-2">
@@ -30,34 +19,6 @@
               <router-link :to="{ name: 'Index' }">
                 <img :src="brand_logo" style="height: 38px;">
               </router-link>
-            </div>
-
-            <div class="d-inline-block">
-              <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle"
-                  type="button"
-                  id="sortBy"
-                  data-toggle="dropdown">
-                  <span class="d-none d-sm-inline-block"><slot name="topic"></slot></span>
-                </button>
-                <div class="dropdown-menu">
-                  <router-link class="dropdown-item"
-                    :to="{name: 'Index' }">
-                    Home
-                  </router-link>
-                  <router-link v-if="eos_referendum"
-                    class="dropdown-item"
-                    :to="{name: 'Sub', params: { sub: 'referendum' } }">
-                    Referendum
-                  </router-link>
-                  <router-link v-for="sub in subs"
-                    :key="sub"
-                    class="dropdown-item"
-                    :to="{ name: 'Sub', params: { sub: sub } }">
-                    e/{{ sub }}
-                  </router-link>
-                </div>
-              </div>
             </div>
           </div>
 

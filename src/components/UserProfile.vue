@@ -6,32 +6,41 @@
     </template>
 
     <template slot="content">
-      <div class="mb-1">
-        <div class="float-left">
-          <post-sorter ref="sorter" :change="load"></post-sorter>
-        </div>
-        <div class="float-left ml-1">
-          <button class="btn btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</button>
-        </div>
-        <div class="float-right">
-          <pager :pages="pages" :current_page="current_page"></pager>
-        </div>
-        <div class="clearfix"></div>
-      </div>
-
-      <div v-if="!loading">
-        <div v-if="posts.length == 0">
-          <div class="text-center">
-            <h1>No posts history found!</h1>
+        <b-tabs>
+        <b-tab title="comments" active>
+          <div class="mt-2 mb-2">
+            <div class="float-left">
+              <post-sorter ref="sorter" :change="load"></post-sorter>
+            </div>
+            <div class="float-left ml-1">
+              <b-button class="btn btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</b-button>
+            </div>
+            <div class="float-right">
+              <pager :pages="pages" :current_page="current_page"></pager>
+            </div>
+            <div class="clearfix"></div>
           </div>
-        </div>
 
-        <post v-for="p in posts" :key="p.o_id" :post="p"></post>
-      </div>
+          <div v-if="!loading">
+            <div v-if="posts.length == 0">
+              <div class="text-center">
+                <h1>No posts history found!</h1>
+              </div>
+            </div>
 
-      <div class="text-center" v-else>
-        <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
-      </div>
+            <post v-for="p in posts" :key="p.o_id" :post="p"></post>
+          </div>
+          <div class="text-center" v-else>
+            <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+          </div>
+        </b-tab>
+        <b-tab title="threads" >
+          Threads...
+        </b-tab>
+        <b-tab title="blogs">
+          Blogs...
+        </b-tab>
+      </b-tabs>
     </template>
 
     <template slot="right_sidebar">
