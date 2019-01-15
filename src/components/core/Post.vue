@@ -39,7 +39,7 @@
 
       <div class="posttext float-left">
         <div v-if="offsite">
-            <a :href="post.o_attachment.value" target="_blank" class="title">
+            <a :href="post.data.json_metadata.attachment.value" target="_blank" class="title">
                {{ post.data.json_metadata.title }}
             </a>
             <span class="offsite" v-if="offsite">
@@ -256,10 +256,10 @@ export default {
     },
     offsite() {
       if (
-        this.post.o_attachment.type == "url" &&
-        this.post.o_attachment.value
+        this.post.data.json_metadata.attachment.type == "url" &&
+        this.post.data.json_metadata.attachment.value
       ) {
-        return ui.helpers.GetHost(this.post.o_attachment.value);
+        return ui.helpers.GetHost(this.post.data.json_metadata.attachment.value);
       }
       return null;
     },
