@@ -16,7 +16,7 @@ export default {
     $('html').css('overflow-y', 'hidden');
   },
   beforeDestroy() {
-    $('html').css('overflow-y', 'overlay');
+    $('html').css('overflow-y', '');
   },
   methods: {
   },

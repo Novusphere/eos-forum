@@ -6,27 +6,6 @@
       <span v-else>Home</span>
     </template>
 
-    <template slot="left_sidebar">
-      <div class="sidebarblock">
-        <router-link class="dropdown-item"
-          :to="{name: 'Index' }">
-          Home
-        </router-link>
-        <router-link v-if="eos_referendum"
-          class="dropdown-item"
-          :to="{name: 'Sub', params: { sub: 'referendum' } }">
-          Referendum
-        </router-link>
-        <div class="divline" />
-        <router-link v-for="sub in subs"
-          :key="sub"
-          class="dropdown-item"
-          :to="{ name: 'Sub', params: { sub: sub } }">
-          e/{{ sub }}
-        </router-link>
-      </div>
-    </template>
-
     <template slot="content">
       <div class="mt-1 mb-3">
         <div class="ml-1 float-left">
@@ -87,12 +66,6 @@
       </div>
     </template>
 
-    <template slot="right_sidebar">
-      <div class="sidebarblock">
-        <recently-visited></recently-visited>
-      </div>
-    </template>
-
   </layout>
 </template>
 
@@ -102,7 +75,6 @@ import { GetNovusphere } from "@/novusphere";
 
 import Pager from "@/components/core/Pager";
 import PostSorter from "@/components/core/PostSorter";
-import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Post from "@/components/core/Post";
 import { storage } from "@/storage";
 import Layout from "@/components/section/Layout";
@@ -120,7 +92,6 @@ export default {
   components: {
     Pager,
     PostSorter,
-    RecentlyVisited,
     Post,
     Layout,
     Modal,
@@ -187,7 +158,6 @@ export default {
     },
     openPost (postID, sub){
       this.selectedPostID = postID;
-      console.log(this.$route);
       history.pushState({},"","#/e/" + sub + "/" + postID);
     },
     closePost () {

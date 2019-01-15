@@ -94,13 +94,32 @@
 
         <div class="row">
           <div class="col-0 col-lg-3 col-xl-3">
-            <slot name="left_sidebar"></slot>
+            <div class="sidebarblock">
+              <router-link class="dropdown-item"
+                :to="{name: 'Index' }">
+                Home
+              </router-link>
+              <router-link v-if="eos_referendum"
+                class="dropdown-item"
+                :to="{name: 'Sub', params: { sub: 'referendum' } }">
+                Referendum
+              </router-link>
+              <div class="divline" />
+              <router-link v-for="sub in subs"
+                :key="sub"
+                class="dropdown-item"
+                :to="{ name: 'Sub', params: { sub: sub } }">
+                e/{{ sub }}
+              </router-link>
+            </div>
           </div>
           <div class="col-12 col-lg-6 col-xl-6">
             <slot name="content"></slot>
           </div>
           <div class="col-0 col-lg-3 col-xl-3">
-            <slot name="right_sidebar"></slot>
+            <div class="sidebarblock">
+              <recently-visited></recently-visited>
+            </div>
           </div>
         </div>
       </div>
@@ -151,6 +170,7 @@ import { FORUM_BRAND } from "@/ui/constants";
 import { storage } from "@/storage";
 import { ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
+import RecentlyVisited from "@/components/core/RecentlyVisited";
 
 export default {
   name: "Layout",
@@ -163,6 +183,9 @@ export default {
         amp: undefined // "amp" has no value
       }
     };
+  },
+  components: {
+    RecentlyVisited,
   },
   props: {
     load: {
