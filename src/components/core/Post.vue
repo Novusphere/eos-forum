@@ -62,10 +62,10 @@
         <div class="posttext float-left">
           <div>
               <div class="flex-center">
-                <a class="title">
+                <a :href="offsite ? post.o_attachment.value : undefined" class="title" target="_blank">
                   {{ post.data.json_metadata.title }}
                 </a>
-                <a v-if="offsite" :href="post.o_attachment.value" class="offsite">
+                <a v-if="offsite" :href="post.o_attachment.value" class="offsite" target="_blank">
                   ({{ offsite }})
                 </a>
                 <template v-if="post.depth === 0">

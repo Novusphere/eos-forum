@@ -61,6 +61,9 @@ export default {
     "$route.query.page": function() {
       this.load();
     },
+    "$route.params.tag": function() {
+      this.load();
+    }
   },
   async mounted() {
     this.load();
