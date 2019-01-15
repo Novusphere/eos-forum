@@ -117,9 +117,10 @@
             <slot name="content"></slot>
           </div>
           <div class="col-0 col-lg-3 col-xl-3">
-            <div class="sidebarblock">
+            <div v-if="noRightBar" class="sidebarblock">
               <recently-visited></recently-visited>
             </div>
+            <slot v-else name="right_sidebar" />
           </div>
         </div>
       </div>
@@ -201,6 +202,9 @@ export default {
   computed: {
     subs() {
       return storage.subscribed_subs;
+    },
+    noRightBar() {
+      return !this.$slots['right_sidebar']
     }
   },
   async mounted() {
