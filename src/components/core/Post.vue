@@ -307,10 +307,10 @@ export default {
     },
     offsite() {
       if (
-        this.post.o_attachment.type == "url" &&
-        this.post.o_attachment.value
+        this.post.data.json_metadata.attachment.type == "url" &&
+        this.post.data.json_metadata.attachment.value
       ) {
-        return ui.helpers.GetHost(this.post.o_attachment.value);
+        return ui.helpers.GetHost(this.post.data.json_metadata.attachment.value);
       }
       return null;
     },
