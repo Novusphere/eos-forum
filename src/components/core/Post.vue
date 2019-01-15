@@ -164,9 +164,10 @@
               </a>
             </li>
             <li class="list-inline-item" v-if="post.depth === 0">
-              <font-awesome-icon :icon="['fas', 'clock']" />
-              {{ new Date(post.createdAt * 1000).toLocaleString() }}
-
+              <template v-if="!post.referendum">
+                <font-awesome-icon :icon="['fas', 'clock']" />
+                {{ new Date(post.createdAt * 1000).toLocaleString() }}
+              </template>
               <router-link
                 @click.stop
                 v-if="post.id && is_edit"
@@ -596,7 +597,7 @@ export default {
   height: 25px!important;
   width: 25px!important;
 }
-.post-body, .date {
+.date {
   margin-left: 15px;
 }
 .tip-amount {
