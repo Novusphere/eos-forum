@@ -324,9 +324,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.col-form-label {
-  white-space: nowrap;
-}
-</style>
