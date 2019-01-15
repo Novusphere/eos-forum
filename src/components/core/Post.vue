@@ -5,13 +5,22 @@
     class="post">
     <template v-if="post.depth !== 0">
       <div
-        @click.stop="togglePost"
+        @click.stop="togglePost()"
         class="post-toggle">
-        <font-awesome-icon :icon="['fas', hide ? 'plus-circle' : 'minus-circle']" ></font-awesome-icon>
-        <font-awesome-icon class="user" :icon="['fas', reddit.author ? 'reddit' : 'user-secret']" />
+        <font-awesome-icon
+          class="toggle-icon"
+          :icon="['fas', hide ? 'plus-circle' : 'minus-circle']"
+        />
+        <font-awesome-icon class="user" :icon="['fas', reddit ? 'reddit' : 'user-secret']" />
         {{ post.data.poster }}
         <div class="date">
           {{ new Date(post.createdAt * 1000).toLocaleString() }}
+        </div>
+        <div class="flex-center received-tips">
+          <div :key="key" class="flex-center" v-for="(tip, key) in received_tips">
+            <img class="tip-icon" :src="$root.icons[key].logo" :title="`${tip}-${key}`" />
+            <div class="tip-amount"> x {{ tip }} </div>
+          </div>
         </div>
       </div>
     </template>
@@ -53,24 +62,22 @@
 
         <div class="posttext float-left">
           <div>
-              <a class="title">
-                {{ post.data.json_metadata.title }}
-              </a>
-              <a v-if="offsite" :href="post.o_attachment.value" class="offsite">
-                ({{ offsite }})
-              </a>
-              <span v-for="(tip, key) in received_tips">
-                <object
-                  class="tip-icon"
-                  v-if="isSvg(key)"
-                  :data="$root.icons[key].logo"
-                  type="image/svg+xml">
-                </object>
-                <template v-else>
-                  <img class="tip-icon" :src="$root.icons[key].logo" />
+              <div class="flex-center">
+                <a class="title">
+                  {{ post.data.json_metadata.title }}
+                </a>
+                <a v-if="offsite" :href="post.o_attachment.value" class="offsite">
+                  ({{ offsite }})
+                </a>
+                <template v-if="post.depth === 0">
+                  <div class="flex-center received-tips">
+                    <div :key="key" class="flex-center" v-for="(tip, key) in received_tips">
+                      <img class="tip-icon" :src="$root.icons[key].logo" :title="`${tip}-${key}`" />
+                      <div class="tip-amount"> x {{ tip }} </div>
+                    </div>
+                  </div>
                 </template>
-                x {{ tip }}
-              </span>
+              </div>
               <div v-if="post.depth === 0">
                 <li class="list-inline-item">
                   <a v-if="reddit.author"
@@ -219,7 +226,7 @@
         :key="child.o_id">
         <div>
           <post
-            @click.native.stop="hidePost(child)"
+            v-if="hide === false"
             class="post-child"
             :post="child"
             :thread="thread"
@@ -404,21 +411,6 @@ export default {
         )));
   },
   methods: {
-    isSvg(key) {
-      const currency = this.$root.icons[key];
-      console.log(currency);
-      if (currency.logo.split('.') !== undefined) {
-        const length = currency.logo.split('.').length;
-        const extension = currency.logo.split('.')[length - 1];
-        if (extension === 'svg') {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    },
     showQuickEdit() {
       this.show_quick_edit = !this.show_quick_edit;
       this.quick_reply = this.show_quick_edit ? this.post.data.content : "";
@@ -594,19 +586,25 @@ export default {
   display: flex;
   align-items: center;
 }
+.toggle-icon {
+  margin-right: 5px;
+}
 .post-toggle:hover {
   cursor:pointer;
 }
 
-.post-toggle .user {
-  margin-left: 5px;
-  margin-right: 5px;
-}
 .tip-icon {
   height: 25px!important;
   width: 25px!important;
 }
 .post-body, .date {
   margin-left: 15px;
+}
+.tip-amount {
+  margin: 3px;
+}
+.received-tips {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>

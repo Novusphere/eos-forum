@@ -60,6 +60,7 @@ a:hover {
 .flex-center {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 /*-----------------------------------------------------------------*/
@@ -368,7 +369,7 @@ td.chbox {
     left: 7px;
     top: 20px;
     content: '';
-    border-left: 2px solid black;
+    border-left: 2px solid grey;
     height: calc(100% - 20px);
 }
 

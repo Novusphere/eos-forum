@@ -36,8 +36,10 @@ export default {
     background-color: rgba(0,0,0,0.5);
     display: flex !important;
   }
-  .modal .body{
-    max-width: 80vw;
+  .body {
     overflow: auto;
   }
+  /* .body {
+    width: 80vw;
+  } */
 </style>
