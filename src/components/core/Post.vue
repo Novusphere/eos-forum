@@ -114,7 +114,7 @@
             :collapse="false">
           </post-attachment>
 
-          <p v-if="post_content_html" v-html="post_content_html" />
+          <p v-if="post_content_html && !post.referendum" v-html="post_content_html" />
 
           <div v-if="post.referendum">
             <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
