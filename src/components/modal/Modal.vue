@@ -30,7 +30,7 @@ export default {
     position: fixed;
     top:0;
     left:0;
-    z-index: 99999999;
+    z-index: 1;
     align-items: center;
     justify-content: center;
     background-color: rgba(0,0,0,0.5);
