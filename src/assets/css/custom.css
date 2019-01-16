@@ -60,6 +60,7 @@ a:hover {
 .flex-center {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 /*-----------------------------------------------------------------*/
@@ -350,6 +351,37 @@ td.chbox {
     padding: 1px;
 }
 
+.post-parent {
+    max-height: 300px;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 25px;
+}
+
+.post-parent .postinfobot {
+    position: absolute;
+    bottom: 0px;
+    z-index: 1;
+    background-color: white;
+    width: 100%;
+}
+
+.post-parent .posttext {
+    pointer-events: none!important;
+}
+
+.post-parent .posttext p:after {
+    content: '';
+    height: 80px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-image: linear-gradient(transparent, white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .post-container .post-parent.post:hover {
     outline: 1px solid grey;
     cursor: pointer;

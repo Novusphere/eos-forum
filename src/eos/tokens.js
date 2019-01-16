@@ -28,7 +28,8 @@ async function GetTokensInfo() {
     );
 
     tokens = our_tokens.concat(tokens);
-
+    let atmos = tokens.find(t => t.symbol == 'ATMOS');
+    atmos.logo = atmos.logo_lg = 'https://cdn.novusphere.io/static/atmos.svg';
     return tokens;
 }
 
@@ -38,11 +39,18 @@ async function GetTokenPrecision(eos, account, sym) {
         sym
     );
 
-    const precision = stats[sym].max_supply
-        .split(" ")[0]
-        .split(".")[1].length;
+    try {
+        const precision = stats[sym].supply
+            .split(" ")[0]
+            .split(".")[1].length;
 
-    return precision;
+        return precision;
+    }
+    catch (ex) {
+        console.log(account + ' ' + sym);
+        console.log(stats);
+        return 0;
+    }
 }
 
 export { GetTokensInfo, GetTokenPrecision };

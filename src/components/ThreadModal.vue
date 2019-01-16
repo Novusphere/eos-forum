@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="thread-container">
     <post v-if="opening_post.id" class="root" :post="main_post" :thread="opening_post" />
     <div v-else class="white-bg">
       <div>
@@ -87,9 +87,14 @@ export default {
     justify-content: center;
     align-items: center;
 }
-.container {
+.thread-container {
     margin-top: 5vh;
     margin-bottom: 5vh;
+}
+.root {
+  max-width: 100%;
+  width: 1000px;
+  min-width: 80%;
 }
 .post {
     max-height: 80vh;

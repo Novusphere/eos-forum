@@ -20,15 +20,29 @@
             </div>
             <div class="clearfix"></div>
           </div>
-
-          <div v-if="!loading">
+          
+          <div class="post-container" v-if="!loading">
             <div v-if="posts.length == 0">
               <div class="text-center">
-                <h1>No posts history found!</h1>
+                <h1>There doesn't seem to be any posts here! Why not make one?</h1>
               </div>
             </div>
 
-            <post v-for="p in posts" :key="p.o_id" :post="p"></post>
+            <post
+              v-for="p in posts"
+              class="post-parent"
+              :key="p.o_id"
+              @openPost="openPost"
+              :post="p"
+            />
+            <modal
+              @click.native="closePost"
+              v-if="selectedPostID">
+              <thread-modal
+                @click.native.stop
+                :id="selectedPostID"
+              />
+            </modal>
           </div>
           <div class="text-center" v-else>
             <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
@@ -85,6 +99,8 @@ import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
 
 import Layout from "@/components/section/Layout";
+import Modal from "@/components/modal/Modal.vue";
+import ThreadModal from "@/components/ThreadModal.vue";
 
 export default {
   name: "UserProfile",
@@ -92,7 +108,9 @@ export default {
     Layout,
     Pager,
     Post,
-    PostSorter
+    PostSorter,
+    Modal,
+    ThreadModal,
   },
   watch: {
     "$route.query.page": function() {
@@ -129,6 +147,14 @@ export default {
     async toggleBlock() {
       await ui.actions.BlockUser(this.account, this.is_blocked);
       await this.load();
+    },
+    openPost (postID, sub){
+      this.selectedPostID = postID;
+      history.pushState({},"","#/e/" + sub + "/" + postID);
+    },
+    closePost () {
+      this.selectedPostID = undefined;
+      history.pushState({},"","#/");
     }
   },
   data() {
@@ -144,7 +170,8 @@ export default {
       last_activity: "",
       posts: [],
       current_page: 1,
-      pages: 0
+      pages: 0,
+      selectedPostID: undefined,
     };
   }
 };
