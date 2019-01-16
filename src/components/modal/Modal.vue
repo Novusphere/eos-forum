@@ -31,15 +31,9 @@ export default {
     top:0;
     left:0;
     z-index: 1;
-    align-items: center;
     justify-content: center;
-    background-color: rgba(0,0,0,0.5);
-    display: flex !important;
+    background-color: rgba(0,0,0,0.65);
+    display: flex;
+    overflow-y: auto;
   }
-  .body {
-    overflow: auto;
-  }
-  /* .body {
-    width: 80vw;
-  } */
 </style>

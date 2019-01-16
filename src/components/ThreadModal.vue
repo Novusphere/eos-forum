@@ -1,13 +1,15 @@
 <template>
   <div class="thread-container">
     <post v-if="opening_post.id" class="root" :post="main_post" :thread="opening_post" />
-    <div v-else class="white-bg">
-      <div>
-        Loading thread...
+    <div v-else class="loader">
+      <div class="white-bg">
+        <div>
+          Loading thread...
+        </div>
+        <h1>
+          <font-awesome-icon :icon="['fas', 'spinner']" spin />
+        </h1>
       </div>
-      <h1>
-        <font-awesome-icon :icon="['fas', 'spinner']" spin />
-      </h1>
     </div>
   </div>
 </template>
@@ -78,27 +80,36 @@ export default {
 </script>
 
 <style scoped>
+.loader {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.thread-container {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding-bottom: 20px;
+}
 .white-bg {
+    align-self: center;
     background-color: white;
-    width: 640px;
     height: 200px;
+    width: 60vw;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
-.thread-container {
-    margin-top: 5vh;
-    margin-bottom: 5vh;
-}
 .root {
-  max-width: 100%;
-  width: 1000px;
-  min-width: 80%;
+  padding-bottom: 10px;
+  padding-top: 10px;
 }
 .post {
-    max-height: 80vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+  width: 60vw;
 }
 </style>
