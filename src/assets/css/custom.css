@@ -63,6 +63,11 @@ a:hover {
     flex-wrap: wrap;
 }
 
+.topwrap {
+    display: flex;
+}
+
+
 /*-----------------------------------------------------------------*/
 /*--- Footer ---*/
 
@@ -346,13 +351,16 @@ td.chbox {
 }
 
 .post {
+    background-color: white;
+}
+.post-parent {
     background-color: #ffffff;
     margin-bottom: 20px;
     padding: 1px;
 }
 
 .post-parent {
-    max-height: 300px;
+    max-height: 400px;
     overflow: hidden;
     position: relative;
     padding-bottom: 25px;
@@ -366,7 +374,7 @@ td.chbox {
     width: 100%;
 }
 
-.post-parent .posttext {
+.post-parent .title {
     pointer-events: none!important;
 }
 
@@ -374,7 +382,7 @@ td.chbox {
     content: '';
     height: 80px;
     position: absolute;
-    bottom: 0;
+    top: 300px;
     left: 0;
     width: 100%;
     background-image: linear-gradient(transparent, white);

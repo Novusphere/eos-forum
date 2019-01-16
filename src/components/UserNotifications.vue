@@ -20,7 +20,21 @@
               </div>
         </div>
 
-        <post v-for="p in posts" :key="p.o_id" :post="p"></post>
+        <post
+          v-for="p in posts"
+          class="post-parent"
+          :key="p.transaction"
+          @openPost="openPost"
+          :post="p"
+        />
+        <modal
+          @click.native="closePost"
+          v-if="selectedPostID">
+          <thread-modal
+            @click.native.stop
+            :id="selectedPostID"
+          />
+        </modal>
       </div>
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
@@ -43,8 +57,10 @@ import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
 import RecentlyVisited from "@/components/core/RecentlyVisited";
-
 import Layout from "@/components/section/Layout";
+
+import Modal from "@/components/modal/Modal.vue";
+import ThreadModal from "@/components/ThreadModal.vue";
 
 export default {
   name: "UserNotifications",
@@ -53,7 +69,9 @@ export default {
     Pager,
     Post,
     PostSorter,
-    RecentlyVisited
+    RecentlyVisited,
+    Modal,
+    ThreadModal,
   },
   watch: {
     "$route.query.page": function() {

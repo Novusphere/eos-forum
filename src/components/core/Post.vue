@@ -105,17 +105,14 @@
                 </li>
               </div>
           </div>
-
-          <post-attachment
-            v-if="thread"
-            ref="post_attachment"
-            :attachment="post.data.json_metadata.attachment"
-            :id="'content-' + post.data.post_uuid"
-            :collapse="false">
-          </post-attachment>
-
-          <p :class="{'referendum' : post.referendum}" v-if="post_content_html" v-html="post_content_html" />
-
+          <div>
+            <post-attachment
+              ref="post_attachment"
+              :attachment="post.data.json_metadata.attachment"
+              :id="'content-' + post.data.post_uuid"
+              :collapse="false">
+            </post-attachment>
+          </div>
           <div v-if="post.referendum">
             <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
               <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
@@ -133,6 +130,8 @@
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
           </div>
+
+          <p v-if="post_content_html" v-html="post_content_html" />
         </div>
         <div class="clearfix"></div>
       </div>
@@ -372,14 +371,15 @@ export default {
       }
     },
     thumbnail() {
-      var t = this.post.data.json_metadata.attachment.thumbnail;
-      if (!t) {
+      // var t = this.post.data.json_metadata.attachment.thumbnail;
+      let t;
+      // if (!t) {
         if (this.reddit.author) {
           t = "https://cdn.novusphere.io/static/reddit.png";
         } else {
           t = FORUM_BRAND.logo;
         }
-      }
+      // }
       return t;
     }
   },
