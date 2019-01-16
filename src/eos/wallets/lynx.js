@@ -2,8 +2,6 @@ export default class LynxWallet {
     static async detect(identity) {
         if (window.lynxMobile) {
             var lynx = window.lynxMobile;
-            //window.lynxMobile = null;
-            console.log('Lynx Mobile loaded');
             return new LynxWallet(lynx, identity);
         }
         return null; // fail
@@ -25,8 +23,6 @@ export default class LynxWallet {
         this.identity.notifications = 0;
         
         await this.identity.update(true);
-
-        _alert('lynx 5');
     }
 
     async forgetIdentity() {
