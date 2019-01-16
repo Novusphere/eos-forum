@@ -12,7 +12,7 @@ import LynxWallet from "./wallets/lynx";
 
 import Identity from "./identity";
 
-const WALLETS = [ScatterWallet, LynxWallet];
+const WALLETS = [ScatterWallet, /*LynxWallet*/];
 var g_wallet = null;
 var g_identity = new Identity();
 

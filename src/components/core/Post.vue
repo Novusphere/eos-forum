@@ -114,7 +114,7 @@
             :collapse="false">
           </post-attachment>
 
-          <p v-if="post_content_html" v-html="post_content_html" />
+          <p :class="{'referendum' : post.referendum}" v-if="post_content_html" v-html="post_content_html" />
 
           <div v-if="post.referendum">
             <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
@@ -128,7 +128,7 @@
             </div>
 
             <div class="text-center" v-if="identity.account">
-              <a class="btn btn-sm btn-outline-primary" @click.stop="referendumVote()" v-if="!post.referendum.expired">vote</a>
+              <a class="btn btn-sm btn-outline-primary" :class="{'referendum' : post.referendum}" @click.stop="referendumVote()" v-if="!post.referendum.expired">vote</a>
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumExpire()" v-if="!post.referendum.expired && post.data.poster == identity.account">expire</a>
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
@@ -580,6 +580,12 @@ export default {
 </script>
 
 <style scoped>
+.referendum {
+  display: none;
+}
+.modal .referendum {
+  display: inherit;
+}
 .post-toggle {
   height: 20px;
   color: black;
