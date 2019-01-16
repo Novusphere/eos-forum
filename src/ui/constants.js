@@ -31,6 +31,14 @@ var BRANDS = {
         "token_symbol": "EOS",
         "token_contract": "eosio.token"
     },
+    "pixeos": {
+        "title": "A decentralized forum",
+        "logo": "https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/pixeos.png",
+        "icon": "https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/pixeos.png",
+        "banner": "https://i.imgur.com/XCli8ik.jpg",
+        "token_symbol": "PIXEOS",
+        "token_contract": "pixeos1token"
+    },
     "eos": {
         "title": "EOS Community",
         "logo": "https://cdn.novusphere.io/static/eos3.svg",
@@ -41,7 +49,7 @@ var BRANDS = {
     }
 }
 
-var FORUM_BRAND =  Object.assign({}, BRANDS["novusphere"]);
+var FORUM_BRAND = Object.assign({}, BRANDS["novusphere"]);
 
 if (window.__PRESETS__) {
     var presets = window.__PRESETS__;
