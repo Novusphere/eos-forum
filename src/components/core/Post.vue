@@ -144,7 +144,7 @@
                   <font-awesome-icon :icon="['fas', 'reply']" />
                   <span v-if="!post.parent">{{ post.total_replies }} comments</span>
               </router-link>
-              <a v-else @click.stop="showQuickReply()">
+              <a class="reply" v-else @click.stop="showQuickReply()">
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 reply
               </a>
@@ -203,7 +203,7 @@
           </ul>
         </div>
 
-        <div :class="'row quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
+        <div :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
           :id="'qreply-' + post.data.post_uuid">
           <div class="col-sm-12">
             <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
@@ -594,7 +594,7 @@ export default {
 .toggle-icon {
   margin-right: 5px;
 }
-.post-toggle:hover {
+.post-toggle:hover, .reply:hover {
   cursor:pointer;
 }
 
