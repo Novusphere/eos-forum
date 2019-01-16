@@ -594,7 +594,7 @@ export default {
 .toggle-icon {
   margin-right: 5px;
 }
-.post-toggle:hover, .reply:hover {
+.post-toggle:hover, .reply:hover, .up:hover {
   cursor:pointer;
 }
 
