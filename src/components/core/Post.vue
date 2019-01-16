@@ -384,7 +384,6 @@ export default {
     }
   },
   async mounted() {
-    console.log(this.received_tips);
     if (this.$root.icons.length === 0) {
       const response = await GetTokensInfo();
       const icons = {};

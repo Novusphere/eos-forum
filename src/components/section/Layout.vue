@@ -97,7 +97,7 @@
             <div class="sidebarblock">
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
-                Home
+                Home 3
               </router-link>
               <router-link v-if="eos_referendum"
                 class="dropdown-item"
