@@ -28,7 +28,7 @@ export default class ScatterWallet {
         var result = null;
 
         if (scatter_timeout < 10000) {
-            console.log('Trying to connect to scatter with timeout ' + `scatter`_timeout + 'ms...');
+            console.log('Trying to connect to scatter with timeout ' + scatter_timeout + 'ms...');
             
             const network = SCATTER_CONFIG;
             var connected = await ScatterJS.connect('eos-forum', { network, initTimeout: scatter_timeout });
