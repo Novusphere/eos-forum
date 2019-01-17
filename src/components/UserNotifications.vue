@@ -21,6 +21,7 @@
         </div>
 
         <post
+          class="notification"
           v-for="p in posts"
           :key="p.transaction"
           @openPost="openPost"

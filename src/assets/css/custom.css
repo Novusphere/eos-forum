@@ -390,7 +390,7 @@ td.chbox {
     justify-content: center;
     align-items: center;
 }
-.post-container .post-parent.post:hover {
+.post-container .post-parent.post:hover, .notification.post:hover {
     outline: 1px solid grey;
     cursor: pointer;
 }
