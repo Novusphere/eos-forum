@@ -1,6 +1,12 @@
 <template>
-  <div class="thread-container">
-    <post v-if="opening_post.id" class="root" :post="main_post" :thread="opening_post" />
+  <div @click="$emit('close')" class="thread-container">
+    <post
+      v-if="opening_post.id"
+      @click.native.stop
+      class="root"
+      :post="main_post"
+      :thread="opening_post"
+    />
     <div v-else class="loader">
       <div class="white-bg">
         <div>
