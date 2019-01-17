@@ -2,8 +2,8 @@ import requests from "@/requests";
 
 var our_tokens = [{
     name: "EOS",
-    logo: "",
-    logo_lg: "",
+    logo: "https://cdn.novusphere.io/static/eos3.svg",
+    logo_lg: "https://cdn.novusphere.io/static/eos3.svg",
     symbol: "EOS",
     account: "eosio.token"
 }, {
