@@ -1,7 +1,6 @@
 import Eos from "eosjs";
 
-import { LoadStorage, storage } from '@/storage';
-LoadStorage();
+import { storage } from '@/storage';
 
 import EOSBinaryReader from "./binaryreader";
 

@@ -19,28 +19,36 @@ import App from "@/App"
 import router from '@/router'
 import Meta from 'vue-meta'
 import { LoadStorage } from "@/storage"
+import { LoadConstants } from "@/ui/constants"
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(BootstrapVue);
 Vue.use(Meta);
 Vue.config.productionTip = false;
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  components: { App },
-  data() {
-    return {
-      icons: [],
-    }
-  },
-  template: '<App/>'
-});
+(async function () {
 
-router.afterEach((to, from) => {
-  var ga = window.ga || (function () { /*console.log('ga');*/ });
+  await LoadStorage();
+  await LoadConstants();
 
-  ga('set', 'page', to.path);
-  ga('send', 'pageview');
-});
+  /* eslint-disable no-new */
+  new Vue({
+    el: '#app',
+    router,
+    components: { App },
+    data() {
+      return {
+        icons: [],
+      }
+    },
+    template: '<App/>'
+  });
+
+  router.afterEach((to, from) => {
+    var ga = window.ga || (function () { /*console.log('ga');*/ });
+
+    ga('set', 'page', to.path);
+    ga('send', 'pageview');
+  });
+
+})();
