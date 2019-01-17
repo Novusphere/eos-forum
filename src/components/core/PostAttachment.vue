@@ -15,18 +15,16 @@
         </iframe>
       </div>
       <div v-if="img">
-        <a :href="attachment.value">
-          <img :src="attachment.value">
-        </a>
+        <img class="limit-height" :src="attachment.value">
       </div>
       <div v-if="mp4">
-        <video style="width: 100%" controls>
+        <video class="limit-height" controls>
           <source :src="attachment.value" type="video/mp4">
         </video>
       </div>
 
       <div v-if="mp3">
-        <audio style="width: 100%" controls>
+        <audio class="limit-height" controls>
           <source :src="attachment.value" type="audio/mpeg">
         </audio>
       </div>
@@ -95,3 +93,10 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.limit-height {
+  max-height:500px;
+  width: auto
+}
+</style>

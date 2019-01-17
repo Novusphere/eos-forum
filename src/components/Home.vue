@@ -52,10 +52,10 @@
           :post="p"
         />
         <modal
-          @click.native="closePost"
+          @click.native.stop="closePost"
           v-if="selectedPostID">
           <thread-modal
-            @click.native.stop
+            @close="closePost"
             :id="selectedPostID"
           />
         </modal>

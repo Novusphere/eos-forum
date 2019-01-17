@@ -390,7 +390,7 @@ td.chbox {
     justify-content: center;
     align-items: center;
 }
-.post-container .post-parent.post:hover {
+.post-container .post-parent.post:hover, .notification.post:hover {
     outline: 1px solid grey;
     cursor: pointer;
 }
@@ -431,10 +431,6 @@ td.chbox {
     font-size: 14px;
     font-family: 'Open Sans Light', sans-serif;
     line-height: 25px;
-}
-
-.post .posttext img {
-    width: 100%;
 }
 
 .post .posttext .title {
