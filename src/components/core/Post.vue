@@ -12,7 +12,21 @@
           :icon="['fas', hide ? 'plus-circle' : 'minus-circle']"
         />
         <font-awesome-icon class="user" :icon="['fas', reddit ? 'reddit' : 'user-secret']" />
-        {{ post.data.poster }}
+        <li class="list-inline-item">
+          <a v-if="reddit.author"
+            @click.stop
+            :href="`https://www.reddit.com/user/${reddit.author}`">
+            <font-awesome-icon :icon="['fab', 'reddit']" />
+            {{ poster_name }}
+          </a>
+          <router-link
+            v-else-if="post.transaction"
+            @click.stop
+            :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+            <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
+            {{ poster_name }}
+          </router-link>
+        </li>
         <div class="date">
           {{ new Date(post.createdAt * 1000).toLocaleString() }}
         </div>
