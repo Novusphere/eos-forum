@@ -22,7 +22,6 @@
 
         <post
           v-for="p in posts"
-          class="post-parent"
           :key="p.transaction"
           @openPost="openPost"
           :post="p"
@@ -96,6 +95,14 @@ export default {
       await ui.actions.MarkNotificationsAsRead();
 
       this.loading = false;
+    },
+    openPost (postID, sub){
+      this.selectedPostID = postID;
+      history.pushState({},"","#/e/" + sub + "/" + postID);
+    },
+    closePost () {
+      this.selectedPostID = undefined;
+      history.pushState({},"","#/");
     }
   },
   data() {
@@ -103,7 +110,8 @@ export default {
       loading: false,
       posts: [],
       current_page: 1,
-      pages: 0
+      pages: 0,
+      selectedPostID: undefined,
     };
   }
 };

@@ -62,7 +62,7 @@
         <div class="posttext float-left">
           <div>
               <div class="flex-center">
-                <a :href="offsite ? post.o_attachment.value : undefined" class="title" target="_blank">
+                <a @click.stop="$emit('openPost', selectedPostID, post.data.json_metadata.sub)" class="title" target="_blank">
                   {{ post.data.json_metadata.title }}
                 </a>
                 <a v-if="offsite" :href="post.o_attachment.value" class="offsite" target="_blank">
@@ -594,7 +594,7 @@ export default {
 .toggle-icon {
   margin-right: 5px;
 }
-.post-toggle:hover, .reply:hover, .up:hover {
+.post-toggle:hover, .reply:hover, .up:hover, .title:hover {
   cursor:pointer;
 }
 
