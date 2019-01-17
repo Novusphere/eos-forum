@@ -421,6 +421,10 @@ td.chbox {
     padding: 20px 0 15px 15px;
 }
 
+.post img {
+    max-width: 100%;
+}
+
 .post .posttext {
     width: 85%;
     padding-right: 30px;
