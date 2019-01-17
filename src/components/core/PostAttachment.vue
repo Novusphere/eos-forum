@@ -15,9 +15,7 @@
         </iframe>
       </div>
       <div v-if="img">
-        <a :href="attachment.value">
-          <img :src="attachment.value">
-        </a>
+        <img :src="attachment.value">
       </div>
       <div v-if="mp4">
         <video style="width: 100%" controls>
