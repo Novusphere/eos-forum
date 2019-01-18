@@ -131,6 +131,7 @@ export default async function Thread(id, child_id) {
 
     return {
         opening_post: op,
-        main_post: main_post
+        main_post: main_post,
+        count: responses.length
     }
 }

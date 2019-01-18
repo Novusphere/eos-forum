@@ -1,4 +1,5 @@
 import { storage } from "@/storage";
+import ui from "@/ui";
 import requests from "@/requests";
 
 import { GetEOS, EOSBinaryReader, GetTokensInfo, GetTokenPrecision } from "@/eos";
@@ -128,28 +129,7 @@ class Post {
         if (post && post.name == 'propose') {
             var data = post.data;
 
-            post.referendum = {
-                type: post.data.proposal_json.type || REFERENDUM_TYPES[0],
-                name: post.data.proposal_name,
-                expired: Array.isArray(post.expired) ? (post.expired.length > 0) : post.expired,
-                expires_at: data.expires_at,
-                options: [],
-                details: null
-            };
-
-            // set to default so we know how to display
-            if (!REFERENDUM_TYPES.some(o => o == post.referendum.type)) {
-                post.referendum.type = REFERENDUM_TYPES[0];
-            }
-
-            if (post.referendum.type == REFERENDUM_TYPES[0] || post.referendum.type == REFERENDUM_TYPES[1]) // yn
-                post.referendum.options = REFERENDUM_OPTIONS_YN;
-            else if (post.referendum.type == REFERENDUM_TYPES[2]) // yna
-                post.referendum.options = REFERENDUM_OPTIONS_YNA;
-            else if (post.referendum.type == REFERENDUM_TYPES[3]) // options
-                post.referendum.options = (post.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 255);
-            else if (post.referendum.type == REFERENDUM_TYPES[4]) // multi
-                post.referendum.options = (post.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 8);
+            this.setReferendumDetails(post, post);
 
             post.data = {
                 poster: data.proposer,
@@ -222,6 +202,32 @@ class Post {
         this.o_attachment = new PostAttachment(this.data.json_metadata.attachment);
     }
 
+    setReferendumDetails(post, src) {
+        post.referendum = {
+            transaction: src.transaction,
+            type: src.data.proposal_json.type || REFERENDUM_TYPES[0],
+            name: src.data.proposal_name,
+            expired: Array.isArray(src.expired) ? (src.expired.length > 0) : src.expired,
+            expires_at: src.data.expires_at,
+            options: [],
+            details: null
+        };
+
+        // set to default so we know how to display
+        if (!REFERENDUM_TYPES.some(o => o == post.referendum.type)) {
+            post.referendum.type = REFERENDUM_TYPES[0];
+        }
+
+        if (post.referendum.type == REFERENDUM_TYPES[0] || post.referendum.type == REFERENDUM_TYPES[1]) // yn
+            post.referendum.options = REFERENDUM_OPTIONS_YN;
+        else if (post.referendum.type == REFERENDUM_TYPES[2]) // yna
+            post.referendum.options = REFERENDUM_OPTIONS_YNA;
+        else if (post.referendum.type == REFERENDUM_TYPES[3]) // options
+            post.referendum.options = (src.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 255);
+        else if (post.referendum.type == REFERENDUM_TYPES[4]) // multi
+            post.referendum.options = (src.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 8);
+    }
+
     async normalize() {
         if (!this._post) {
             return;
@@ -245,6 +251,24 @@ class Post {
             this.data.json_metadata.title = this.parent.data.json_metadata.title;
         }
 
+        if (!this.data.json_metadata.attachment.value) {
+            await this.detectAttachment();
+        }
+
+        if (this.data.json_metadata.attachment.value &&
+            this.data.json_metadata.attachment.display == 'referendum') {
+
+            const rp = await ui.actions.Referendum.GetProposal(this.data.json_metadata.attachment.value);
+            if (rp) {
+                this.setReferendumDetails(this, rp);
+                post.referendum = this.referendum;
+
+                if (rp.data.proposal_json.content) {
+                    this.data.content = this.data.content + '\n\n---\n\n' + rp.data.proposal_json.content;
+                }
+            }
+        }
+
         if (post.referendum) {
             if (isNaN(post.referendum.expires_at)) {
                 post.referendum.expires_at = (new Date(post.referendum.expires_at)).getTime() / 1000;
@@ -256,7 +280,7 @@ class Post {
 
             const rcache = await GetReferendumCache();
             const eosvotes = rcache.active;
-            const status = eosvotes[this.referendum.name];
+            const status = eosvotes[post.referendum.name];
 
             var votes = {};
 
@@ -311,15 +335,11 @@ class Post {
                 }
             }
 
-            this.referendum.details = {
+            this.referendum.details = post.referendum.details = {
                 votes: votes,
                 total_participants: status ? status.stats.votes.total : 0,
                 total_eos: (status ? status.stats.staked.total : 0) / 10000,
             }
-        }
-
-        if (!this.data.json_metadata.attachment.value) {
-            await this.detectAttachment();
         }
 
         await this.data.json_metadata.attachment.normalize();
@@ -335,7 +355,7 @@ class Post {
             const eos = GetEOS();
             const tx = await eos.getTransaction(this.transaction);
             const actions = tx.trx.trx.actions;
-            
+
             for (var i = 0; i < actions.length; i++) {
                 if (actions[i].name == 'transfer') {
 
@@ -343,7 +363,7 @@ class Post {
 
                     const from = rdr.readName();
                     const to = rdr.readName();
-                    
+
                     // this should really be an i64
                     var amount = rdr.readInt32();
                     rdr.readInt32();

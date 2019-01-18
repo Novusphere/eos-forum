@@ -54,22 +54,35 @@ export default {
       this.load();
     }
   },
+  beforeDestroy() {
+    this.inactive = true;
+  },
   async mounted() {
-    console.log('opening post:', this.id);
     this.load(this.id);
   },
   props: {
     id: {
       default: 0,
-      type: Number,
+      type: Number
     }
   },
   methods: {
-    async load(id = this.$route.params.id, child_id = this.$route.params.child_id) {
+    async load(
+      id = this.$route.params.id,
+      child_id = this.$route.params.child_id
+    ) {
+      if (this.inactive) {
+        return;
+      }
+
       var thread = await ui.views.Thread(id, child_id);
-      this.opening_post = thread.opening_post;
-      this.main_post = thread.main_post;
-      // this.loading = false;
+      if (thread.count > this.count) {
+        this.opening_post = thread.opening_post;
+        this.main_post = thread.main_post;
+        this.count = thread.count;
+      }
+
+      setTimeout(() => this.load(id, child_id), 7500);
     },
     postContent(txid, data) {
       this.load(); // reload thread
@@ -80,6 +93,8 @@ export default {
       opening_post: ui.helpers.PlaceholderPost(),
       main_post: ui.helpers.PlaceholderPost(),
       loading: true,
+      count: 0,
+      inactive: false
     };
   }
 };
@@ -105,14 +120,14 @@ export default {
   padding-bottom: 20px;
 }
 .white-bg {
-    align-self: center;
-    background-color: white;
-    height: 200px;
-    width: 60vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  align-self: center;
+  background-color: white;
+  height: 200px;
+  width: 60vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .root {
   padding-bottom: 10px;

@@ -128,6 +128,7 @@
             </post-attachment>
           </div>
           <div v-if="post.referendum">
+
             <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
               <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
               <input v-if="identity.account && is_multi_referendum" class="form-check-input" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
@@ -532,10 +533,10 @@ export default {
         : this.referendum_colors[i];
     },
     async referendumClean() {
-      await ui.actions.Referendum.CleanProposal(this.post.transaction);
+      await ui.actions.Referendum.CleanProposal(this.post.referendum.transaction);
     },
     async referendumExpire() {
-      await ui.actions.Referendum.Expire(this.post.transaction);
+      await ui.actions.Referendum.Expire(this.post.referendum.transaction);
     },
     async referendumVote() {
       if (!this.identity.account) {
@@ -549,7 +550,7 @@ export default {
       }
 
       var txid = await ui.actions.Referendum.Vote(
-        this.post.transaction,
+        this.post.referendum.transaction,
         this.is_multi_referendum ? this.multi_vote_value : this.vote_value
       );
       alert(
