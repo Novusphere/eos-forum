@@ -75,7 +75,10 @@ export default {
                     input: "$replies",
                     as: "replies",
                     cond: {
-                        $in: ["tip", { "$ifNull": [ "$$replies.tags", [] ] }]
+                        $and: [ // only responses to OP, and responses with #tip
+                            { $eq: ["$data.post_uuid", "$$replies.data.json_metadata.parent_uuid"]},
+                            { $in: ["tip", { "$ifNull": [ "$$replies.tags", [] ] }] }
+                        ]
                     }
                 }
             }
