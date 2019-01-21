@@ -168,7 +168,8 @@ class Post {
             parent: null,
             my_vote: null,
             referendum: null,
-            tags: []
+            tags: [],
+            replies: []
 
         }, post);
 
@@ -189,6 +190,7 @@ class Post {
         this.referendum = post.referendum;
         this.tags = post.tags;
         this.tips = [];
+        this.replies = post.replies;
 
         if (storage.settings.atmos_upvotes) {
             this.up = Math.floor(this.up + (post.up_atmos ? post.up_atmos : 0));

@@ -234,7 +234,7 @@
         <div class="clearfix"></div>
       </div>
     </div>
-    <template v-if="post.depth <= 5">
+    <template v-if="showChildren && post.depth <= 5">
       <div
         v-for="child in post.children"
         :key="child.o_id">
@@ -283,6 +283,11 @@ export default {
       type: Object,
       required: false,
       default: null
+    },
+    showChildren: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   computed: {

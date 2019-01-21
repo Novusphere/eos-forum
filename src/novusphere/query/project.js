@@ -44,6 +44,7 @@ export default {
             normalize_parent: false,
             normalize_my_vote: false,
             recent_edit: false,
+            tip_replies_only: false,
             total_replies: false,
             score: true
 
@@ -59,6 +60,7 @@ export default {
             //state: "$state",
             expired: "$expired",
             replies: !opts.total_replies ? "$replies" : [],
+            //replies: "$replies",
             up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
             up_atmos: !opts.normalize_up ? "$up_atmos" : { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] },
             parent: !opts.normalize_parent ? "$parent" : { $arrayElemAt: ["$parent", 0] },
@@ -66,6 +68,18 @@ export default {
             my_vote: !opts.normalize_my_vote ? "$my_vote" : { $arrayElemAt: ["$my_vote", 0] },
             recent_edit: "$recent_edit"
         };
+
+        if (opts.tip_replies_only) {
+            query['replies'] = {
+                $filter: {
+                    input: "$replies",
+                    as: "replies",
+                    cond: {
+                        $in: ["tip", { "$ifNull": [ "$$replies.tags", [] ] }]
+                    }
+                }
+            }
+        }
 
         if (opts.score) {
             query['score'] = score();
