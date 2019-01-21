@@ -254,7 +254,7 @@
 </template>
 
 <script>
-import { FORUM_BRAND } from "@/ui/constants";
+import { BRANDS } from "@/ui/constants";
 import ui from "@/ui";
 import requests from "@/requests";
 import { GetIdentity, GetTokensInfo } from "@/eos";
@@ -267,13 +267,13 @@ import { Post } from "@/types/post";
 export default {
   name: "Post",
   components: {
-    PostAttachment,
+    PostAttachment
   },
   props: {
     preview: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
     post: {
       type: Object,
@@ -301,19 +301,21 @@ export default {
             } else {
               tips[tip.symbol] += Number(tip.amount);
             }
-          })
+          });
         }
-      })
+      });
       return tips;
     },
     is_multi_referendum() {
-      return this.post.referendum && this.post.referendum.type == 'multi-select-v1';
+      return (
+        this.post.referendum && this.post.referendum.type == "multi-select-v1"
+      );
     },
     multi_vote_value() {
       var value = 0;
       for (var i = 0; i < this.vote_value_multi.length; i++) {
         if (this.vote_value_multi[i]) {
-          value |= (1 << i);
+          value |= 1 << i;
         }
       }
       return value;
@@ -336,7 +338,9 @@ export default {
         this.post.data.json_metadata.attachment.type == "url" &&
         this.post.data.json_metadata.attachment.value
       ) {
-        return ui.helpers.GetHost(this.post.data.json_metadata.attachment.value);
+        return ui.helpers.GetHost(
+          this.post.data.json_metadata.attachment.value
+        );
       }
       return null;
     },
@@ -346,8 +350,11 @@ export default {
         : this.post.data.json_metadata.sub;
     },
     selectedPostID() {
-      return this.post.parent ? this.post.parent.o_id : this.thread
-      ? this.thread.o_id || this.thread.o_transaction : this.post.o_id || this.post.o_transaction;
+      return this.post.parent
+        ? this.post.parent.o_id
+        : this.thread
+          ? this.thread.o_id || this.thread.o_transaction
+          : this.post.o_id || this.post.o_transaction;
     },
     selectedPostTitle() {
       return this.thread ? this.thread.getUrlTitle() : this.post.getUrlTitle();
@@ -359,7 +366,7 @@ export default {
         params: {
           sub: this.sub,
           id: id,
-          title: this.selectedPostTitle,
+          title: this.selectedPostTitle
         }
       };
     },
@@ -391,15 +398,15 @@ export default {
       }
     },
     thumbnail() {
-      // var t = this.post.data.json_metadata.attachment.thumbnail;
-      let t;
-      // if (!t) {
-        if (this.reddit.author) {
-          t = "https://cdn.novusphere.io/static/reddit.png";
-        } else {
-          t = FORUM_BRAND.logo;
+      let t = this.post.data.json_metadata.attachment.thumbnail;
+      if (!t) {
+        if (this.sub in BRANDS) {
+          t = BRANDS[this.sub].logo;
         }
-      // }
+        else {
+          t = BRANDS['novusphere'].logo;
+        }
+      }
       return t;
     }
   },
@@ -409,7 +416,7 @@ export default {
       const icons = {};
       response.forEach(x => {
         icons[x.symbol] = x;
-      })
+      });
       this.$root.icons = icons;
     }
     this.hide = this.is_spam ? true : false;
@@ -538,7 +545,9 @@ export default {
         : this.referendum_colors[i];
     },
     async referendumClean() {
-      await ui.actions.Referendum.CleanProposal(this.post.referendum.transaction);
+      await ui.actions.Referendum.CleanProposal(
+        this.post.referendum.transaction
+      );
     },
     async referendumExpire() {
       await ui.actions.Referendum.Expire(this.post.referendum.transaction);
@@ -569,11 +578,11 @@ export default {
     togglePost() {
       this.hide = !this.hide;
       this.$forceUpdate();
-    },
+    }
   },
   data() {
     return {
-      vote_value_multi: [ 0, 0, 0, 0, 0, 0, 0, 0 ],
+      vote_value_multi: [0, 0, 0, 0, 0, 0, 0, 0],
       vote_value: 0,
       referendum_colors: [
         "#dc3545",
@@ -592,7 +601,7 @@ export default {
       quick_reply: "",
       is_nsfw: false,
       is_spam: false,
-      hide: false,
+      hide: false
     };
   }
 };
@@ -614,13 +623,16 @@ export default {
 .toggle-icon {
   margin-right: 5px;
 }
-.post-toggle:hover, .reply:hover, .up:hover, .title:hover {
-  cursor:pointer;
+.post-toggle:hover,
+.reply:hover,
+.up:hover,
+.title:hover {
+  cursor: pointer;
 }
 
 .tip-icon {
   height: 25px !important;
-  width: 25px!important;
+  width: 25px !important;
 }
 .date {
   margin-left: 15px;
