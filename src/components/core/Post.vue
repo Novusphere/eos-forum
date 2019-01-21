@@ -254,7 +254,7 @@
 </template>
 
 <script>
-import { BRANDS } from "@/ui/constants";
+import { BRANDS, FORUM_BRAND } from "@/ui/constants";
 import ui from "@/ui";
 import requests from "@/requests";
 import { GetIdentity, GetTokensInfo } from "@/eos";
@@ -398,13 +398,13 @@ export default {
       }
     },
     thumbnail() {
-      let t = this.post.data.json_metadata.attachment.thumbnail;
+      let t = null;// = this.post.data.json_metadata.attachment.thumbnail;
       if (!t) {
         if (this.sub in BRANDS) {
           t = BRANDS[this.sub].logo;
         }
         else {
-          t = BRANDS['novusphere'].logo;
+          t = FORUM_BRAND.logo;
         }
       }
       return t;
