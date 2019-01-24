@@ -1,7 +1,7 @@
 <template>
   <!-- POST -->
   <div
-    @click="$emit('openPost', selectedPostID, post.data.json_metadata.sub)"
+    @click="openPost"
     class="post">
     <template v-if="post.depth !== 0">
       <div
@@ -564,6 +564,13 @@ export default {
       this.hide = !this.hide;
       this.$forceUpdate();
     },
+    openPost() {
+      if (screen.width > 600) {
+        this.$emit('openPost', this.selectedPostID, this.post.data.json_metadata.sub)
+      } else {
+        this.$router.push(this.thread_link);
+      }
+    }
   },
   data() {
     return {
