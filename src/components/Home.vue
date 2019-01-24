@@ -50,6 +50,7 @@
           :key="p.transaction"
           @openPost="openPost"
           :post="p"
+          :showChildren="false"
         />
         <modal
           @click.native.stop="closePost"

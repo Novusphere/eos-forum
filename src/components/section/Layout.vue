@@ -236,7 +236,9 @@ export default {
       this.identity = await GetIdentity(true);
       if (!this.identity.account) {
         alert(
-          "Failed to detect an EOS wallet! However, you can still post to the forum anonymously for free!"
+          "Failed to detect a compatible EOS wallet!" + 
+          " If your wallet is open, and we failed to detect it try refreshing the page." +
+          " However if you don't have a compatible EOS wallet, you can still post to the forum anonymously for free!"
         );
       }
     },

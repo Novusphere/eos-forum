@@ -90,13 +90,23 @@
                               <input class="form-check-input" type="radio" name="attachmentType" value="ipfs" v-model="attachment.type">
                               <label class="form-check-label">IPFS</label>
                            </div>
+                           <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="attachmentType" value="txid" v-model="attachment.type">
+                              <label class="form-check-label">TXID</label>
+                           </div>
                         </div>
                      </div>
                   </fieldset>
                   <fieldset class="form-group" v-if="attachment.type != ''">
                      <div class="row">
                         <legend class="col-form-label col-sm-2 pt-0"></legend>
-                        <div class="col-sm-10">
+                        <div class="col-sm-10" v-if="attachment.type == 'txid'">
+                           <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="attachmentDisplay" value="referendum" v-model="attachment.display">
+                              <label class="form-check-label">referendum</label>
+                           </div>
+                        </div>
+                        <div class="col-sm-10" v-else>
                            <div class="form-check form-check-inline">
                               <input class="form-check-input" type="radio" name="attachmentDisplay" value="link" checked v-model="attachment.display">
                               <label class="form-check-label">link</label>
@@ -119,7 +129,7 @@
                   <div class="form-group row" v-if="attachment.type != ''">
                      <label class="col-sm-2 col-form-label"></label>
                      <div class="col-sm-10">
-                        <input class="form-control" placeholder="IPFS hash / URL" v-model="attachment.value">
+                        <input class="form-control" placeholder="IPFS hash / URL / TXID" v-model="attachment.value">
                      </div>
                   </div>
                   <div class="row">

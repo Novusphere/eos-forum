@@ -64,6 +64,7 @@ export default async function Home(current_page, sub, sorter) {
                     normalize_my_vote: true,
                     recent_edit: true,
                     total_replies: true,
+                    tip_replies_only: true,
                     score: false
                 })
             },
@@ -89,7 +90,8 @@ export default async function Home(current_page, sub, sorter) {
                 $project: novusphere.query.project.post({
                     normalize_my_vote: true,
                     recent_edit: true,
-                    total_replies: true
+                    total_replies: true,
+                    tip_replies_only: true
                 })
             }
         ]
@@ -104,6 +106,17 @@ export default async function Home(current_page, sub, sorter) {
         var post = threads[i];
         if (i < pinned_threads.length) {
             post.is_pinned = true;
+        }
+
+        // so that tips show up
+        if (post.replies && post.replies.length > 0) {
+            for (var j = 0; j < post.replies.length; j++) {
+                if (post.replies[j].data.json_metadata.parent_uuid == post.data.post_uuid) {
+                    var r = new Post(post.replies[j]);
+                    await r.normalize();
+                    post.children.push(r);
+                }
+            } 
         }
 
         var old_replies = storage.new_posts[post.data.post_uuid];
