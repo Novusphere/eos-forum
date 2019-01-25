@@ -400,8 +400,11 @@ export default {
     },
     thumbnail() {
       let t = null; // = this.post.data.json_metadata.attachment.thumbnail;
-      t = t ? t : FORUM_BRAND.logo;
-      t = t ? t : BRANDS["novusphere"].logo;
+      t = t
+        ? t
+        : this.sub in BRANDS
+          ? BRANDS[this.sub].logo
+          : BRANDS["novusphere"].logo;
       return t;
     }
   },
