@@ -45,7 +45,7 @@ window.addEventListener('identityUpdate', async function () {
     );
 
     var token = atmos;
-    if (FORUM_BRAND.token_contract != 'novusphereio' ||
+    /*if (FORUM_BRAND.token_contract != 'novusphereio' ||
         FORUM_BRAND.token_symbol != 'ATMOS') {
             
         token = parseFloat(
@@ -55,7 +55,7 @@ window.addEventListener('identityUpdate', async function () {
                 FORUM_BRAND.token_symbol
             ))[0]
         );
-    }
+    }*/
 
     const novusphere = GetNovusphere();
     const notifications = (await novusphere.api({

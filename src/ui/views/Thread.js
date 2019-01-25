@@ -87,9 +87,6 @@ export default async function Thread(id, child_id) {
 
     var new_posts = await Post.threadify(main_post, responses);
 
-    responses.splice(0, 0, main_post);
-    responses = await Post.fromArray(responses);
-
     // only count non-edits for new_posts length
     storage.new_posts[main_post.data.post_uuid] = {
         title: main_post.data.json_metadata.title,
