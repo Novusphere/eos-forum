@@ -45,9 +45,12 @@ window.addEventListener('identityUpdate', async function () {
     );
 
     var token = atmos;
-    /*if (FORUM_BRAND.token_contract != 'novusphereio' ||
-        FORUM_BRAND.token_symbol != 'ATMOS') {
+    if (FORUM_BRAND.token_contract &&
+        (FORUM_BRAND.token_contract != 'novusphereio' ||
+        FORUM_BRAND.token_symbol != 'ATMOS')) {
             
+        console.log(`hello ${FORUM_BRAND.token_contract.length} - ${FORUM_BRAND.token_symbol.length}`);
+
         token = parseFloat(
             (await eos.getCurrencyBalance(
                 FORUM_BRAND.token_contract,
@@ -55,7 +58,7 @@ window.addEventListener('identityUpdate', async function () {
                 FORUM_BRAND.token_symbol
             ))[0]
         );
-    }*/
+    }
 
     const novusphere = GetNovusphere();
     const notifications = (await novusphere.api({

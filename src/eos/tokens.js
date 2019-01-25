@@ -39,12 +39,12 @@ async function GetTokensInfo() {
 }
 
 async function GetTokenPrecision(eos, account, sym) {
-    const stats = await eos.getCurrencyStats(
-        account,
-        sym
-    );
-
     try {
+        const stats = await eos.getCurrencyStats(
+            account,
+            sym
+        );
+
         const precision = stats[sym].supply
             .split(" ")[0]
             .split(".")[1].length;
@@ -52,8 +52,8 @@ async function GetTokenPrecision(eos, account, sym) {
         return precision;
     }
     catch (ex) {
-        console.log(account + ' ' + sym);
-        console.log(stats);
+        //console.log(account + ' ' + sym);
+        //console.log(stats);
         return 0;
     }
 }

@@ -85,7 +85,8 @@
                 <template v-if="post.depth === 0">
                   <div class="flex-center received-tips">
                     <div :key="key" class="flex-center" v-for="(tip, key) in received_tips">
-                      <img class="tip-icon" :src="$root.icons[key].logo" :title="`${tip}-${key}`" />
+                      <img v-if="key && (key in $root.icons)" class="tip-icon" :src="$root.icons[key].logo" :title="`${tip}-${key}`" />
+                      <div v-else>{{ key }}</div>
                       <div class="tip-amount"> x {{ tip }} </div>
                     </div>
                   </div>
@@ -398,15 +399,9 @@ export default {
       }
     },
     thumbnail() {
-      let t = null;// = this.post.data.json_metadata.attachment.thumbnail;
-      if (!t) {
-        if (this.sub in BRANDS) {
-          t = BRANDS[this.sub].logo;
-        }
-        else {
-          t = FORUM_BRAND.logo;
-        }
-      }
+      let t = null; // = this.post.data.json_metadata.attachment.thumbnail;
+      t = t ? t : FORUM_BRAND.logo;
+      t = t ? t : BRANDS["novusphere"].logo;
       return t;
     }
   },
@@ -581,7 +576,11 @@ export default {
     },
     openPost() {
       if (screen.width > 600) {
-        this.$emit('openPost', this.selectedPostID, this.post.data.json_metadata.sub)
+        this.$emit(
+          "openPost",
+          this.selectedPostID,
+          this.post.data.json_metadata.sub
+        );
       } else {
         this.$router.push(this.thread_link);
       }

@@ -58,7 +58,7 @@
                 <li class="dropdown-item">
                     {{ identity.atmos }} ATMOS
                 </li>
-                <li v-if="brand_symbol != 'ATMOS'" class="dropdown-item">
+                <li v-if="brand_symbol && (brand_symbol != 'ATMOS')" class="dropdown-item">
                     {{ identity.token }} {{ brand_symbol }}
                 </li>
                 <li class="dropdown-item">
