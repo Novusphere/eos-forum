@@ -300,12 +300,33 @@ export default {
     },
     saveAnonId() {
       if (this.anon_name.length > 12) {
-        alert('Anonymous name must be less than 13 characters');
+        alert("Anonymous name must be less than 13 characters");
         return;
       }
       storage.anon_id.name = this.anon_name;
-      storage.anon_id.key = (this.anon_key && ecc.isValidPrivate(this.anon_key)) ? this.anon_key : "";
+      storage.anon_id.key =
+        this.anon_key && ecc.isValidPrivate(this.anon_key) ? this.anon_key : "";
       SaveStorage();
+
+      if (storage.anon_id.key) {
+        // download
+        
+        const json = JSON.stringify({
+          name: storage.anon_id.name,
+          key: storage.anon_id.key,
+          identity: ecc.privateToPublic(storage.anon_id.key)
+        });
+
+        var a = window.document.createElement("a");
+        a.href = window.URL.createObjectURL(
+          new Blob([json], { type: "application/json" })
+        );
+        a.download = "forum-anonid.json";
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
     }
   },
   data() {
