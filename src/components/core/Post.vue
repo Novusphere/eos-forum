@@ -11,7 +11,7 @@
           class="toggle-icon"
           :icon="['fas', hide ? 'plus-circle' : 'minus-circle']"
         />
-        <font-awesome-icon class="user" :icon="[reddit ? 'fab' : 'fas', reddit ? 'reddit' : 'user-secret']" />
+
         <li class="list-inline-item">
           <a v-if="reddit.author"
             @click.stop

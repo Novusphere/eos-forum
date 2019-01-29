@@ -130,15 +130,15 @@
       <div class="row">
         <div class="col-12 pt-2">
 
-          <p class="text-center">
-            This is an experimental Reddit-style forum built on EOS by the <a href="https://novusphere.io">Novusphere Community</a>.
-            <br/>
-            Special thanks to
-            <a href="https://www.eoscanada.com/">EOS Canada</a>,
-            <a href="https://greymass.com/">Greymass</a>,
-            <a href="https://www.genereos.io/">GenerEOS</a>,
-            <a href="https://get-scatter.com/">Scatter</a>,
-            <a href="https://eosflare.io/">EOS Flare</a>.
+          <p class="text-center" style="font-size: 20px">
+            <ul class="list-inline">
+              <li class="list-inline-item"><a target="_blank" href="https://discord.gg/PtXzUVr"><font-awesome-icon :icon="['fab', 'discord']" ></font-awesome-icon></a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://www.youtube.com/channel/UCEHErggJuJJWDuBEoyLiRVQ"><font-awesome-icon :icon="['fab', 'youtube']" ></font-awesome-icon></a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://twitter.com/thenovusphere"><font-awesome-icon :icon="['fab', 'twitter']" ></font-awesome-icon></a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://medium.com/@thenovusphere/"><font-awesome-icon :icon="['fab', 'medium']" ></font-awesome-icon></a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://github.com/Novusphere"><font-awesome-icon :icon="['fab', 'github']" ></font-awesome-icon></a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://t.me/atmosforum"><font-awesome-icon :icon="['fab', 'telegram']" ></font-awesome-icon></a></li>
+            </ul>
           </p>
 
           <p class="text-center">
@@ -151,10 +151,30 @@
               please contact the respective site owners hosting content in breach of DMCA.
           </p>
 
+          <p class="text-center">
+            <strong>Partners</strong>
+            <ul class="list-inline">
+              <li class="list-inline-item"><router-link :to="{ name: 'Sub', params: { sub: 'eoscafe' } }"><img src="https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png" width="60">EOS Cafe</router-link></li>
+              <li class="list-inline-item"><router-link :to="{ name: 'Sub', params: { sub: 'pixeos' } }"><img src="https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/pixeos.png" width="60">pixEOS</router-link></li>
+            </ul>
+          </p>
+
           <div class="text-center">
             <img src="https://cdn.novusphere.io/static/atmos.svg" style="width: 12.5%">
             <img src="https://cdn.novusphere.io/static/eos3.svg" style="width: 12.5%">
           </div>
+
+          <p class="text-center">
+            <strong>Special Thanks</strong>
+            <ul class="list-inline">
+              <li class="list-inline-item"><a target="_blank" href="https://www.eoscanada.com/">EOS Canada</a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://greymass.com/">Greymass</a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://www.genereos.io/">GenerEOS</a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://get-scatter.com/">Scatter</a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://eoslynx.com/">EOS Lynx</a></li>
+              <li class="list-inline-item"><a target="_blank" href="https://eosflare.io/">EOS Flare</a></li>
+            </ul>
+          </p>
 
         </div>
       </div>
