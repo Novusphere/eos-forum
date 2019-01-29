@@ -18,12 +18,17 @@ library.add(fab);
 import App from "@/App"
 import router from '@/router'
 import Meta from 'vue-meta'
+import VueAnalytics from 'vue-analytics'
 import { LoadStorage } from "@/storage"
 import { LoadConstants } from "@/ui/constants"
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(BootstrapVue);
 Vue.use(Meta);
+Vue.use(VueAnalytics, {
+  id: 'UA-131745808-1',
+  router
+})
 Vue.config.productionTip = false;
 
 (async function () {
@@ -42,13 +47,6 @@ Vue.config.productionTip = false;
       }
     },
     template: '<App/>'
-  });
-
-  router.afterEach((to, from) => {
-    var ga = window.ga || (function () { /*console.log('ga');*/ });
-
-    ga('set', 'page', to.path);
-    ga('send', 'pageview');
   });
 
 })();

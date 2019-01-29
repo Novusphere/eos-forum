@@ -406,11 +406,11 @@ class Post {
         const filters = [
             { // youtube
                 match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/,
-                handle: (m) => attach(m[0], 'url', 'iframe')
+                handle: (m) => attach(m[0], 'url', 'link')
             },
             { // youtube 2
                 match: /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/,
-                handle: (m) => attach(m[0], 'url', 'iframe')
+                handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
 

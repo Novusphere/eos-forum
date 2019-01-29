@@ -13,8 +13,8 @@ function GetHost(href) {
 async function OEmbed(url) {
     const novusphere = GetNovusphere();
 
-    var oembed = null; 
-    
+    var oembed = null;
+
     try { oembed = JSON.parse(await novusphere.cors(url)); }
     catch (ex) { return null; }
 
@@ -98,7 +98,19 @@ class PostAttachment {
                     host = 'youtube.com';
                 }
                 if (host == 'youtube.com' || host == 'www.youtube.com') {
-                    oembed = await OEmbed('https://www.youtube.com/oembed?format=json&url='+attachment.value);
+                    oembed = await OEmbed('https://www.youtube.com/oembed?format=json&url=' + attachment.value);
+                    if (oembed == null) {
+                        // fall back for youtube
+                        const video_src = attachment.value.match('v\=[a-zA-Z0-9_-]+');
+                        if (video_src && video_src.length > 0) {
+                            oembed = {
+                                src: 'https://www.youtube.com/embed/' + video_src[0].substring(2),
+                                thumbnail: '',
+                                width: 560,
+                                height: 315
+                            }
+                        }
+                    }
                 }
                 if (host == 'i.imgur.com') {
                     attachment.display = 'img';
@@ -133,7 +145,7 @@ class PostAttachment {
             if (attachment.display == 'link') {
                 if (attachment.value.endsWith('.png') ||
                     attachment.value.endsWith('.jpg') ||
-                    attachment.value.endsWith('.jpeg') || 
+                    attachment.value.endsWith('.jpeg') ||
                     attachment.value.endsWith('.gif')) {
 
                     attachment.display = 'img';
@@ -152,8 +164,7 @@ class PostAttachment {
             }
         }
 
-        if (oembed)
-        {
+        if (oembed) {
             attachment.thumbnail = oembed.thumbnail;
             attachment.width = oembed.width;
             attachment.height = oembed.height;
