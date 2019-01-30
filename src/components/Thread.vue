@@ -79,6 +79,9 @@ export default {
         this.opening_post = thread.opening_post;
         this.main_post = thread.main_post;
         this.count = thread.count;
+        
+        console.log(this.main_post.referendum != null);
+        console.log(this.main_post.referendum.details != null);
       }
 
       setTimeout(() => this.load(id, child_id), 7500);

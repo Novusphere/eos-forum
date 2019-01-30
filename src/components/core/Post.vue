@@ -49,8 +49,7 @@
               alt="thumbnail">
           </div>
 
-          <div v-if="!post.referendum"
-            class="text-center">
+          <div class="text-center">
             <a
               class="up"
               @click.stop="upvote()">
@@ -58,8 +57,7 @@
               {{ post.up }}
             </a>
           </div>
-
-          <div v-else class="text-center">
+          <div v-if="post.referendum && post.referendum.details" class="text-center">
             <div>
               <font-awesome-icon :icon="['fas', 'user']" />
               {{ post.referendum.details.total_participants }}
@@ -128,7 +126,7 @@
               :collapse="false">
             </post-attachment>
           </div>
-          <div v-if="post.referendum">
+          <div v-if="post.referendum && post.referendum.details">
 
             <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
               <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
@@ -164,7 +162,7 @@
                 reply
               </a>
             </li>
-            <li v-if="post.referendum" class="list-inline-item">
+            <li v-if="post.referendum && post.referendum.details" class="list-inline-item">
               <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
               {{ post.referendum.details.total_eos.toFixed(4) }}
             </li>
@@ -377,7 +375,7 @@ export default {
       return link;
     },
     post_content_html() {
-      var md = new MarkdownParser(this.post.data.content, this.post.createdAt);
+      var md = new MarkdownParser(this.post.getContent(), this.post.createdAt);
       return md.html;
     },
     reddit() {

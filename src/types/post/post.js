@@ -129,12 +129,12 @@ class Post {
         if (post && post.name == 'propose') {
             var data = post.data;
 
-            this.setReferendumDetails(post, post);
+            this.setReferendum(post, post);
 
             post.data = {
                 poster: data.proposer,
                 post_uuid: 'ref-' + post.transaction,
-                content: data.proposal_json.content ? data.proposal_json.content : '',
+                content: '',
                 reply_to_poster: '',
                 reply_to_post_uuid: '',
                 certify: 0,
@@ -204,11 +204,12 @@ class Post {
         this.o_attachment = new PostAttachment(this.data.json_metadata.attachment);
     }
 
-    setReferendumDetails(post, src) {
+    setReferendum(post, src) {
         post.referendum = {
             transaction: src.transaction,
             type: src.data.proposal_json.type || REFERENDUM_TYPES[0],
             name: src.data.proposal_name,
+            content: src.data.proposal_json.content,
             expired: Array.isArray(src.expired) ? (src.expired.length > 0) : src.expired,
             expires_at: src.data.expires_at,
             options: [],
@@ -230,70 +231,30 @@ class Post {
             post.referendum.options = (src.data.proposal_json.options || REFERENDUM_OPTIONS_YN).slice(0, 8);
     }
 
-    async normalize() {
-        if (!this._post) {
-            return;
-        }
-
-        var post = this._post;
-        this._post = null;
-        post.data = await DecensorData(post.transaction, post.data);
-
-        this.data = new PostData(post.data, this.createdAt);
-        this.o_attachment = new PostAttachment(this.data.json_metadata.attachment);
-
-        if (post.recent_edit) {
-            await this.applyEdit(post.recent_edit);
-        }
-
-        if (post.parent) {
-            this.parent = new Post(post.parent);
-            await this.parent.normalize();
-
-            this.data.json_metadata.title = this.parent.data.json_metadata.title;
-        }
-
-        if (!this.data.json_metadata.attachment.value) {
-            await this.detectAttachment();
-        }
-
-        if (this.data.json_metadata.attachment.value &&
-            this.data.json_metadata.attachment.display == 'referendum') {
-
-            const rp = await ui.actions.Referendum.GetProposal(this.data.json_metadata.attachment.value);
-            if (rp) {
-                this.setReferendumDetails(this, rp);
-                post.referendum = this.referendum;
-
-                if (rp.data.proposal_json.content) {
-                    this.data.content = this.data.content + '\n\n---\n\n' + rp.data.proposal_json.content;
-                }
-            }
-        }
-
-        if (post.referendum) {
-            if (isNaN(post.referendum.expires_at)) {
-                post.referendum.expires_at = (new Date(post.referendum.expires_at)).getTime() / 1000;
+    async setReferendumDetails() {
+        if (this.referendum) {
+            if (isNaN(this.referendum.expires_at)) {
+                this.referendum.expires_at = (new Date(this.referendum.expires_at)).getTime() / 1000;
             }
 
-            if (post.referendum.expires_at <= (new Date()).getTime() / 1000) {
-                post.referendum.expired = true;
+            if (this.referendum.expires_at <= (new Date()).getTime() / 1000) {
+                this.referendum.expired = true;
             }
 
             const rcache = await GetReferendumCache();
             const eosvotes = rcache.active;
-            const status = eosvotes[post.referendum.name];
+            const status = eosvotes[this.referendum.name];
 
             var votes = {};
 
-            for (var i = 0; i < post.referendum.options.length; i++) {
+            for (var i = 0; i < this.referendum.options.length; i++) {
                 votes[i] = { value: 0, percent: 0 };
             }
 
             if (status) {
                 var staked_total = status.stats.staked.total;
 
-                if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
+                if (this.referendum.type == REFERENDUM_TYPES[4]) { // multi
                     staked_total = 0;
                 }
 
@@ -305,9 +266,9 @@ class Post {
                     var vote_result = status.stats.staked[vote_value];
                     vote_result = (isNaN(vote_result) ? 0 : parseInt(vote_result)) / 10000;
 
-                    if (post.referendum.type == REFERENDUM_TYPES[4]) { // multi
+                    if (this.referendum.type == REFERENDUM_TYPES[4]) { // multi
 
-                        for (var i = 0; i < post.referendum.options.length; i++) {
+                        for (var i = 0; i < this.referendum.options.length; i++) {
                             if ((vote_value & (1 << i)) != 0) {
                                 if (i in votes)
                                     votes[i].value += vote_result;
@@ -337,13 +298,39 @@ class Post {
                 }
             }
 
-            this.referendum.details = post.referendum.details = {
+            this.referendum.details = {
                 votes: votes,
                 total_participants: status ? status.stats.votes.total : 0,
                 total_eos: (status ? status.stats.staked.total : 0) / 10000,
             }
         }
+    }
 
+    async normalize() {
+        if (!this._post) {
+            return;
+        }
+
+        var post = this._post;
+        this._post = null;
+        post.data = await DecensorData(post.transaction, post.data);
+
+        this.data = new PostData(post.data, this.createdAt);
+        this.o_attachment = new PostAttachment(this.data.json_metadata.attachment);
+
+        if (post.recent_edit) {
+            await this.applyEdit(post.recent_edit);
+        }
+
+        if (post.parent) {
+            this.parent = new Post(post.parent);
+            await this.parent.normalize();
+
+            this.data.json_metadata.title = this.parent.data.json_metadata.title;
+        }
+
+        await this.detectAttachment();
+        await this.setReferendumDetails();
         await this.data.json_metadata.attachment.normalize();
         await this.detectTip();
     }
@@ -394,8 +381,36 @@ class Post {
         }
     }
 
+    getContent() {
+        var str = this.data.content || '';
+        if (this.referendum) {
+            if (str) {
+                str += '\n\n---\n\n';
+            }
+            str += this.referendum.content;;
+        }
+        return str;
+    }
+
     async detectAttachment() {
         var attachment = this.data.json_metadata.attachment;
+
+        if (attachment.value &&
+            attachment.display == 'referendum') {
+
+            const rp = await ui.actions.Referendum.GetProposal(attachment.value);
+            if (rp) {
+                this.setReferendum(this, rp);
+            }
+
+            return;
+        }
+
+        // detect automatic
+
+        if (attachment.value) {
+            return;
+        }
 
         var attach = (v, t, d) => {
             attachment.value = v;
@@ -440,6 +455,8 @@ class Post {
 
         if (edit.data.json_metadata.attachment) {
             this.data.json_metadata.attachment = new PostAttachment(edit.data.json_metadata.attachment);
+            await this.detectAttachment();
+            await this.setReferendumDetails();
         }
     }
 
