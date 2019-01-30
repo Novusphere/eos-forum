@@ -63,7 +63,7 @@ window.addEventListener('identityUpdate', async function () {
     const novusphere = GetNovusphere();
     const notifications = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             {

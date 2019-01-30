@@ -50,7 +50,7 @@ export default async function Referendum(current_page, by) {
 
     var n_proposals = (await novusphere.api({
         aggregate: REFERENDUM_COLLECTION,
-        maxTimeMS: 5000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: MATCH_QUERY },
@@ -67,7 +67,7 @@ export default async function Referendum(current_page, by) {
 
     var payload = (await novusphere.api({
         aggregate: REFERENDUM_COLLECTION,
-        maxTimeMS: 5000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: MATCH_QUERY },

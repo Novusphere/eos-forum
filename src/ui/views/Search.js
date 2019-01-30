@@ -5,7 +5,7 @@ export default async function Search() {
     const novusphere = GetNovusphere();
     var subs = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             {

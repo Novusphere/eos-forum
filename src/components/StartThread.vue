@@ -233,7 +233,7 @@ export default {
 
         var main_post = (await novusphere.api({
           aggregate: novusphere.config.collection_forum,
-          maxTimeMS: 1000,
+          maxTimeMS: 7500,
           cursor: {},
           pipeline: [
             { $match: novusphere.query.match.threadById(id) },

@@ -60,7 +60,7 @@ async function HandleTipAccount(post, json_metadata, parent_tx, actions, set_sta
     const novusphere = GetNovusphere();
     const main_post = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.threadById(parent_tx) },

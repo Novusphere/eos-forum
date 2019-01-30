@@ -8,7 +8,7 @@ export default async function PostHistory(txid) {
 
     var main_post = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: { transaction: txid } },
@@ -28,7 +28,7 @@ export default async function PostHistory(txid) {
 
     var edits = (await novusphere.api({
         find: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         filter: novusphere.query.match.postEdits(main_post.data.poster, main_post.data.post_uuid),
         sort: novusphere.query.sort.time(true)
     })).cursor.firstBatch;

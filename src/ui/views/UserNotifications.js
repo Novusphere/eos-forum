@@ -23,7 +23,7 @@ export default async function UserNotifications(current_page) {
 
     var n_notifications = (await novusphere.api({
         count: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         query: novusphere.query.match.notifications(identity.account)
     })).n;
 
@@ -31,7 +31,7 @@ export default async function UserNotifications(current_page) {
 
     var posts = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 5000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.notifications(identity.account) },

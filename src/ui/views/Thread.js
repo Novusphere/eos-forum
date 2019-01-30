@@ -10,7 +10,7 @@ export default async function Thread(id, child_id) {
     
     var main_post = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.threadById(id) },
@@ -32,7 +32,7 @@ export default async function Thread(id, child_id) {
         // look for extension
         var content_ext = (await novusphere.api({
             aggregate: novusphere.config.collection_nsdb,
-            maxTimeMS: 1000,
+            maxTimeMS: 7500,
             cursor: {},
             pipeline: [
                 {
@@ -60,7 +60,7 @@ export default async function Thread(id, child_id) {
     for (; ;) {
         var _responses = (await novusphere.api({
             aggregate: novusphere.config.collection_forum,
-            maxTimeMS: 1000,
+            maxTimeMS: 7500,
             cursor: {},
             pipeline: [
                 { $match: novusphere.query.match.threadReplies(main_post.data.post_uuid) },

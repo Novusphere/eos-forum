@@ -33,7 +33,7 @@ export default async function Home(current_page, sub, sorter) {
 
     var n_posts = (await novusphere.api({
         count: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         query: novusphere.query.match.threadsBySub(sub, blocked_accounts)
     })).n;
 
@@ -42,7 +42,7 @@ export default async function Home(current_page, sub, sorter) {
 
     var threads = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.threadsBySub(sub, blocked_accounts) },
@@ -73,7 +73,7 @@ export default async function Home(current_page, sub, sorter) {
 
     var pinned_threads = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 7500,
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.threadById(await moderation.getPinned(sub)) },

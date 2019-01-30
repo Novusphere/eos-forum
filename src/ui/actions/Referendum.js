@@ -43,7 +43,7 @@ export default {
 
         var prop = (await novusphere.api({
             aggregate: REFERENDUM_COLLECTION,
-            maxTimeMS: 5000,
+            maxTimeMS: 7500,
             cursor: {},
             pipeline: [
                 { $match: MATCH_QUERY },
@@ -58,7 +58,7 @@ export default {
 
         var votes = (await novusphere.api({
             find: REFERENDUM_COLLECTION,
-            maxTimeMS: 1000,
+            maxTimeMS: 7500,
             filter: {
                 name: "vote",
                 "data.proposal_name": prop.data.proposal_name,
@@ -69,7 +69,7 @@ export default {
 
         var unvotes = (await novusphere.api({
             find: REFERENDUM_COLLECTION,
-            maxTimeMS: 1000,
+            maxTimeMS: 7500,
             filter: {
                 name: "unvote",
                 "data.proposal_name": prop.data.proposal_name,
