@@ -22,7 +22,7 @@
             </div>
 
             <div class="d-none d-sm-inline-block">
-              {{ $route.params.sub }}
+              /e/{{ $route.params.sub }}
             </div>
           </div>
 
