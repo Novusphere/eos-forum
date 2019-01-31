@@ -50,6 +50,7 @@ export default class ScatterWallet {
     }
 
     constructor(scatter, identity) {
+        this.scatter = scatter;
         this.identity = identity;
     }
 
