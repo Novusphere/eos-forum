@@ -1,6 +1,7 @@
 <template>
   <!-- POST -->
   <div
+    v-if="!(!showChildren && hide_spam_threads && is_spam)"
     @click="openPost"
     class="post">
     <template v-if="post.depth !== 0">
@@ -256,6 +257,7 @@
 import { BRANDS, FORUM_BRAND } from "@/ui/constants";
 import ui from "@/ui";
 import requests from "@/requests";
+import { storage } from "@/storage";
 import { GetIdentity, GetTokensInfo } from "@/eos";
 import { MarkdownParser } from "@/markdown";
 import { moderation } from "@/moderation";
@@ -415,14 +417,18 @@ export default {
       });
       this.$root.icons = icons;
     }
-    this.hide = this.is_spam ? true : false;
+
     this.identity = await GetIdentity();
+
+    this.hide_spam_threads = storage.moderation.hide_spam_threads;
 
     this.is_spam = await moderation.isBlocked(
       this.post.createdAt,
       this.post.o_transaction,
       this.post.data.poster
     );
+
+    this.hide = this.is_spam ? true : false;
 
     this.is_nsfw =
       (this.post.tags && this.post.tags.includes("nsfw")) ||
@@ -608,6 +614,7 @@ export default {
       quick_reply: "",
       is_nsfw: false,
       is_spam: false,
+      hide_spam_threads: false,
       hide: false
     };
   }
