@@ -63,10 +63,10 @@ a:hover {
     flex-wrap: wrap;
 }
 
-.topwrap {
+.flex-column {
     display: flex;
+    flex-direction: column;
 }
-
 
 /*-----------------------------------------------------------------*/
 /*--- Footer ---*/
@@ -421,9 +421,8 @@ td.chbox {
     width: 85%;
 }
 
-.post .userinfo {
-    width: 15%;
-    padding: 20px 0 15px 15px;
+.post {
+    padding: 20px 20px 15px 15px;
 }
 
 .post img {
@@ -431,9 +430,7 @@ td.chbox {
 }
 
 .post .posttext {
-    width: 85%;
-    padding-right: 30px;
-    padding-top: 20px;
+    width: 100%;
     padding-bottom: 15px;
     word-wrap: break-word;
     color: #989c9e;
@@ -972,199 +969,4 @@ a.down:hover {
 
 .accsection input[type=password] {
     margin-bottom: 0;
-}
-
-
-/*-----------------------------------------------------------------*/
-/*--- Extra small devices (less 767px) ---*/
-
-@media (max-width: 767px) {
-
-    /*--- index.html ---*/
-
-    .post .userinfo {
-        width: 30%;
-        padding: 15px 0 15px 15px;
-    }
-
-    .post .posttext {
-        width: 70%;
-        padding-right: 15px;
-        padding-top: 15px;
-        padding-bottom: 15px;
-    }
-
-    .post .comments .commentbg {
-        font-size: 12px;
-        padding: 7px;
-        min-width: 35px;
-    }
-    .post .time i {
-        display: block;
-        margin-top: 5px;
-    }
-
-    .post .views i {
-        display: block;
-        margin-top: 5px;
-    }
-
-    .post .comments .commentbg .mark {
-        left: 36%;
-    }
-
-    .post .time,
-    .post .views,
-    .post .views {
-    }
-
-    .avatar .dropdown-menu {
-        left: auto;
-        right: 0;
-    }
-
-    .dropdown.avatar .status {
-        right: 14px;
-    }
-
-    .dropdown.avatar b.caret {
-        color: #363838;
-    }
-
-    .sociconcent {
-        text-align: center;
-    }
-
-    /*--- 02_topic.html ---*/
-
-    .postinfobot {
-        padding: 10px;
-    }
-
-    .postinfobot .likeblock {
-        width: 100%;
-    }
-
-    .postinfobot .posted {
-        margin: 0;
-    }
-
-    .postinfobot .next {
-        width: 76px;
-        margin: 0;
-    }
-
-    .textwraper textarea {
-        width: 175px;
-    }
-
-    footer ul.socialicons {
-        margin: 0;
-        padding: 0;
-    }
-    /* end 2*/
-
-    /*--- 03_new_topic.html ---*/
-    #pass {
-        margin-bottom: 20px;
-    }
-
-    .accsection .htext,
-    .accsection .hnotice {
-        width: 100%;
-    }
-
-    .accsection .hnotice {
-        font-size: 10px;
-    }
-
-    .postinfobot .lblfch {
-        width: 80%;
-    }
-    .postinfobot .lblfch label {
-        line-height: normal;
-        padding-top: 15px;
-        padding-bottom: 15px;
-
-    }
-    /* end 3 */
-}
-
-
-/*-----------------------------------------------------------------*/
-/*--- Small devices (768 - 991px) ---*/
-
-@media (min-width: 768px) and (max-width: 991px) {
-
-    .post .userinfo {
-        width: 10%;
-        padding: 15px 0 15px 15px;
-    }
-
-    .post .posttext {
-        width: 85%;
-        padding-right: 15px;
-        padding-top: 15px;
-        padding-bottom: 15px;
-    }
-
-    .post .comments .commentbg {
-        font-size: 12px;
-        padding: 7px;
-        min-width: 35px;
-    }
-    .post .time i {
-        display: block;
-        margin-top: 5px;
-    }
-
-    .post .views i {
-        display: block;
-        margin-top: 5px;
-    }
-
-    .post .comments .commentbg .mark {
-        left: 36%;
-    }
-
-    .avatar .dropdown-menu {
-        left: auto;
-        right: 0;
-    }
-
-    .dropdown.avatar .status {
-        right: 14px;
-    }
-
-    .dropdown.avatar b.caret {
-        color: #363838;
-    }
-
-}
-
-
-/*-----------------------------------------------------------------*/
-/*--- Medium devices (992-1200px) ---*/
-@media (min-width: 992px) and (max-width: 1200px) {
-
-    .avatar .dropdown-menu {
-        left: auto;
-        right: 0;
-    }
-    ul.socialicons {
-        margin-bottom: 0;
-    }
-
-    /* 2 */
-    .textwraper textarea {
-
-        width: 100%;
-    }
-    /* end 2 */
-}
-
-
-/*-----------------------------------------------------------------*/
-/*--- Large devices (more 1200px) ---*/
-@media (min-width: 1201px) {
 }

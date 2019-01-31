@@ -32,47 +32,43 @@
           {{ new Date(post.createdAt * 1000).toLocaleString() }}
         </div>
         <div class="flex-center received-tips">
-          <div :key="key" class="flex-center" v-for="(tip, key) in received_tips">
-            <img class="tip-icon" :src="$root.icons[key].logo" :title="`${tip}-${key}`" />
+          <div @click.stop.prevent="goToSub(key)" :key="key" class="flex-center hover" v-for="(tip, key) in received_tips">
+            <img class="tip-icon" :src="$root.icons[key].logo" :title="`${tip} ${key}`" />
             <div class="tip-amount"> x {{ tip }} </div>
           </div>
         </div>
       </div>
     </template>
     <div class="post-body" :class="{'hidden': hide === true && post.depth !== 0}">
-      <div class="topwrap">
+      <div class="flex-column">
 
-        <div class="userinfo float-left">
-          <div v-if="!thread && !post.referendum"
-            class="postthumbnail">
-            <img :src="thumbnail"
-              class="img-fluid"
-              alt="thumbnail">
-          </div>
-
-          <div class="text-center">
-            <a
-              class="up"
-              @click.stop="upvote()">
-              <font-awesome-icon :icon="['far', 'thumbs-up']" />
-              {{ post.up }}
-            </a>
-          </div>
-          <div v-if="post.referendum && post.referendum.details" class="text-center">
+        <div class="userinfo">
+          <div v-if="is_op" class="post-icon" >
             <div>
-              <font-awesome-icon :icon="['fas', 'user']" />
-              {{ post.referendum.details.total_participants }}
+              <img class="hover" @click.stop.prevent="goToSub()" :src="thumbnail" alt="thumbnail">
+
+              <div class="text-center">
+                <a
+                  class="up"
+                  @click.stop="upvote()">
+                  <font-awesome-icon :icon="['far', 'thumbs-up']" />
+                  {{ post.up }}
+                </a>
+              </div>
+            </div>
+            <div v-if="post.referendum && post.referendum.details" class="text-center">
+              <div>
+                <font-awesome-icon :icon="['fas', 'user']" />
+                {{ post.referendum.details.total_participants }}
+              </div>
+            </div>
+
+            <div class="text-center">
+              <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
+              <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
+              <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
             </div>
           </div>
-
-          <div class="text-center">
-            <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
-            <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
-            <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
-          </div>
-        </div>
-
-        <div class="posttext float-left">
           <div>
               <div class="flex-center">
                 <a @click.stop="$emit('openPost', selectedPostID, post.data.json_metadata.sub)" class="title" target="_blank">
@@ -81,17 +77,17 @@
                 <a v-if="offsite" :href="post.o_attachment.value" class="offsite" target="_blank">
                   ({{ offsite }})
                 </a>
-                <template v-if="post.depth === 0">
+                <template v-if="is_op">
                   <div class="flex-center received-tips">
-                    <div :key="key" class="flex-center" v-for="(tip, key) in received_tips">
-                      <img v-if="key && (key in $root.icons)" class="tip-icon" :src="$root.icons[key].logo" :title="`${tip}-${key}`" />
+                    <div @click.stop.prevent="goToSub(key)" :key="key" class="flex-center hover" v-for="(tip, key) in received_tips">
+                      <img v-if="key && (key in $root.icons)" class="tip-icon" :src="$root.icons[key].logo" :title="`${tip} ${key}`" />
                       <div v-else>{{ key }}</div>
                       <div class="tip-amount"> x {{ tip }} </div>
                     </div>
                   </div>
                 </template>
               </div>
-              <div v-if="post.depth === 0">
+              <div v-if="is_op">
                 <li class="list-inline-item">
                   <a v-if="reddit.author"
                     @click.stop
@@ -107,7 +103,7 @@
                     {{ poster_name }}
                   </router-link>
                 </li>
-                <li v-if="!thread || post.depth == 0"
+                <li v-if="!thread || is_op"
                   class="list-inline-item">
                   in
                   <router-link
@@ -119,6 +115,9 @@
                 </li>
               </div>
           </div>
+        </div>
+
+        <div class="posttext float-left">
           <div>
             <post-attachment
               ref="post_attachment"
@@ -177,7 +176,7 @@
                 edit
               </a>
             </li>
-            <li class="list-inline-item" v-if="post.depth === 0">
+            <li class="list-inline-item" v-if="is_op">
               <template v-if="!post.referendum">
                 <font-awesome-icon :icon="['fas', 'clock']" />
                 {{ new Date(post.createdAt * 1000).toLocaleString() }}
@@ -292,6 +291,9 @@ export default {
     }
   },
   computed: {
+    is_op() {
+      return this.is_op;
+    },
     received_tips() {
       const tips = {};
       this.post.children.forEach(child => {
@@ -432,13 +434,27 @@ export default {
 
     this.is_nsfw =
       (this.post.tags && this.post.tags.includes("nsfw")) ||
-      (this.post.depth == 0 &&
+      (this.is_op &&
         (await moderation.isNsfw(
           this.post.createdAt,
           this.post.o_transaction
         )));
   },
   methods: {
+    goToSub(token) {
+      console.log('go to sub', token, BRANDS);
+      // const brands = await GetTokensInfo();
+      const brand = Object.keys(BRANDS).find(k => {
+        if (BRANDS[k].token_symbol === token) {
+          return k;
+        }
+      })
+      if (brand && brand !== this.$route.params.sub) {
+        this.$router.push(`/e/${brand}`);
+      } else if (!token && this.sub !== this.$route.params.sub) {
+        this.$router.push(`/e/${this.sub}`);
+      }
+    },
     showQuickEdit() {
       this.show_quick_edit = !this.show_quick_edit;
       this.quick_reply = this.show_quick_edit ? this.post.data.content : "";
@@ -657,5 +673,21 @@ export default {
 .received-tips {
   margin-left: 10px;
   margin-right: 10px;
+}
+.post-icon {
+  width: 50px;
+  margin-right: 15px;
+}
+.post-icon img {
+  max-width: 50px!important;
+}
+.userinfo {
+  display: flex;
+}
+.tip:hover {
+  cursor: pointer;
+}
+.hover:hover {
+  cursor: pointer;
 }
 </style>
