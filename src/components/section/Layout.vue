@@ -20,6 +20,15 @@
                 <img :src="brand_logo" style="height: 38px;">
               </router-link>
             </div>
+
+            <div class="d-none d-sm-inline-block sub">
+              <template v-if="$route.params.sub" >
+                {{ $route.params.sub }}
+              </template>
+              <template v-else>
+                Home
+              </template>
+            </div>
           </div>
 
           <div class="col-8 col-sm-6 col-md-6 col-lg-4 col-xl-4 text-right">
@@ -278,3 +287,11 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.sub {
+  text-transform: capitalize;
+  font-size: 18px;
+  color: black;
+}
+</style>
