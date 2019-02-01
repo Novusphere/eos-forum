@@ -442,8 +442,6 @@ export default {
   },
   methods: {
     goToSub(token) {
-      console.log('go to sub', token, BRANDS);
-      // const brands = await GetTokensInfo();
       const brand = Object.keys(BRANDS).find(k => {
         if (BRANDS[k].token_symbol === token) {
           return k;

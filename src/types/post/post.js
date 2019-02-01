@@ -420,11 +420,15 @@ class Post {
 
         const filters = [
             { // youtube
-                match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/,
+                match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/i,
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             { // youtube 2
-                match: /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/,
+                match: /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/i,
+                handle: (m) => attach(m[0], 'url', 'link')
+            },
+            {
+                match: /https:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/i,
                 handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
