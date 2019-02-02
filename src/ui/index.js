@@ -1,6 +1,7 @@
 import { GetNovusphere } from "@/novusphere";
 import { GetEOS } from "@/eos";
 import { storage } from "@/storage";
+import { LoadAccountState } from "@/accountstate";
 
 // views
 import Home from "./views/Home";
@@ -30,6 +31,10 @@ import { GetIdentity } from "../eos";
 // constants
 import { FORUM_BRAND } from "./constants";
 
+window.addEventListener('identity', async function() {
+    await LoadAccountState();
+});
+
 window.addEventListener('identityUpdate', async function () {
     //console.log('identity' + Math.random());
 
@@ -49,8 +54,6 @@ window.addEventListener('identityUpdate', async function () {
         (FORUM_BRAND.token_contract != 'novusphereio' ||
         FORUM_BRAND.token_symbol != 'ATMOS')) {
             
-        console.log(`hello ${FORUM_BRAND.token_contract.length} - ${FORUM_BRAND.token_symbol.length}`);
-
         token = parseFloat(
             (await eos.getCurrencyBalance(
                 FORUM_BRAND.token_contract,

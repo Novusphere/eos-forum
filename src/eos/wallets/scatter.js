@@ -60,6 +60,7 @@ export default class ScatterWallet {
         const identity = ScatterJS.account('eos');
 
         this.identity.account = identity.name;
+        this.identity.publicKey = identity.publicKey;
         this.identity.auth = identity.authority;
         this.identity.atmos = '0.000';
         this.identity.token = '0.000';
@@ -93,5 +94,9 @@ export default class ScatterWallet {
         });
     
         return eostx.transaction_id;
+    }
+
+    async sign(pub, data) {
+        return ScatterJS.getArbitrarySignature(pub, data);
     }
 }

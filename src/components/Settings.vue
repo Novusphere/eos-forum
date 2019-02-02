@@ -202,6 +202,7 @@ import ecc from "eosjs-ecc";
 import ui from "@/ui";
 import { storage, DEFAULT_STORAGE, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
+import { LoadAccountState } from "@/accountstate";
 
 import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
@@ -249,10 +250,11 @@ export default {
     reset() {
       this.settings = JSON.stringify(DEFAULT_STORAGE.settings, null, 2);
     },
-    save() {
+    async save() {
       storage.settings = JSON.parse(this.settings);
       this.theme = storage.settings.theme;
       this.mods = storage.moderation.mods;
+
       SaveStorage();
     },
     forgetAll() {
@@ -298,7 +300,7 @@ export default {
     async newAnonId() {
       this.anon_key = await ecc.randomKey();
     },
-    saveAnonId() {
+    async saveAnonId() {
       if (this.anon_name.length > 12) {
         alert("Anonymous name must be less than 13 characters");
         return;
@@ -306,11 +308,15 @@ export default {
       storage.anon_id.name = this.anon_name;
       storage.anon_id.key =
         this.anon_key && ecc.isValidPrivate(this.anon_key) ? this.anon_key : "";
-      SaveStorage();
 
       if (storage.anon_id.key) {
+        await LoadAccountState();
+        SaveStorage();
+
+        this.$forceUpdate();
+
         // download
-        
+
         const json = JSON.stringify({
           name: storage.anon_id.name,
           key: storage.anon_id.key,
@@ -326,6 +332,9 @@ export default {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+      } else {
+        SaveStorage();
       }
     }
   },

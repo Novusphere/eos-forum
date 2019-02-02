@@ -1,10 +1,13 @@
 import { storage, SaveStorage } from "@/storage";
+import { SaveAccountState } from "@/accountstate";
 
 export default async function Subscribe(subscribe, sub) {
     if (subscribe) {
         if (storage.subscribed_subs.includes(sub)) return;
         storage.subscribed_subs.push(sub);
         SaveStorage();
+
+        await SaveAccountState();
 
         return true;
     } else {
@@ -17,6 +20,8 @@ export default async function Subscribe(subscribe, sub) {
         }
 
         SaveStorage();
+
+        await SaveAccountState();
 
         return false;
     }

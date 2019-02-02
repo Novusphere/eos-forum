@@ -227,6 +227,7 @@
           <div class="col-sm-12 mt-1 mb-2">
             <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
             <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(true)">post anon</button>
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" @click="addTip()">tip</button>
           </div>
         </div>
 
@@ -465,6 +466,14 @@ export default {
         this.quick_reply = "";
       }
       this.show_quick_edit = false;
+    },
+    async addTip() {
+      var brand = BRANDS["novusphere"];
+      if (BRANDS[this.sub] && BRANDS[this.sub].token_symbol) {
+        brand = BRANDS[this.sub];
+      }
+
+      this.quick_reply += ' #tip 1 ' + brand.token_symbol;
     },
     async upvote() {
       if (this.post.my_vote) {

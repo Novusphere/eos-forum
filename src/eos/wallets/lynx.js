@@ -17,6 +17,7 @@ export default class LynxWallet {
         const identity = await lynx.requestSetAccountName();
 
         this.identity.account = identity;
+        this.identity.publicKey = '';
         this.identity.auth = 'active'; // assume
         this.identity.atmos = '0.000';
         this.identity.token = '0.000';
@@ -57,5 +58,13 @@ export default class LynxWallet {
 
             throw err;
         }
+    }
+
+    async sign(pub, data) {
+        const lynx = this.lynx;
+        return await lynx.requestArbitrarySignature({
+            data: data,
+            whatFor: '',
+        });
     }
 }

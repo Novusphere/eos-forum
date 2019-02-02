@@ -21,9 +21,10 @@ var DEFAULT_STORAGE = {
     },
     settings: {
         atmos_upvotes: true,
-        scatter_timeout: 1500,
+        scatter_timeout: 3000,
         theme: "https://eos-forum.org/static/css/theme/day.css",
         novusphere_api: "https://db.novusphere.io",
+        //novusphere_api: "http://localhost:8099",
         eos_api: {
             host: "eos.greymass.com", // ( or null if endorsed chainId )
             port: "443", // ( or null if defaulting to 80 )

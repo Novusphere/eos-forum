@@ -84,6 +84,13 @@ async function ExecuteEOSActions(actions) {
     return (await g_wallet.executeActions(auth, actions));
 }
 
+async function SignData(pub, data) {
+    if (!g_wallet.sign) {
+        return '';
+    }
+    return await g_wallet.sign(pub, data);
+}
+
 export {
     EOS_OPTIONS,
     DEFAULT_IDENTITY,
@@ -91,6 +98,7 @@ export {
     GetIdentity,
     ForgetIdentity,
     ExecuteEOSActions,
+    SignData,
     EOSBinaryReader,
     GetTokensInfo,
     GetTokenPrecision,

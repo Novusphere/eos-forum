@@ -16,6 +16,7 @@ import Settings from "@/components/Settings";
 Vue.use(Router)
 
 export default new Router({
+  //mode: "history",
   routes: [
     { // default route
       path: '/',
@@ -76,6 +77,6 @@ export default new Router({
       path: '/test',
       name: 'Test',
       component: Test
-    },
+    }
   ]
 })

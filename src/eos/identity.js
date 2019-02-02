@@ -7,6 +7,7 @@ export default class Identity {
     
     setDefault() {
         this.account = '';
+        this.publicKey = '';
         this.auth = '';
         this.atmos = '0.000';
         this.token = '0.000';
