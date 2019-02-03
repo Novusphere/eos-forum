@@ -154,8 +154,8 @@
           <ul class="list-inline">
             <li class="list-inline-item">
               <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
-                  <font-awesome-icon :icon="['fas', 'reply']" />
-                  <span v-if="!post.parent">{{ post.total_replies }} comments</span>
+                <font-awesome-icon :icon="['fas', 'reply']" />
+                <span v-if="!post.parent">{{ post.total_replies }} comments</span>
               </router-link>
               <a class="reply" v-else @click.stop="showQuickReply()">
                 <font-awesome-icon :icon="['fas', 'reply']" />
@@ -271,6 +271,11 @@ export default {
     PostAttachment
   },
   props: {
+    notification: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     preview: {
       type: Boolean,
       required: false,
@@ -292,9 +297,6 @@ export default {
     }
   },
   computed: {
-    is_op() {
-      return this.is_op;
-    },
     received_tips() {
       const tips = {};
       this.post.children.forEach(child => {
@@ -335,7 +337,7 @@ export default {
       );
     },
     is_op() {
-      return !this.post.data.reply_to_poster;
+      return !this.post.data.reply_to_poster || this.notification;
     },
     offsite() {
       if (
