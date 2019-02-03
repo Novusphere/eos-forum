@@ -129,9 +129,9 @@
           <div v-if="post.referendum && post.referendum.details">
 
             <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
-              <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
-              <input v-if="identity.account && is_multi_referendum" class="form-check-input" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
               <div class="progress">
+                <input v-if="identity.account && !is_multi_referendum" class="checkbox" type="radio" name="vote" :value="i" v-model="vote_value">
+                <input v-if="identity.account && is_multi_referendum" class="checkbox" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
                 <div class="referendumbar progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
                   {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
                 </div>
@@ -696,5 +696,10 @@ export default {
 }
 .hover:hover {
   cursor: pointer;
+}
+.checkbox {
+  height: 100%;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 </style>
