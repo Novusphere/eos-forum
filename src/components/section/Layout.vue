@@ -107,7 +107,7 @@
               <font-awesome-icon
                 @click="toggleSubs()"
                 class="sub-toggle"
-                :icon="['fas', showSubs ? 'minus-square' : 'plus-square']" />
+                :icon="['fas', $root.showSubs ? 'minus-square' : 'plus-square']" />
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
                 Home
@@ -119,7 +119,7 @@
               </router-link>
               <div class="divline" />
               <router-link v-for="sub in subs"
-                v-show="showSubs"
+                v-show="$root.showSubs"
                 :key="sub"
                 class="dropdown-item"
                 :to="{ name: 'Sub', params: { sub: sub } }">
@@ -280,7 +280,7 @@ export default {
       await ForgetIdentity();
     },
     toggleSubs() {
-      this.showSubs = !this.showSubs;
+      this.$root.showSubs = !this.$root.showSubs;
     }
   },
   data() {
@@ -291,7 +291,6 @@ export default {
       brand_icon: "",
       brand_symbol: "",
       brand_banner: "",
-      showSubs: true,
     };
   }
 };
@@ -308,9 +307,11 @@ export default {
 }
 .sub-toggle {
   position: absolute;
-  right: 10px;
+  right: 0;
   top:0;
-  height: 59px;
-  width: 20px;
+  height: 58px;
+  width: 50px;
+  padding: 10px;
+  background-color: white;
 }
 </style>
