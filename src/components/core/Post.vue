@@ -129,9 +129,9 @@
           <div v-if="post.referendum && post.referendum.details">
 
             <div v-for="(o, i) in post.referendum.options" :key="i" class="mb-1">
-              <input v-if="identity.account && !is_multi_referendum" class="form-check-input" type="radio" name="vote" :value="i" v-model="vote_value">
-              <input v-if="identity.account && is_multi_referendum" class="form-check-input" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
               <div class="progress">
+                <input v-if="identity.account && !is_multi_referendum" class="checkbox" type="radio" name="vote" :value="i" v-model="vote_value">
+                <input v-if="identity.account && is_multi_referendum" class="checkbox" type="checkbox" name="vote2" v-model="vote_value_multi[i]">
                 <div class="referendumbar progress-bar" role="progressbar" :style="'width: ' + post.referendum.details.votes[i].percent + '%; background-color: ' + referendumColor(i)">
                   {{ o }} ({{ post.referendum.details.votes[i].percent }}%)
                 </div>
@@ -154,8 +154,8 @@
           <ul class="list-inline">
             <li class="list-inline-item">
               <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
-                  <font-awesome-icon :icon="['fas', 'reply']" />
-                  <span v-if="!post.parent">{{ post.total_replies }} comments</span>
+                <font-awesome-icon :icon="['fas', 'reply']" />
+                <span v-if="!post.parent">{{ post.total_replies }} comments</span>
               </router-link>
               <a class="reply" v-else @click.stop="showQuickReply()">
                 <font-awesome-icon :icon="['fas', 'reply']" />
@@ -271,6 +271,11 @@ export default {
     PostAttachment
   },
   props: {
+    notification: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     preview: {
       type: Boolean,
       required: false,
@@ -292,9 +297,6 @@ export default {
     }
   },
   computed: {
-    is_op() {
-      return this.is_op;
-    },
     received_tips() {
       const tips = {};
       this.post.children.forEach(child => {
@@ -335,7 +337,7 @@ export default {
       );
     },
     is_op() {
-      return !this.post.data.reply_to_poster;
+      return !this.post.data.reply_to_poster || this.notification;
     },
     offsite() {
       if (
@@ -696,5 +698,10 @@ export default {
 }
 .hover:hover {
   cursor: pointer;
+}
+.checkbox {
+  height: 100%;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 </style>

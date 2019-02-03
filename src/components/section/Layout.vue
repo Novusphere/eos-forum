@@ -104,6 +104,10 @@
         <div class="row">
           <div class="col-0 col-lg-3 col-xl-3">
             <div class="sidebarblock">
+              <font-awesome-icon
+                @click="toggleSubs()"
+                class="sub-toggle"
+                :icon="['fas', $root.showSubs ? 'minus-square' : 'plus-square']" />
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
                 Home
@@ -115,6 +119,7 @@
               </router-link>
               <div class="divline" />
               <router-link v-for="sub in subs"
+                v-show="$root.showSubs"
                 :key="sub"
                 class="dropdown-item"
                 :to="{ name: 'Sub', params: { sub: sub } }">
@@ -265,7 +270,7 @@ export default {
       this.identity = await GetIdentity(true);
       if (!this.identity.account) {
         alert(
-          "Failed to detect a compatible EOS wallet!" + 
+          "Failed to detect a compatible EOS wallet!" +
           " If your wallet is open, and we failed to detect it try refreshing the page." +
           " However if you don't have a compatible EOS wallet, you can still post to the forum anonymously for free!"
         );
@@ -273,6 +278,9 @@ export default {
     },
     async logout() {
       await ForgetIdentity();
+    },
+    toggleSubs() {
+      this.$root.showSubs = !this.$root.showSubs;
     }
   },
   data() {
@@ -282,7 +290,7 @@ export default {
       brand_logo: "",
       brand_icon: "",
       brand_symbol: "",
-      brand_banner: ""
+      brand_banner: "",
     };
   }
 };
@@ -293,5 +301,17 @@ export default {
   text-transform: capitalize;
   font-size: 18px;
   color: black;
+}
+.sub-toggle:hover {
+  cursor: pointer;
+}
+.sub-toggle {
+  position: absolute;
+  right: 0;
+  top:0;
+  height: 58px;
+  width: 50px;
+  padding: 10px;
+  background-color: white;
 }
 </style>
