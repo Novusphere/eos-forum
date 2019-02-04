@@ -27,10 +27,10 @@
                   <div class="form-group row" v-if="!edit_post && !is_referendum">
                      <label class="col-sm-2 col-form-label">Sub</label>
                      <div class="col-sm-10">
-                        <v-select v-model="sub" :options="sub_options" label="sub" class="form-control">
+                        <v-select v-model="sub2" :options="sub_options" label="sub" class="form-control">
                           <template slot="option" slot-scope="option">
-                            {{ option.sub }}
                             <img v-if="option.logo" :src="option.logo" style="max-width:24px">
+                            {{ option.sub }}
                           </template>
                         </v-select>
                      </div>
@@ -205,7 +205,7 @@ export default {
   watch: {},
   computed: {
     is_referendum() {
-      return this.sub == "referendum";
+      return this.sub2.sub == "referendum";
     },
     is_referendum_multi() {
       return (
@@ -274,18 +274,19 @@ export default {
         }
 
         sub_options.push({
-          logo: "",
+          logo: BRANDS["novusphere"].logo,
           sub: storage.subscribed_subs[i]
         });
       }
 
       for (var i = 0; i < sub_options.length; i++) {
         const brand = BRANDS[sub_options[i].sub];
-        if (brand) {
+        if (brand && brand.logo) {
           sub_options[i].logo = brand.logo;
         }
       }
 
+      this.sub2 = sub_options[0];
       this.sub_options = sub_options;
     },
     setStatus(message) {
@@ -318,7 +319,7 @@ export default {
         json_metadata: JSON.stringify({
           title: this.title,
           type: "novusphere-forum",
-          sub: edit_post ? edit_post.data.json_metadata.sub : this.sub,
+          sub: edit_post ? edit_post.data.json_metadata.sub : this.sub2.sub,
           parent_uuid: edit_post ? edit_post.data.post_uuid : "",
           parent_poster: edit_post ? edit_post.data.poster : "",
           edit: edit_post ? true : false,
@@ -379,7 +380,7 @@ export default {
       this.$router.push({
         name: "Thread",
         params: {
-          sub: this.sub,
+          sub: this.sub2.sub,
           id: this.edit_post ? this.edit_post.o_transaction : txid
         }
       });
@@ -412,6 +413,7 @@ export default {
       identity: {},
       status: "",
       sub: "",
+      sub2: {},
       title: "",
       content: "",
       attachment: {

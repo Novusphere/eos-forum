@@ -123,8 +123,8 @@
                 :key="s.sub"
                 class="dropdown-item"
                 :to="{ name: 'Sub', params: { sub: s.sub } }">
-                e/{{ s.sub }}
                 <img v-if="s.logo" :src="s.logo" style="max-width:24px">
+                e/{{ s.sub }}
               </router-link>
             </div>
           </div>
@@ -238,12 +238,12 @@ export default {
     subs() {
       var subs = storage.subscribed_subs.map(s => ({
         sub: s,
-        logo: ""
+        logo: BRANDS["novusphere"].logo
       }));
 
       for (var i = 0; i < subs.length; i++) {
         const brand = BRANDS[subs[i].sub];
-        if (brand) {
+        if (brand && brand.logo) {
           subs[i].logo = brand.logo;
         }
       }
