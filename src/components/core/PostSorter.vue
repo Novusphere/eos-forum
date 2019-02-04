@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown d-inline-block">
     <button
-      class="btn btn-outline-primary dropdown-toggle"
+      class="btn btn-primary dropdown-toggle"
       type="button"
       id="sortBy"
       data-toggle="dropdown">

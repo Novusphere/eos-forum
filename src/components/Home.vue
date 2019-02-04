@@ -19,14 +19,33 @@
           <button v-if="sub && !is_subscribed"
             v-on:click="subscribe(true)"
             type="button"
-            class="btn btn-outline-primary mr-1">
+            class="btn btn-primary mr-1">
             subscribe
           </button>
           <button v-if="sub && is_subscribed"
             v-on:click="subscribe(false)"
             type="button"
-            class="btn btn-outline-danger mr-1">
+            class="btn btn-danger mr-1">
             unsubscribe
+          </button>
+          <button
+            type="button"
+            class="btn"
+            @click="showPreview()"
+            :class="{
+              'btn-primary' : $root.showPreview
+            }"
+          >
+            <font-awesome-icon :icon="['fas', 'th-list']" />
+          </button>
+          <button
+            type="button"
+            @click="hidePreview()"
+            class="btn"
+            :class="{
+              'btn-primary' : !$root.showPreview
+            }">
+            <font-awesome-icon :icon="['fas', 'list']" />
           </button>
         </div>
         <div class="float-right">
@@ -47,6 +66,7 @@
         <post
           v-for="p in posts"
           class="post-parent"
+          :class="{'hide-preview': $root.showPreview === false}"
           :key="p.transaction"
           @openPost="openPost"
           :post="p"
@@ -131,7 +151,8 @@ export default {
       this.sub = this.$route.params.sub;
       this.posts = [];
       this.pages = 0;
-
+      this.selectedPostID = undefined;
+      window.scrollTo(0,0);
       const novusphere = GetNovusphere();
       var home = await ui.views.Home(this.$route.query.page, this.sub, this.$refs.sorter.getSorter());
       this.is_subscribed = home.is_subscribed;
@@ -164,6 +185,14 @@ export default {
     closePost () {
       this.selectedPostID = undefined;
       history.pushState({},"","#/");
+    },
+    hidePreview () {
+      this.$root.showPreview = false;
+      localStorage.setItem('preview', false);
+    },
+    showPreview () {
+      this.$root.showPreview = true;
+      localStorage.setItem('preview', true);
     }
   },
   data() {

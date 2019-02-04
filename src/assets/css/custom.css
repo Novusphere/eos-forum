@@ -430,7 +430,16 @@ td.chbox {
 .post img {
     max-width: 100%;
 }
+.hide-preview {
+    padding-bottom: 0 !important;
+}
+.hide-preview .posttext {
+    display: none;
+}
 
+.hide-preview .postinfobot {
+    position: static;
+}
 .post .posttext {
     width: 100%;
     padding-bottom: 15px;
@@ -708,20 +717,14 @@ a.down:hover {
 
 .btn-primary {
     background-color: #1abc9c;
-    box-shadow: none;
-    border-radius: 2px;
-    padding: 10px 15px;
-    color: #ffffff;
-    font-size: 14px;
-    font-family: 'Open Sans Bold', sans-serif;
-    border: none;
+    border-color: #1abc9c;
 
 }
 
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary:focus {
-    border: none;
+    border-color: #1abc9c;
     background-color: #20e1bb;
     box-shadow: none;
 }
