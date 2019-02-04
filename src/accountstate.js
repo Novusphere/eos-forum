@@ -61,7 +61,6 @@ async function ApplyLoadedState(ns_account) {
 
     if (ns_account) {
         const state = ns_account.state;
-        console.log(state);
 
         if (state.subscribed_subs && Array.isArray(state.subscribed_subs)) {
             storage.subscribed_subs.length = 0;

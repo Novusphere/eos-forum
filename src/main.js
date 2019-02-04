@@ -21,7 +21,9 @@ import Meta from 'vue-meta'
 import VueAnalytics from 'vue-analytics'
 import { LoadStorage } from "@/storage"
 import { LoadConstants } from "@/ui/constants"
+import vSelect from 'vue-select'
 
+Vue.component('v-select', vSelect)
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(BootstrapVue);
 Vue.use(Meta);

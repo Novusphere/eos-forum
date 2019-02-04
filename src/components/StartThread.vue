@@ -27,7 +27,12 @@
                   <div class="form-group row" v-if="!edit_post && !is_referendum">
                      <label class="col-sm-2 col-form-label">Sub</label>
                      <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="Sub" v-model="sub" readonly>
+                        <v-select v-model="sub" :options="sub_options" label="sub" class="form-control">
+                          <template slot="option" slot-scope="option">
+                            {{ option.sub }}
+                            <img v-if="option.logo" :src="option.logo" style="max-width:24px">
+                          </template>
+                        </v-select>
                      </div>
                   </div>
                   <div class="form-group row" v-if="is_referendum">
@@ -173,6 +178,8 @@
 
 <script>
 import ui from "@/ui";
+import { BRANDS } from "@/ui/constants";
+import { storage } from "@/storage";
 
 import { GetNovusphere } from "@/novusphere";
 import { GetIdentity } from "@/eos";
@@ -259,6 +266,27 @@ export default {
         this.attachment.type = attachment.type;
         this.attachment.display = attachment.display;
       }
+
+      var sub_options = [{ icon: "", sub: this.sub }];
+      for (var i = 0; i < storage.subscribed_subs.length; i++) {
+        if (sub_options.find(so => so.sub == storage.subscribed_subs[i])) {
+          continue;
+        }
+
+        sub_options.push({
+          logo: "",
+          sub: storage.subscribed_subs[i]
+        });
+      }
+
+      for (var i = 0; i < sub_options.length; i++) {
+        const brand = BRANDS[sub_options[i].sub];
+        if (brand) {
+          sub_options[i].logo = brand.logo;
+        }
+      }
+
+      this.sub_options = sub_options;
     },
     setStatus(message) {
       this.status = message;
@@ -317,7 +345,9 @@ export default {
       if (this.is_referendum) {
         if (this.is_referendum && this.is_referendum_multi) {
           if (this.referendum_options.length < 2) {
-            this.setStatus('You must set at least 2 options for this referendum type!');
+            this.setStatus(
+              "You must set at least 2 options for this referendum type!"
+            );
             return;
           }
         }
@@ -376,6 +406,7 @@ export default {
   },
   data() {
     return {
+      sub_options: [],
       preview: null,
       edit_post: null,
       identity: {},
@@ -399,6 +430,6 @@ export default {
 
 <style scoped>
 .col-form-label {
-  white-space: nowrap!important;
+  white-space: nowrap !important;
 }
 </style>

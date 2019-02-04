@@ -118,12 +118,13 @@
                 Referendum
               </router-link>
               <div class="divline" />
-              <router-link v-for="sub in subs"
+              <router-link v-for="s in subs"
                 v-show="$root.showSubs"
-                :key="sub"
+                :key="s.sub"
                 class="dropdown-item"
-                :to="{ name: 'Sub', params: { sub: sub } }">
-                e/{{ sub }}
+                :to="{ name: 'Sub', params: { sub: s.sub } }">
+                e/{{ s.sub }}
+                <img v-if="s.logo" :src="s.logo" style="max-width:24px">
               </router-link>
             </div>
           </div>
@@ -201,7 +202,7 @@ import "@/assets/css/style2.css";
 import "@/assets/css/custom.css";
 
 import ui from "@/ui";
-import { FORUM_BRAND } from "@/ui/constants";
+import { BRANDS, FORUM_BRAND } from "@/ui/constants";
 import { storage } from "@/storage";
 import { ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
@@ -220,7 +221,7 @@ export default {
     };
   },
   components: {
-    RecentlyVisited,
+    RecentlyVisited
   },
   props: {
     load: {
@@ -235,10 +236,22 @@ export default {
   },
   computed: {
     subs() {
-      return storage.subscribed_subs;
+      var subs = storage.subscribed_subs.map(s => ({
+        sub: s,
+        logo: ""
+      }));
+
+      for (var i = 0; i < subs.length; i++) {
+        const brand = BRANDS[subs[i].sub];
+        if (brand) {
+          subs[i].logo = brand.logo;
+        }
+      }
+
+      return subs;
     },
     noRightBar() {
-      return !this.$slots['right_sidebar']
+      return !this.$slots["right_sidebar"];
     }
   },
   async mounted() {
@@ -271,8 +284,8 @@ export default {
       if (!this.identity.account) {
         alert(
           "Failed to detect a compatible EOS wallet!" +
-          " If your wallet is open, and we failed to detect it try refreshing the page." +
-          " However if you don't have a compatible EOS wallet, you can still post to the forum anonymously for free!"
+            " If your wallet is open, and we failed to detect it try refreshing the page." +
+            " However if you don't have a compatible EOS wallet, you can still post to the forum anonymously for free!"
         );
       }
     },
@@ -290,7 +303,7 @@ export default {
       brand_logo: "",
       brand_icon: "",
       brand_symbol: "",
-      brand_banner: "",
+      brand_banner: ""
     };
   }
 };
@@ -308,7 +321,7 @@ export default {
 .sub-toggle {
   position: absolute;
   right: 0;
-  top:0;
+  top: 0;
   height: 58px;
   width: 50px;
   padding: 10px;
