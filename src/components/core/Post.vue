@@ -32,8 +32,13 @@
           {{ new Date(post.createdAt * 1000).toLocaleString() }}
         </div>
         <div class="flex-center received-tips">
-          <div @click.stop.prevent="goToSub(key)" :key="key" class="flex-center hover" v-for="(tip, key) in received_tips">
-            <img class="tip-icon" :src="$root.icons[key].logo" :title="`${tip} ${key}`" />
+          <div
+            :title="`${tip} ${key}`"
+            @click.stop.prevent="goToSub(key)"
+            :key="key"
+            class="flex-center hover"
+            v-for="(tip, key) in received_tips">
+            <img class="tip-icon" :src="$root.icons[key].logo" />
             <div class="tip-amount"> x {{ tip }} </div>
           </div>
         </div>
@@ -79,10 +84,16 @@
                 </a>
                 <template v-if="is_op">
                   <div class="flex-center received-tips">
-                    <div @click.stop.prevent="goToSub(key)" :key="key" class="flex-center hover" v-for="(tip, key) in received_tips">
-                      <img v-if="key && (key in $root.icons)" class="tip-icon" :src="$root.icons[key].logo" :title="`${tip} ${key}`" />
-                      <div v-else>{{ key }}</div>
-                      <div class="tip-amount"> x {{ tip }} </div>
+                    <div
+                      :title="`${tip} ${key}`"
+                      @click.stop.prevent="goToSub(key)"
+                      :key="key"
+                      class="flex-center hover"
+                      v-for="(tip, key) in received_tips"
+                    >
+                        <img v-if="key && (key in $root.icons)" class="tip-icon" :src="$root.icons[key].logo"/>
+                        <div v-else>{{ key }}</div>
+                        <div class="tip-amount"> x {{ tip }} </div>
                     </div>
                   </div>
                 </template>
@@ -703,5 +714,10 @@ export default {
   height: 100%;
   margin-right: 5px;
   margin-left: 5px;
+}
+.title {
+  color: black!important;
+  font-weight: bold;
+  font-size: 18px;
 }
 </style>

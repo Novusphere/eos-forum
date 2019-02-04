@@ -45,6 +45,7 @@ Vue.config.productionTip = false;
       return {
         icons: [],
         showSubs: true,
+        showPreview: true,
       }
     },
     template: '<App/>'
