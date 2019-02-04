@@ -177,6 +177,7 @@ export default {
     },
     async subscribe(sub) {
       this.is_subscribed = await ui.actions.Subscribe(sub, this.sub);
+      this.$forceUpdate();
     },
     openPost (postID, sub){
       this.selectedPostID = postID;
