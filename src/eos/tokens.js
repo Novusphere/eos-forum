@@ -11,11 +11,18 @@ async function GetTokensInfo() {
             )
         );
 
-        var our_tokens = JSON.parse(
-            await requests.get(
-                "https://raw.githubusercontent.com/Novusphere/eos-forum-settings/master/tokens.json"
-            )
-        );
+        var our_tokens = [];
+        try {
+            our_tokens = JSON.parse(
+                await requests.get(
+                    "https://raw.githubusercontent.com/Novusphere/eos-forum-settings/master/tokens.json"
+                )
+            );
+        }
+        catch (ex) {
+            console.log('malformed (our) tokens.json');
+            console.log(ex);
+        }
 
 
         // merge our_tokens into tokens with overrides
@@ -34,7 +41,7 @@ async function GetTokensInfo() {
 
         token_cache = tokens;
     }
-    
+
     return token_cache;
 }
 

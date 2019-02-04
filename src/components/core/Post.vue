@@ -38,7 +38,8 @@
             :key="key"
             class="flex-center hover"
             v-for="(tip, key) in received_tips">
-            <img class="tip-icon" :src="$root.icons[key].logo" />
+            <img v-if="key in $root.icons" class="tip-icon" :src="$root.icons[key].logo" />
+            <span v-else>{{ key }}</span>
             <div class="tip-amount"> x {{ tip }} </div>
           </div>
         </div>
@@ -427,7 +428,7 @@ export default {
   async mounted() {
     if (this.$root.icons.length === 0) {
       const response = await GetTokensInfo();
-      const icons = {};
+      var icons = {};
       response.forEach(x => {
         icons[x.symbol] = x;
       });
