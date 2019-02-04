@@ -118,7 +118,7 @@
                 Referendum
               </router-link>
               <div class="divline" />
-              <router-link v-for="s in subs"
+              <router-link v-for="s in subs()"
                 v-show="$root.showSubs"
                 :key="s.sub"
                 class="dropdown-item"
@@ -235,6 +235,19 @@ export default {
     }
   },
   computed: {
+    noRightBar() {
+      return !this.$slots["right_sidebar"];
+    }
+  },
+  async mounted() {
+    this.updateBrand();
+    this.identity = await GetIdentity();
+    window.addEventListener("identity", this.updateIdentity);
+  },
+  async beforeDestroy() {
+    window.removeEventListener("identity", this.updateIdentity);
+  },
+  methods: {
     subs() {
       var subs = storage.subscribed_subs.map(s => ({
         sub: s,
@@ -250,19 +263,6 @@ export default {
 
       return subs;
     },
-    noRightBar() {
-      return !this.$slots["right_sidebar"];
-    }
-  },
-  async mounted() {
-    this.updateBrand();
-    this.identity = await GetIdentity();
-    window.addEventListener("identity", this.updateIdentity);
-  },
-  async beforeDestroy() {
-    window.removeEventListener("identity", this.updateIdentity);
-  },
-  methods: {
     updateBrand() {
       ui.helpers.UpdateBrand(this.$route.params.sub);
       this.brand_logo = FORUM_BRAND.logo;
