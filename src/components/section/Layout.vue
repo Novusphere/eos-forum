@@ -21,7 +21,7 @@
               </router-link>
             </div>
 
-            <div class="d-none d-sm-inline-block sub">
+            <div class="sub">
               <template v-if="$route.params.sub" >
                 {{ $route.params.sub }}
               </template>
@@ -314,6 +314,7 @@ export default {
   text-transform: capitalize;
   font-size: 18px;
   color: black;
+  display: inline;
 }
 .sub-toggle:hover {
   cursor: pointer;
