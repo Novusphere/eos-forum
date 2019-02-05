@@ -57,6 +57,10 @@ a:hover {
     display: none;
 }
 
+.flex {
+    display: flex;
+}
+
 .flex-center {
     display: flex;
     align-items: center;
@@ -406,7 +410,7 @@ td.chbox {
     width: 65px;
 }
 .post-child.post {
-    margin-left: 15px;
+    margin-left: 0px;
     position: relative;
 }
 
@@ -424,7 +428,7 @@ td.chbox {
 }
 
 .post {
-    padding: 20px 20px 15px 15px;
+    padding: 20px 20px 0px 15px;
 }
 
 .post img {
@@ -719,6 +723,11 @@ a.down:hover {
     background-color: #1abc9c;
     border-color: #1abc9c;
 
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid grey;
 }
 
 .btn-primary:hover,

@@ -19,14 +19,14 @@
           <button v-if="sub && !is_subscribed"
             v-on:click="subscribe(true)"
             type="button"
-            class="btn btn-primary mr-1">
+            class="btn btn-outline mr-1">
             subscribe
           </button>
           <button v-if="sub && is_subscribed"
             v-on:click="subscribe(false)"
             type="button"
-            class="btn btn-danger mr-1">
-            unsubscribe
+            class="btn mr-1 btn-primary ">
+            subscribed
           </button>
           <button
             type="button"
@@ -81,9 +81,13 @@
           />
         </modal>
       </div>
-
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+      </div>
+      <div v-if="!loading" class="float-right mb-3">
+        <pager :pages="pages"
+          :current_page="current_page">
+        </pager>
       </div>
     </template>
 

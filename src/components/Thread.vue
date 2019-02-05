@@ -11,7 +11,7 @@
           e/{{ opening_post.data.json_metadata.sub }}
         </router-link>
       </div>
-      <post class="mb-2" v-if="opening_post.id" :post="main_post" :thread="opening_post"></post>
+      <post class="mb-2 pb-2" v-if="opening_post.id" :post="main_post" :thread="opening_post"></post>
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
       </div>

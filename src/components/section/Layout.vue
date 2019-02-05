@@ -12,30 +12,31 @@
     <!-- header navigation -->
     <div class="HeaderNavigation">
       <div class="container py-2">
-        <div class="row no-gutters">
-          <div class="col-4 col-sm-6 col-md-6 col-lg-8 col-xl-8">
-
+        <div class="row no-gutters navbar">
+          <div class="flex-center">
             <div class="d-inline-block px-2 px-lg-4">
               <router-link :to="{ name: 'Index' }">
                 <img :src="brand_logo" style="height: 38px;">
               </router-link>
             </div>
 
-            <div class="d-none d-sm-inline-block sub">
-              <template v-if="$route.params.sub" >
-                {{ $route.params.sub }}
-              </template>
-              <template v-else>
-                Home
-              </template>
+            <div class="sub">
+              <div>
+                <template v-if="$route.params.sub" >
+                  {{ $route.params.sub }}
+                </template>
+                <template v-else>
+                  Home
+                </template>
+              </div>
             </div>
           </div>
 
-          <div class="col-8 col-sm-6 col-md-6 col-lg-4 col-xl-4 text-right">
+          <div class="text-right navbar-actions">
             <button class="btn btn-outline-primary mx-2 mx-lg-4 ConnectButton"
               v-if="!identity.account"
               v-on:click="login()">
-              connect wallet
+              login
             </button>
 
             <div class="d-inline-block MenuIconButton">
@@ -310,11 +311,17 @@ export default {
 </script>
 
 <style scoped>
+.navbar {
+  display: flex;
+  justify-content:space-between;
+}
 .sub {
   text-transform: capitalize;
   font-size: 18px;
   color: black;
+  display: inline;
 }
+
 .sub-toggle:hover {
   cursor: pointer;
 }
@@ -326,5 +333,8 @@ export default {
   width: 50px;
   padding: 10px;
   background-color: white;
+}
+.navbar-actions {
+  display: inherit;
 }
 </style>

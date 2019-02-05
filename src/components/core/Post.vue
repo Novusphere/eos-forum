@@ -4,7 +4,7 @@
     v-if="!(!showChildren && hide_spam_threads && is_spam)"
     @click="openPost"
     class="post">
-    <template v-if="post.depth !== 0">
+    <template v-if="!is_op">
       <div
         @click.stop="togglePost()"
         class="post-toggle">
@@ -12,7 +12,6 @@
           class="toggle-icon"
           :icon="['fas', hide ? 'plus-circle' : 'minus-circle']"
         />
-
         <li class="list-inline-item">
           <a v-if="reddit.author"
             @click.stop
@@ -31,12 +30,12 @@
         <div class="date">
           {{ new Date(post.createdAt * 1000).toLocaleString() }}
         </div>
-        <div class="flex-center received-tips">
+        <div class="flex-center received-tips ml-1">
           <div
             :title="`${tip} ${key}`"
             @click.stop.prevent="goToSub(key)"
             :key="key"
-            class="flex-center hover"
+            class="flex hover"
             v-for="(tip, key) in received_tips">
             <img v-if="key in $root.icons" class="tip-icon" :src="$root.icons[key].logo" />
             <span v-else>{{ key }}</span>
@@ -52,15 +51,6 @@
           <div v-if="is_op" class="post-icon" >
             <div>
               <img class="hover" @click.stop.prevent="goToSub()" :src="thumbnail" alt="thumbnail">
-
-              <div class="text-center">
-                <a
-                  class="up"
-                  @click.stop="upvote()">
-                  <font-awesome-icon :icon="['far', 'thumbs-up']" />
-                  {{ post.up }}
-                </a>
-              </div>
             </div>
             <div v-if="post.referendum && post.referendum.details" class="text-center">
               <div>
@@ -68,28 +58,28 @@
                 {{ post.referendum.details.total_participants }}
               </div>
             </div>
-
-            <div class="text-center">
-              <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
-              <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
-              <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
-            </div>
           </div>
           <div>
               <div class="flex-center">
+
                 <a @click.stop="$emit('openPost', selectedPostID, post.data.json_metadata.sub)" class="title" target="_blank">
                   {{ post.data.json_metadata.title }}
                 </a>
+                <div v-if="post.is_pinned || is_spam || is_nsfw" class="text-center ml-1 mr-1">
+                  <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
+                  <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
+                  <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
+                </div>
                 <a v-if="offsite" :href="post.o_attachment.value" class="offsite" target="_blank">
                   ({{ offsite }})
                 </a>
                 <template v-if="is_op">
-                  <div class="flex-center received-tips">
+                  <div class="flex-center received-tips ml-1">
                     <div
                       :title="`${tip} ${key}`"
                       @click.stop.prevent="goToSub(key)"
                       :key="key"
-                      class="flex-center hover"
+                      class="flex hover"
                       v-for="(tip, key) in received_tips"
                     >
                         <img v-if="key && (key in $root.icons)" class="tip-icon" :src="$root.icons[key].logo"/>
@@ -127,6 +117,14 @@
                 </li>
               </div>
           </div>
+          <div v-if="is_op" class="op-upvote">
+            <a
+              class="up"
+              @click.stop="upvote()">
+              <font-awesome-icon :icon="['far', 'thumbs-up']" />
+              {{ post.up }}
+            </a>
+          </div>
         </div>
 
         <div class="posttext float-left">
@@ -156,7 +154,6 @@
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
           </div>
-
           <p v-if="post_content_html" v-html="post_content_html" />
         </div>
         <div class="clearfix"></div>
@@ -165,6 +162,14 @@
         <div class="posted">
           <ul class="list-inline">
             <li class="list-inline-item">
+              <a
+                v-if="!is_op"
+                class="up"
+                style="margin-right: 10px;display: inline"
+                @click.stop="upvote()">
+                <font-awesome-icon :icon="['far', 'thumbs-up']" />
+                {{ post.up }}
+              </a>
               <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 <span v-if="!post.parent">{{ post.total_replies }} comments</span>
@@ -204,7 +209,7 @@
               <span v-if="post.referendum.expired" class="text-danger">expired</span>
               <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
             </li>
-            <li v-if="post.depth > 0"
+            <li v-if="!is_op"
               class="list-inline-item">
               <a
                 @click.stop
@@ -670,6 +675,7 @@ export default {
   color: black;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 .toggle-icon {
   margin-right: 5px;
@@ -685,14 +691,10 @@ export default {
   height: 25px !important;
   width: 25px !important;
 }
-.date {
-  margin-left: 15px;
-}
 .tip-amount {
   margin: 3px;
 }
 .received-tips {
-  margin-left: 10px;
   margin-right: 10px;
 }
 .post-icon {
@@ -720,5 +722,14 @@ export default {
   color: black!important;
   font-weight: bold;
   font-size: 18px;
+}
+.op-upvote {
+  margin-top:5px;
+  display: flex;
+  flex:1;
+  justify-content:flex-end;
+}
+.op-upvote .up {
+  white-space:nowrap;
 }
 </style>
