@@ -87,12 +87,6 @@
                         <div class="tip-amount"> x {{ tip }} </div>
                     </div>
                   </div>
-                  <a
-                    class="up"
-                    @click.stop="upvote()">
-                    <font-awesome-icon :icon="['far', 'thumbs-up']" />
-                    {{ post.up }}
-                  </a>
                 </template>
               </div>
               <div v-if="is_op">
@@ -122,6 +116,15 @@
                   </router-link>
                 </li>
               </div>
+          </div>
+          <div v-if="is_op" style="margin-top:5px">
+            <a
+              class="up"
+              style="white-space:nowrap"
+              @click.stop="upvote()">
+              <font-awesome-icon :icon="['far', 'thumbs-up']" />
+              {{ post.up }}
+            </a>
           </div>
         </div>
 
@@ -704,6 +707,7 @@ export default {
 }
 .userinfo {
   display: flex;
+  justify-content: space-between;
 }
 .tip:hover {
   cursor: pointer;
