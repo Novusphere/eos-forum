@@ -26,6 +26,9 @@ export default {
   },
   mounted() {
     window._VueApp = this;
+    if (screen.width <= 600) {
+      this.$root.showSubs = false;
+    }
     this.$root.showPreview = JSON.parse(localStorage.getItem('preview'));
   },
   methods: {},
