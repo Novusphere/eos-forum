@@ -4,7 +4,7 @@
     v-if="!(!showChildren && hide_spam_threads && is_spam)"
     @click="openPost"
     class="post">
-    <template v-if="post.depth !== 0">
+    <template v-if="!is_op">
       <div
         @click.stop="togglePost()"
         class="post-toggle">
@@ -12,7 +12,13 @@
           class="toggle-icon"
           :icon="['fas', hide ? 'plus-circle' : 'minus-circle']"
         />
-
+        <a
+          class="up"
+          style="margin-right: 10px;display: inline"
+          @click.stop="upvote()">
+          <font-awesome-icon :icon="['far', 'thumbs-up']" />
+          {{ post.up }}
+        </a>
         <li class="list-inline-item">
           <a v-if="reddit.author"
             @click.stop
@@ -156,7 +162,6 @@
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
           </div>
-
           <p v-if="post_content_html" v-html="post_content_html" />
         </div>
         <div class="clearfix"></div>

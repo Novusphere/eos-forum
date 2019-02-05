@@ -81,9 +81,13 @@
           />
         </modal>
       </div>
-
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+      </div>
+      <div v-if="!loading" class="float-right mb-3">
+        <pager :pages="pages"
+          :current_page="current_page">
+        </pager>
       </div>
     </template>
 
