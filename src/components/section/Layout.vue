@@ -11,7 +11,7 @@
 
     <!-- header navigation -->
     <div class="HeaderNavigation">
-      <div class="container py-2">
+      <div class="container">
         <div class="row no-gutters navbar">
           <div class="flex-center">
             <div class="d-inline-block px-2 px-lg-4">
