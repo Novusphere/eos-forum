@@ -721,6 +721,11 @@ a.down:hover {
 
 }
 
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid grey;
+}
+
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary:focus {
