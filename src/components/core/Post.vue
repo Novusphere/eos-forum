@@ -671,11 +671,14 @@ export default {
   display: inherit;
 }
 .post-toggle {
-  height: 20px;
   color: black;
   display: flex;
   align-items: center;
   white-space: nowrap;
+  flex-wrap: wrap;
+}
+.post-toggle .date {
+  font-size: 12px;
 }
 .toggle-icon {
   margin-right: 5px;
