@@ -15,7 +15,7 @@ import Settings from "@/components/Settings";
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   //mode: "history",
   routes: [
     { // default route
@@ -80,3 +80,10 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  window.scrollTo(0,0);
+  next();
+});
+
+export default router;

@@ -30,25 +30,18 @@
         <div class="date">
           {{ new Date(post.createdAt * 1000).toLocaleString() }}
         </div>
-        <div class="flex-center received-tips">
+        <div class="flex-center received-tips ml-1">
           <div
             :title="`${tip} ${key}`"
             @click.stop.prevent="goToSub(key)"
             :key="key"
-            class="flex-center hover"
+            class="flex hover"
             v-for="(tip, key) in received_tips">
             <img v-if="key in $root.icons" class="tip-icon" :src="$root.icons[key].logo" />
             <span v-else>{{ key }}</span>
             <div class="tip-amount"> x {{ tip }} </div>
           </div>
         </div>
-        <a
-          class="up"
-          style="margin-right: 10px;display: inline"
-          @click.stop="upvote()">
-          <font-awesome-icon :icon="['far', 'thumbs-up']" />
-          {{ post.up }}
-        </a>
       </div>
     </template>
     <div class="post-body" :class="{'hidden': hide === true && post.depth !== 0}">
@@ -72,7 +65,7 @@
                 <a @click.stop="$emit('openPost', selectedPostID, post.data.json_metadata.sub)" class="title" target="_blank">
                   {{ post.data.json_metadata.title }}
                 </a>
-                <div class="text-center ml-1 mr-1">
+                <div v-if="post.is_pinned || is_spam || is_nsfw" class="text-center ml-1 mr-1">
                   <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
                   <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
                   <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
@@ -81,12 +74,12 @@
                   ({{ offsite }})
                 </a>
                 <template v-if="is_op">
-                  <div class="flex-center received-tips">
+                  <div class="flex-center received-tips ml-1">
                     <div
                       :title="`${tip} ${key}`"
                       @click.stop.prevent="goToSub(key)"
                       :key="key"
-                      class="flex-center hover"
+                      class="flex hover"
                       v-for="(tip, key) in received_tips"
                     >
                         <img v-if="key && (key in $root.icons)" class="tip-icon" :src="$root.icons[key].logo"/>
@@ -167,6 +160,14 @@
         <div class="posted">
           <ul class="list-inline">
             <li class="list-inline-item">
+              <a
+                v-if="!is_op"
+                class="up"
+                style="margin-right: 10px;display: inline"
+                @click.stop="upvote()">
+                <font-awesome-icon :icon="['far', 'thumbs-up']" />
+                {{ post.up }}
+              </a>
               <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 <span v-if="!post.parent">{{ post.total_replies }} comments</span>
@@ -206,7 +207,7 @@
               <span v-if="post.referendum.expired" class="text-danger">expired</span>
               <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
             </li>
-            <li v-if="post.depth > 0"
+            <li v-if="!is_op"
               class="list-inline-item">
               <a
                 @click.stop
@@ -672,6 +673,7 @@ export default {
   color: black;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 .toggle-icon {
   margin-right: 5px;
@@ -687,14 +689,10 @@ export default {
   height: 25px !important;
   width: 25px !important;
 }
-.date {
-  margin-left: 15px;
-}
 .tip-amount {
   margin: 3px;
 }
 .received-tips {
-  margin-left: 10px;
   margin-right: 10px;
 }
 .post-icon {

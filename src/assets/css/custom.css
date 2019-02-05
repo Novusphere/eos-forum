@@ -57,6 +57,10 @@ a:hover {
     display: none;
 }
 
+.flex {
+    display: flex;
+}
+
 .flex-center {
     display: flex;
     align-items: center;
@@ -406,7 +410,7 @@ td.chbox {
     width: 65px;
 }
 .post-child.post {
-    margin-left: 15px;
+    margin-left: 0px;
     position: relative;
 }
 
