@@ -60,11 +60,11 @@ export default class LynxWallet {
         }
     }
 
-    async sign(pub, data) {
+    async sign(pub, data, reason) {
         const lynx = this.lynx;
         return await lynx.requestArbitrarySignature({
             data: data,
-            whatFor: '',
+            whatFor: reason ? reason : '',
         });
     }
 }

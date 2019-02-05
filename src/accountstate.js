@@ -18,42 +18,79 @@ async function SaveAccountState() {
 
     // save to EOS account
     if (identity.account) {
+
         try {
-            const sig = await SignData(identity.publicKey, nonce.toString());
-            if (!sig) {
-                throw new Error('invalid signature');
+            if (!storage.accountstate[identity.account] ||
+                !(await novusphere.isAccountStateAuthorized(storage.accountstate[identity.account], identity.account, ''))) {
+                
+                //console.log('unauthorized');
+                storage.accountstate[identity.account] = 0;
+                
+                const sig = await SignData(identity.publicKey, nonce.toString(), 'Start session');
+                if (!sig) {
+                    throw new Error('invalid signature');
+                }
+
+                const payload = await novusphere.authorizeAccountState(identity.account, identity.publicKey, nonce, sig);
+                //console.log(payload);
+
+                if (payload.session_key) {
+                    //console.log('authorized with key: ' + payload.session_key);
+                    storage.accountstate[identity.account] = payload.session_key;
+                }
             }
-
-            const key = ecc.recover(sig, nonce.toString()); // identity.publicKey may be unset in Lynx
-
-            const account = {
-                name: identity.account,
-                key: key,
-                nonce: nonce,
-                sig: sig,
-                state: account_state
-            }
-
-            const r = await novusphere.saveAccountState(account);
         }
         catch (ex) {
             console.log(ex); // likely, signature was rejected
+        }
+
+        if (storage.accountstate[identity.account]) {
+            const account = {
+                name: identity.account,
+                key: identity.publicKey,
+                session_key: storage.accountstate[identity.account],
+                state: account_state
+            }
+
+            //console.log('saving with key ' + account.session_key);
+            const r = await novusphere.saveAccountState(account);
+            //console.log(r);
         }
     }
 
     // save to anonymous ID
     if (storage.anon_id.key && ecc.isValidPrivate(storage.anon_id.key)) {
-        const sig = ecc.sign(nonce.toString(), storage.anon_id.key);
+        const pubkey =  ecc.privateToPublic(storage.anon_id.key);
 
-        const account = {
-            name: '',
-            key: ecc.privateToPublic(storage.anon_id.key),
-            nonce: nonce,
-            sig: sig,
-            state: account_state
+        if (!storage.accountstate[pubkey] ||
+            !(await novusphere.isAccountStateAuthorized(storage.accountstate[pubkey], '', pubkey))) {
+              
+            //console.log('unauthorized');
+            storage.accountstate[pubkey] = 0;
+            
+            const sig = ecc.sign(nonce.toString(), storage.anon_id.key);
+
+            const payload = await novusphere.authorizeAccountState('', pubkey, nonce, sig);
+            console.log(payload);
+            
+            if (payload.session_key) {
+                //console.log('authorized with key: ' + payload.session_key);
+                storage.accountstate[pubkey] = payload.session_key;
+            }
         }
 
-        const r = await novusphere.saveAccountState(account);
+        if (storage.accountstate[pubkey]) {
+            const account = {
+                name: '',
+                key: pubkey,
+                session_key: storage.accountstate[pubkey],
+                state: account_state
+            }
+
+            //console.log('saving with key ' + account.session_key);
+            const r = await novusphere.saveAccountState(account);
+            //console.log(r);
+        }
     }
 }
 

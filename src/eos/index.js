@@ -84,11 +84,11 @@ async function ExecuteEOSActions(actions) {
     return (await g_wallet.executeActions(auth, actions));
 }
 
-async function SignData(pub, data) {
+async function SignData(pub, data, reason) {
     if (!g_wallet.sign) {
         return '';
     }
-    return await g_wallet.sign(pub, data);
+    return await g_wallet.sign(pub, data, reason);
 }
 
 export {

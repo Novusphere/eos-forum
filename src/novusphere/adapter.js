@@ -39,6 +39,35 @@ class NovusphereAdapter {
 
         return 'https://db.novusphere.io';
     }
+    async authorizeAccountState(name, key, nonce, sig) {
+        var endpoint = (await this.getApiEnabled('/service/accountstate/', "_account_state")) +
+            '/service/accountstate/authorize';
+
+        var result = await requests.post(endpoint, {
+            value: JSON.stringify({
+                name: name,
+                key: key,
+                nonce: nonce,
+                sig: sig
+            })
+        });
+
+        return result;
+    }
+    async isAccountStateAuthorized(session_key, name, key) {
+        var endpoint = (await this.getApiEnabled('/service/accountstate/', "_account_state")) +
+            '/service/accountstate/authorized';
+
+        endpoint += '?session_key=' + session_key;
+        endpoint += '&key=' + key;
+        endpoint += '&name=' + name;
+
+        var result = await requests.get(endpoint);
+        if (result.error) {
+            return false;
+        }
+        return result.authorized;
+    }
     async getAccountState(id) {
         var endpoint = (await this.getApiEnabled('/service/accountstate/', "_account_state")) +
             '/service/accountstate/get';
@@ -51,10 +80,10 @@ class NovusphereAdapter {
         }
 
         var result = await requests.get(endpoint);
-        if (result && result.cursor.firstBatch && result.cursor.firstBatch.length > 0) {
-            return result.cursor.firstBatch[0];
+        if (result.error) {
+            return null;
         }
-        return null;
+        return result;
     }
     async saveAccountState(account) {
         var endpoint = (await this.getApiEnabled('/service/accountstate/', "_account_state")) +

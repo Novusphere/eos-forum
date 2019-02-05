@@ -96,7 +96,7 @@ export default class ScatterWallet {
         return eostx.transaction_id;
     }
 
-    async sign(pub, data) {
+    async sign(pub, data, reason) {
         return ScatterJS.getArbitrarySignature(pub, data);
     }
 }

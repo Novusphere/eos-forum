@@ -4,7 +4,7 @@ import ecc from "eosjs-ecc";
 const MAX_TRACK_NEW_POSTS = 1000;
 
 var DEFAULT_STORAGE = {
-    version: 15,
+    version: 16,
     eos_referendum: true,
     subscribed_subs: ["all", "novusphere", "eos", "anon", "anon-r-eos", "anon-pol-econ", "music", "anon-bounties"],
     new_posts: {},
@@ -15,6 +15,7 @@ var DEFAULT_STORAGE = {
         accounts: [],
         transactions: []
     },
+    accountstate: {}, // session keys
     anon_id: {
         name: '',
         key: ''
@@ -86,6 +87,9 @@ function importStorage(obj) {
         }
         else if (obj.version < 15) {
             obj.anon_id = storage.anon_id;
+        }
+        else if (obj.version , 16) {
+            obj.accountstate = {};
         }
 
         obj.version++;
