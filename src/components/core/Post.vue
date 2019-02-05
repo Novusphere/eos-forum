@@ -12,13 +12,6 @@
           class="toggle-icon"
           :icon="['fas', hide ? 'plus-circle' : 'minus-circle']"
         />
-        <a
-          class="up"
-          style="margin-right: 10px;display: inline"
-          @click.stop="upvote()">
-          <font-awesome-icon :icon="['far', 'thumbs-up']" />
-          {{ post.up }}
-        </a>
         <li class="list-inline-item">
           <a v-if="reddit.author"
             @click.stop
@@ -49,6 +42,13 @@
             <div class="tip-amount"> x {{ tip }} </div>
           </div>
         </div>
+        <a
+          class="up"
+          style="margin-right: 10px;display: inline"
+          @click.stop="upvote()">
+          <font-awesome-icon :icon="['far', 'thumbs-up']" />
+          {{ post.up }}
+        </a>
       </div>
     </template>
     <div class="post-body" :class="{'hidden': hide === true && post.depth !== 0}">
@@ -58,15 +58,6 @@
           <div v-if="is_op" class="post-icon" >
             <div>
               <img class="hover" @click.stop.prevent="goToSub()" :src="thumbnail" alt="thumbnail">
-
-              <div class="text-center">
-                <a
-                  class="up"
-                  @click.stop="upvote()">
-                  <font-awesome-icon :icon="['far', 'thumbs-up']" />
-                  {{ post.up }}
-                </a>
-              </div>
             </div>
             <div v-if="post.referendum && post.referendum.details" class="text-center">
               <div>
@@ -74,18 +65,18 @@
                 {{ post.referendum.details.total_participants }}
               </div>
             </div>
-
-            <div class="text-center">
-              <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
-              <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
-              <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
-            </div>
           </div>
           <div>
               <div class="flex-center">
+
                 <a @click.stop="$emit('openPost', selectedPostID, post.data.json_metadata.sub)" class="title" target="_blank">
                   {{ post.data.json_metadata.title }}
                 </a>
+                <div class="text-center ml-1 mr-1">
+                  <font-awesome-icon v-if="post.is_pinned" :icon="['fas', 'thumbtack']" />
+                  <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
+                  <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
+                </div>
                 <a v-if="offsite" :href="post.o_attachment.value" class="offsite" target="_blank">
                   ({{ offsite }})
                 </a>
@@ -103,6 +94,12 @@
                         <div class="tip-amount"> x {{ tip }} </div>
                     </div>
                   </div>
+                  <a
+                    class="up"
+                    @click.stop="upvote()">
+                    <font-awesome-icon :icon="['far', 'thumbs-up']" />
+                    {{ post.up }}
+                  </a>
                 </template>
               </div>
               <div v-if="is_op">
