@@ -2,27 +2,39 @@ import { storage, SaveStorage } from "@/storage";
 import { SaveAccountState } from "@/accountstate";
 
 export default async function Subscribe(subscribe, sub) {
-    if (subscribe) {
-        if (storage.subscribed_subs.includes(sub)) return;
-        storage.subscribed_subs.push(sub);
-        SaveStorage();
 
-        await SaveAccountState();
-
-        return true;
-    } else {
-        // remove all
+    function removeAll(arr, item) {
         for (; ;) {
-            var i = storage.subscribed_subs.indexOf(sub);
-            if (i < 0) break;
-            storage.subscribed_subs.splice(i, 1);
-            //console.log(storage.subscribed_subs);
+            var i = arr.indexOf(item);
+            if (i < 0) {
+                break;
+            }
+            arr.splice(i, 1);
+        }
+    }
+
+    if (subscribe) {
+        if (storage.subscribed_subs.includes(sub)) {
+            return true;
         }
 
-        SaveStorage();
+        removeAll(storage.unsubscribed_subs, sub);
+        storage.subscribed_subs.push(sub);
+        
+    } else {
+        if (storage.unsubscribed_subs.includes(sub)) {
+            return false;
+        }
 
-        await SaveAccountState();
-
-        return false;
+        removeAll(storage.subscribed_subs, sub);
+        storage.unsubscribed_subs.push(sub);
     }
+
+    console.log(storage.subscribed_subs);
+    console.log(storage.unsubscribed_subs);
+
+    SaveStorage();
+    await SaveAccountState();
+
+    return subscribe;
 }

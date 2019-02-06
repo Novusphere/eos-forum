@@ -1,4 +1,4 @@
-import { storage, SaveStorage } from "@/storage";
+import { storage, SaveStorage, SyncDefaultSubs } from "@/storage";
 import ecc from "eosjs-ecc";
 import { GetNovusphere } from "@/novusphere";
 import { GetEOS, GetIdentity, SignData } from "@/eos";
@@ -9,6 +9,7 @@ async function SaveAccountState() {
 
     const account_state = {
         subscribed_subs: storage.subscribed_subs,
+        unsubscribed_subs: storage.unsubscribed_subs,
         last_notification: storage.last_notification
     };
 
@@ -96,15 +97,21 @@ async function SaveAccountState() {
 
 async function ApplyLoadedState(ns_account) {
 
+    function importArray(src, dst) {
+        if (src && Array.isArray(src)) {
+            dst.length = 0;
+            for (var i = 0; i < src.length; i++) {
+                dst.push(src[i]);
+            }
+        }
+    }
+
     if (ns_account) {
         const state = ns_account.state;
 
-        if (state.subscribed_subs && Array.isArray(state.subscribed_subs)) {
-            storage.subscribed_subs.length = 0;
-            for (var i = 0; i < state.subscribed_subs.length; i++) {
-                storage.subscribed_subs.push(state.subscribed_subs[i]);
-            }
-        }
+        importArray(state.subscribed_subs, storage.subscribed_subs);
+        importArray(state.unsubscribed_subs, storage.unsubscribed_subs);
+        SyncDefaultSubs();
 
         if (state.last_notification && !isNaN(state.last_notification)) {
             storage.last_notification = state.last_notification;

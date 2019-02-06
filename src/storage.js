@@ -4,11 +4,12 @@ import ecc from "eosjs-ecc";
 const MAX_TRACK_NEW_POSTS = 1000;
 
 var DEFAULT_STORAGE = {
-    version: 16,
+    version: 17,
     eos_referendum: true,
-    subscribed_subs: ["all", "novusphere", "eos", "anon", "anon-r-eos", "anon-pol-econ", "music", "anon-bounties"],
+    subscribed_subs: ["all", "novusphere", "eos", "anon-r-eos", "anon-pol-econ"],
+    unsubscribed_subs: [], // used with syncing from default list
     new_posts: {},
-    last_notification: 0,
+    last_notification: 0,   
     moderation: {
         hide_spam_threads: true,
         mods: [],
@@ -49,9 +50,11 @@ if (window.__PRESETS__) {
     }
 
     if (window.__PRESETS__.storage) {
-        DEFAULT_STORAGE = jQuery.extend(true, DEFAULT_STORAGE, window.__PRESETS__.storage);
-        if (window.__PRESETS__.storage.subscribed_subs) {
-            DEFAULT_STORAGE.subscribed_subs = window.__PRESETS__.storage.subscribed_subs;
+        const p_storage = window.__PRESETS__.storage;
+
+        DEFAULT_STORAGE = jQuery.extend(true, DEFAULT_STORAGE, p_storage);
+        if (p_storage.subscribed_subs) {
+            DEFAULT_STORAGE.subscribed_subs = p_storage.subscribed_subs;
         }
     }
 }
@@ -88,8 +91,11 @@ function importStorage(obj) {
         else if (obj.version < 15) {
             obj.anon_id = storage.anon_id;
         }
-        else if (obj.version , 16) {
+        else if (obj.version < 16) {
             obj.accountstate = {};
+        }
+        else if (obj.version < 17) {
+            obj.unsubscribed_subs = [];
         }
 
         obj.version++;
@@ -97,19 +103,24 @@ function importStorage(obj) {
 
     if (obj.version >= storage.version) {
         storage = obj;
+
+        // import possibly new default subs
+        SyncDefaultSubs();
+
         console.log('Loaded storage version ' + storage.version);
         //console.log(storage);
         return true;
     }
+
     console.log('Loaded storage failed');
     return false;
 }
 
-window.__getStorage = function() {
+window.__getStorage = function () {
     return storage;
 }
 
-window.__saveStorage = function() {
+window.__saveStorage = function () {
     SaveStorage();
 }
 
@@ -122,6 +133,17 @@ window.__forgetSettings = function () {
     storage.settings = DEFAULT_STORAGE.settings;
     SaveStorage();
     window.location.reload();
+}
+
+function SyncDefaultSubs() {
+    for (var i = 0; i < DEFAULT_STORAGE.subscribed_subs.length; i++) {
+        const sub = DEFAULT_STORAGE.subscribed_subs[i];
+        if (!storage.subscribed_subs.includes(sub) &&
+            !storage.unsubscribed_subs.includes(sub)) {
+            
+            storage.subscribed_subs.push(sub);
+        }
+    }
 }
 
 function SaveStorage() {
@@ -155,4 +177,4 @@ async function LoadStorage() {
     }
 }
 
-export { DEFAULT_STORAGE, storage, SaveStorage, LoadStorage };
+export { DEFAULT_STORAGE, storage, SaveStorage, LoadStorage, SyncDefaultSubs };

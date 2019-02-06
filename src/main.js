@@ -25,6 +25,7 @@ import router from '@/router'
 import Meta from 'vue-meta'
 import VueAnalytics from 'vue-analytics'
 import vSelect from 'vue-select'
+import { SaveStorage } from "./storage";
 
 Vue.component('v-select', vSelect)
 Vue.component('font-awesome-icon', FontAwesomeIcon);
