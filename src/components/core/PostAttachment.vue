@@ -4,7 +4,8 @@
     :class="this.collapse ? 'row collapse' : 'row'">
 
     <div class="col-md-12">
-      <div v-if="iframe">
+      <Tweet v-if="twitterID" :id="twitterID" />
+      <div v-else-if="iframe">
         <iframe :src="this.show_iframe ? attachment.value : ''"
           style="max-width: 100%"
           :height="attachment.height"
@@ -14,22 +15,22 @@
           allowfullscreen>
         </iframe>
       </div>
-      <div v-if="img">
+      <div v-else-if="img">
         <img class="limit-height" :src="attachment.value">
       </div>
-      <div v-if="mp4">
+      <div v-else-if="mp4">
         <video class="limit-height" controls>
           <source :src="attachment.value" type="video/mp4">
         </video>
       </div>
 
-      <div v-if="mp3">
+      <div v-else-if="mp3">
         <audio class="limit-height" controls>
           <source :src="attachment.value" type="audio/mpeg">
         </audio>
       </div>
 
-      <div v-if="link">
+      <div v-else-if="link">
         <div>
           <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
         </div>
@@ -39,8 +40,12 @@
 </template>
 
 <script>
+import { Tweet } from 'vue-tweet-embed'
 export default {
   name: "PostAttachment",
+  components: {
+    Tweet,
+  },
   props: {
     attachment: {
       type: Object,
@@ -60,8 +65,11 @@ export default {
     this.show_iframe = !this.collapse;
   },
   computed: {
+    twitterID () {
+      return this.attachment.value.includes('twitframe.com/show') && this.attachment.value.split('/')[this.attachment.value.split('/').length - 1].toString();
+    },
     iframe() {
-      return this.hasAttachment("iframe");
+      return this.hasAttachment("iframe") && !this.attachment.value.includes('twitframe.com/show');
     },
     img() {
       return this.hasAttachment("img");

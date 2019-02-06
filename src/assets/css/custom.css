@@ -34,6 +34,23 @@
 
 /*-----------------------------------------------------------------*/
 /*--- General ---*/
+@media screen and (max-width: 600px) {
+    .mobile {
+        display: block;
+    }
+    .desktop {
+        display: none;
+    }
+}
+@media screen and (min-width: 601px) {
+    .mobile {
+        display: none;
+    }
+    .desktop {
+        display: block;
+    }
+}
+
 
 html {
     overflow-y: overlay;
@@ -111,7 +128,7 @@ ul.socialicons li a:hover {
 }
 
 .HeaderNavigation {
-    /* height: 70px; */
+    height: 55px;
     background-color: white;
     border-bottom: 1px solid #c9cccd;
     position: sticky;
@@ -224,7 +241,7 @@ ul.socialicons li a:hover {
     margin-bottom: 20px;
     position: sticky;
     top: 60px;
-    max-height: 90vh;
+    max-height: calc(100vh - 55px - 15px);
     overflow: auto;
 }
 
@@ -733,7 +750,7 @@ a.down:hover {
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary:focus {
-    border-color: #1abc9c;
+    border-color: transparent;
     background-color: #20e1bb;
     box-shadow: none;
 }

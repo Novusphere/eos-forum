@@ -33,7 +33,8 @@
     "vue-analytics": "^5.16.2",
     "vue-meta": "^1.5.8",
     "vue-router": "^3.0.2",
-    "vue-select": "^2.5.1"
+    "vue-select": "^2.5.1",
+    "vue-tweet-embed": "^2.2.1"
   },
   "devDependencies": {
     "@babel/runtime": "^7.3.1",
