@@ -332,7 +332,7 @@ class Post {
         await this.detectAttachment();
         await this.setReferendumDetails();
         await this.data.json_metadata.attachment.normalize();
-        await this.detectTip();
+        this.detectTip(); // load without waiting in context (await)
     }
 
     async detectTip() {
