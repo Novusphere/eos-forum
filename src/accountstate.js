@@ -71,7 +71,7 @@ async function SaveAccountState() {
             const sig = ecc.sign(nonce.toString(), storage.anon_id.key);
 
             const payload = await novusphere.authorizeAccountState('', pubkey, nonce, sig);
-            console.log(payload);
+            //console.log(payload);
             
             if (payload.session_key) {
                 //console.log('authorized with key: ' + payload.session_key);

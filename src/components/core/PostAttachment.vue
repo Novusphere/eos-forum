@@ -66,7 +66,13 @@ export default {
   },
   computed: {
     twitterID () {
-      return this.attachment.value.includes('twitframe.com/show') && this.attachment.value.split('/')[this.attachment.value.split('/').length - 1].toString();
+      if (this.attachment.value.includes('twitframe.com/show')) {
+        const s = this.attachment.value.match(/status\/[0-9]+/);
+        if (s && s.length>0) {
+          return s[0].split('/')[1];
+        }
+      }
+      return '';
     },
     iframe() {
       return this.hasAttachment("iframe") && !this.attachment.value.includes('twitframe.com/show');
