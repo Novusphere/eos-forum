@@ -324,6 +324,10 @@ export default {
   padding-left: 15px;
   padding-right: 50px;
 }
+.mobile .dropdown-menu {
+  max-height: 50vh;
+  overflow: auto;
+}
 .mobile .dropdown-toggle {
   text-transform: capitalize;
   font-size: 18px;
