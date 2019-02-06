@@ -29,7 +29,9 @@ export default {
     if (screen.width <= 600) {
       this.$root.showSubs = false;
     }
-    this.$root.showPreview = JSON.parse(localStorage.getItem('preview'));
+    if (localStorage.getItem('preview')) {
+      this.$root.showPreview = JSON.parse(localStorage.getItem('preview'));
+    }
   },
   methods: {},
   computed: {},
