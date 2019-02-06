@@ -12,7 +12,7 @@
     <!-- header navigation -->
     <div class="HeaderNavigation">
       <div class="container">
-        <div class="row no-gutters navbar">
+        <div class="row navbar">
           <div class="flex-center">
             <div class="d-inline-block px-2 px-lg-4">
               <router-link :to="{ name: 'Index' }">
@@ -20,14 +20,25 @@
               </router-link>
             </div>
 
-            <div class="sub">
-              <div>
-                <template v-if="$route.params.sub" >
-                  {{ $route.params.sub }}
-                </template>
-                <template v-else>
+            <div class="d-sm-inline-block">
+              <b-dropdown variant="link" :text="$route.params.sub || 'Home'" class="mobile">
+                <b-dropdown-item @click="$router.push({name: 'Index'})">
                   Home
-                </template>
+                </b-dropdown-item>
+                <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'referendum' } })">
+                    Referendum
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="s in subs()"
+                  :key="s.sub"
+                  @click="$router.push({ name: 'Sub', params: { sub: s.sub } })"
+                >
+                  <img v-if="s.logo" :src="s.logo" style="max-width:24px">
+                  e/{{ s.sub }}
+                </b-dropdown-item>
+              </b-dropdown>
+              <div class="desktop sub">
+                {{ $route.params.sub || 'Home' }}
               </div>
             </div>
           </div>
@@ -104,11 +115,11 @@
 
         <div class="row">
           <div class="col-0 col-lg-3 col-xl-3">
-            <div class="sidebarblock">
-              <font-awesome-icon
+            <div class="sidebarblock desktop">
+              <!-- <font-awesome-icon
                 @click="toggleSubs()"
                 class="sub-toggle"
-                :icon="['fas', $root.showSubs ? 'minus-square' : 'plus-square']" />
+                :icon="['fas', $root.showSubs ? 'minus-square' : 'plus-square']" /> -->
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
                 Home
@@ -120,7 +131,6 @@
               </router-link>
               <div class="divline" />
               <router-link v-for="s in subs()"
-                v-show="$root.showSubs"
                 :key="s.sub"
                 class="dropdown-item"
                 :to="{ name: 'Sub', params: { sub: s.sub } }">
@@ -309,7 +319,18 @@ export default {
   }
 };
 </script>
-
+<style>
+.dropdown-item {
+  padding-left: 15px;
+  padding-right: 50px;
+}
+.mobile .dropdown-toggle {
+  text-transform: capitalize;
+  font-size: 18px;
+  color: black;
+  padding: 0px;
+}
+</style>
 <style scoped>
 .navbar {
   display: flex;
@@ -319,7 +340,6 @@ export default {
   text-transform: capitalize;
   font-size: 18px;
   color: black;
-  display: inline;
 }
 
 .sub-toggle:hover {

@@ -30,10 +30,11 @@
           </button>
           <button
             type="button"
-            class="btn"
+            class="btn btn-none"
             @click="showPreview()"
             :class="{
-              'btn-primary' : $root.showPreview
+              'btn-primary' : $root.showPreview,
+              'btn-outline' : !$root.showPreview
             }"
           >
             <font-awesome-icon :icon="['fas', 'th-list']" />
@@ -43,7 +44,8 @@
             @click="hidePreview()"
             class="btn"
             :class="{
-              'btn-primary' : !$root.showPreview
+              'btn-primary' : !$root.showPreview,
+              'btn-outline' : $root.showPreview
             }">
             <font-awesome-icon :icon="['fas', 'list']" />
           </button>
