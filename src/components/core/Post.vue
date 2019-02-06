@@ -184,10 +184,10 @@
               {{ post.referendum.details.total_eos.toFixed(4) }}
             </li>
             <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
-              <router-link @click.stop v-if="is_op" :to="{ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction } }">
+              <div v-if="is_op" @click.stop="$router.push({ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction} })">
                 <font-awesome-icon :icon="['fas', 'edit']" />
                 edit
-              </router-link>
+              </div>
               <a v-else @click.stop="showQuickEdit()">
                 <font-awesome-icon :icon="['fas', 'edit']" />
                 edit
