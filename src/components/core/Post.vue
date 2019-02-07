@@ -214,6 +214,7 @@
               <a
                 @click.stop
                 v-if="reddit.author"
+                target="_blank"
                 :href="'https://reddit.com' + reddit.permalink">
                 <font-awesome-icon :icon="['fab', 'reddit']" />
                 permalink
