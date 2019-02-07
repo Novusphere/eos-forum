@@ -85,7 +85,9 @@ export default async function Thread(id, child_id) {
             break;
     }
 
-    var new_posts = await Post.threadify(main_post, responses);
+    var threadify = await Post.threadify(main_post, responses);
+    var new_posts = threadify.new_posts;
+    responses = threadify.responses;
 
     // only count non-edits for new_posts length
     storage.new_posts[main_post.data.post_uuid] = {
@@ -104,10 +106,20 @@ export default async function Thread(id, child_id) {
 
         var child_post;
         if (child_id.length == 64) {
-            child_post = responses.find(p => p.transaction == child_id);
+            child_post = responses.find(p => p.o_transaction == child_id);
         } else {
             child_id = parseInt(child_id);
             child_post = responses.find(p => p.o_id == child_id);
+        }
+
+        // go one up
+        if (child_post.depth >= 1) {
+            // remove all other children
+            var one_up = threadify.map[child_post.data.json_metadata.parent_uuid];
+            one_up.children.length = 0;
+            one_up.children.push(child_post);
+            
+            child_post = one_up;
         }
 
         child_post.parent = main_post;

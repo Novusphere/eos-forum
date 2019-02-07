@@ -11,7 +11,10 @@
           e/{{ opening_post.data.json_metadata.sub }}
         </router-link>
       </div>
-      <post class="mb-2 pb-2" v-if="opening_post.id" :post="main_post" :thread="opening_post"></post>
+      <post class="mb-2 pb-2" 
+        v-if="opening_post.id" 
+        :post="main_post" 
+        :thread="opening_post"></post>
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
       </div>
@@ -68,24 +71,27 @@ export default {
   methods: {
     async load(
       id = this.$route.params.id,
-      child_id = this.$route.params.child_id
+      child_id = this.$route.params.child_id,
+      force = false
     ) {
       if (this.inactive) {
         return;
       }
 
       var thread = await ui.views.Thread(id, child_id);
-      if (thread.count > this.count) {
+      if (force || child_id || thread.count > this.count) {
         this.opening_post = thread.opening_post;
         this.main_post = thread.main_post;
         this.count = thread.count;
       }
 
-      setTimeout(() => this.load(id, child_id), 7500);
+      if (!child_id) {
+        setTimeout(() => this.load(id, child_id), 7500);
+      }
     },
     postContent(txid, data) {
       this.load(); // reload thread
-    }
+    },
   },
   data() {
     return {

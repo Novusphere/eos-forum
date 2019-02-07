@@ -120,7 +120,11 @@ class Post {
             responses[i].children.sort((a, b) => b.score - a.score);
         }
 
-        return new_posts;
+        return {
+            new_posts: new_posts,
+            responses: responses,
+            map: commentMap
+        };
     }
 
     constructor(post) { // post is from mongodb
