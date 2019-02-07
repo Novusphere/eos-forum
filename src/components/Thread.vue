@@ -6,14 +6,29 @@
 
     <template slot="content">
       <div class="mb-1" v-if="opening_post.id">
-        <router-link class="btn btn-sm btn-outline-primary" :to='{name: "Sub", params: { sub: opening_post.data.json_metadata.sub } }'>
-          <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
-          e/{{ opening_post.data.json_metadata.sub }}
-        </router-link>
+        <button
+          class="btn btn-sm btn-primary"
+          @click="$router.push({
+            name: is_perma ? 'Thread' : 'Sub',
+            params: {
+              sub: $route.params.sub,
+              id: $route.params.id,
+            }
+          })"
+        >
+          <template v-if="is_perma">
+            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+            back to original post
+          </template>
+          <template v-else>
+            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+            e/{{ opening_post.data.json_metadata.sub }}
+          </template>
+        </button>
       </div>
-      <post class="mb-2 pb-2" 
-        v-if="opening_post.id" 
-        :post="main_post" 
+      <post class="mb-2 pb-2"
+        v-if="opening_post.id"
+        :post="main_post"
         :thread="opening_post"></post>
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
@@ -56,10 +71,10 @@ export default {
   },
   watch: {
     "$route.params.id": function() {
-      this.load();
+      this.load(true);
     },
     "$route.params.child_id": function() {
-      this.load();
+      this.load(true);
     }
   },
   beforeDestroy() {
@@ -68,11 +83,16 @@ export default {
   async mounted() {
     this.load();
   },
+  computed: {
+    is_perma() {
+      return this.$route.params.child_id;
+    }
+  },
   methods: {
     async load(
+      force = false,
       id = this.$route.params.id,
       child_id = this.$route.params.child_id,
-      force = false
     ) {
       if (this.inactive) {
         return;
