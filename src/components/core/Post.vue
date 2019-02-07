@@ -236,7 +236,7 @@
         <div :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
           :id="'qreply-' + post.data.post_uuid">
           <div class="col-sm-12">
-            <textarea rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
+            <textarea @click.stop rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
           </div>
           <div class="col-sm-12 text-center" v-if="status">
             <span>{{ status }}</span>
