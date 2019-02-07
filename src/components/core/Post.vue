@@ -70,7 +70,7 @@
                   <font-awesome-icon v-if="is_spam" :icon="['fas', 'exclamation-triangle']" />
                   <font-awesome-icon v-if="is_nsfw" :icon="['fas', 'eye-slash']" />
                 </div>
-                <a v-if="offsite" :href="post.attachment.value" class="offsite" target="_blank">
+                <a v-if="offsite" :href="post.data.json_metadata.attachment.value" class="offsite" target="_blank">
                   ({{ offsite }})
                 </a>
                 <template v-if="is_op">
