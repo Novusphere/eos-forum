@@ -11,16 +11,20 @@ async function HandleTip(post, json_metadata, parent_tx, actions, set_status, id
     if (!parent_tx) return;
     if (json_metadata.edit) return;
 
-    var tips_rx = post.content.match(/\#tip [0-9\.]+ [A-Z]+/gi);
+    var tips_rx = post.content.match(/\#tip [0-9\.]+ [A-Z]+( @[a-z0-9\.]+)?/gi);
 
     if (!tips_rx || tips_rx.length == 0) return;
 
     const eos = GetEOS();
     const tokens = await GetTokensInfo();
-    const tip_to = json_metadata.parent_poster;
 
     for (var i = 0; i < tips_rx.length; i++) {
+        var tip_to = json_metadata.parent_poster;
         var tip_args = tips_rx[i].split(" ");
+
+        if (tip_args.length >= 4) {
+            tip_to = tip_args[3].substring(1);
+        }
 
         const token = tokens.find(t => t.symbol == tip_args[2]);
         if (!token) {

@@ -493,7 +493,9 @@ export default {
         brand = BRANDS[this.sub];
       }
 
-      this.quick_reply += ' #tip 1 ' + brand.token_symbol;
+      var tip = `#tip 1 ${brand.token_symbol} @${this.post.data.poster}`;
+
+      this.quick_reply += ' ' + tip;
     },
     async upvote() {
       if (this.post.my_vote) {
