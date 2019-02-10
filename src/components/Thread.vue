@@ -106,7 +106,7 @@ export default {
       }
 
       if (!child_id) {
-        setTimeout(() => this.load(id, child_id), 7500);
+        //setTimeout(() => this.load(id, child_id), 7500);
       }
     },
     postContent(txid, data) {

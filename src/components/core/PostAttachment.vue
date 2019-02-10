@@ -5,7 +5,7 @@
 
     <div class="col-md-12">
       <Tweet v-if="twitterID" :id="twitterID" />
-      <div v-else-if="iframe">
+      <div v-else-if="iframe" class="text-center">
         <iframe :src="this.show_iframe ? attachment.value : ''"
           style="max-width: 100%"
           :height="attachment.height"
@@ -15,21 +15,22 @@
           allowfullscreen>
         </iframe>
       </div>
+      <div v-else-if="markdown">
+        <p v-html="markdown_html"></p>
+      </div>
       <div v-else-if="img">
         <img class="limit-height" :src="attachment.value">
       </div>
-      <div v-else-if="mp4">
+      <div v-else-if="mp4" class="text-center">
         <video class="limit-height" controls>
           <source :src="attachment.value" type="video/mp4">
         </video>
       </div>
-
       <div v-else-if="mp3">
         <audio class="limit-height" controls>
           <source :src="attachment.value" type="audio/mpeg">
         </audio>
       </div>
-
       <div v-else-if="link">
         <div>
           <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
@@ -41,6 +42,8 @@
 
 <script>
 import { Tweet } from 'vue-tweet-embed'
+import { MarkdownParser } from "@/markdown";
+
 export default {
   name: "PostAttachment",
   components: {
@@ -88,6 +91,13 @@ export default {
     },
     link() {
       return this.hasAttachment("link");
+    },
+    markdown() {
+      return this.hasAttachment('markdown');
+    },
+    markdown_html() {
+      var md = new MarkdownParser(this.attachment.value);
+      return md.html;
     },
     any() {
       return (

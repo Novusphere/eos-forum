@@ -25,10 +25,10 @@ export default function (makeUser, makeTag) {
             // #hashtag syntax
             {
                 type: 'lang',
-                regex: '\\B(\\\\)?#([a-zA-Z0-9_]+)\\b', // \B(\\)?#([a-zA-Z0-9_]+)\b
+                regex: '(.)?#([a-zA-Z0-9_]+)\\b',
                 replace: function (match, leadingSlash, tag) {
                     // Check if we matched the leading \ and return nothing changed if so
-                    if (leadingSlash === '\\') {
+                    if (leadingSlash === '\\' || leadingSlash == '/') {
                         return match;
                     } else {
                         return makeTag(tag);

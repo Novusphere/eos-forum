@@ -9,7 +9,9 @@ const WHITE_LIST = [
     'H3', 'H4', 'I', 'IMG', 'KBD',
     'LI', 'OL', 'P', 'PRE', 'S',
     'SUP', 'SUB', 'STRONG', 'STRIKE', 'UL',
-    'BR', 'HR', '#text'
+    'BR', 'HR', '#text',
+    // non-standard
+    'DIV', 'FIGURE', 'CENTER'
 ];
 
 const RX_JAVASCRIPT = new RegExp('javascript', 'i');
@@ -42,7 +44,7 @@ class MarkdownParser {
                     return '<a href="\\#/u/' + username.trim().substring(1) + '">' + username + '</a>';
                 },
                 //(tag) => '<a href="">#' + tag + '</a>'
-                (tag) => '<a href="\\#/tag/' + tag + '">#' + tag + '</a>'
+                (tag) => ' <a href="\\#/tag/' + tag + '">#' + tag + '</a>'
             ));
         }
 

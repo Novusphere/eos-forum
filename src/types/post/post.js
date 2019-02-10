@@ -1,3 +1,4 @@
+import jQuery from 'jquery';
 import { storage } from "@/storage";
 import ui from "@/ui";
 import requests from "@/requests";
@@ -334,6 +335,7 @@ class Post {
         }
 
         await this.detectAttachment();
+        await this.detectContent();
         await this.setReferendumDetails();
         await this.data.json_metadata.attachment.normalize();
         this.detectTip(); // load without waiting in context (await)
@@ -393,7 +395,25 @@ class Post {
             }
             str += this.referendum.content;;
         }
+
         return str;
+    }
+
+    async detectContent() {
+
+        var content = this.data.content;
+
+        // detect images
+        const rx = /(.|)https:\/\/(\w|[:\/\.%])+\.(png|jpg)(.|)/g;
+        content = content.replace(rx, function (x) {
+            var tx = x.trim();
+            if (!tx.startsWith('https')) {
+                return x;
+            }
+            return '<center>![' + tx + '](' + tx + ')</center>';
+        });
+
+        this.data.content = content;
     }
 
     async detectAttachment() {
@@ -409,6 +429,44 @@ class Post {
 
             return;
         }
+
+        if (attachment.value.startsWith('https://trybe.one/')) {
+            try {
+                var cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + attachment.value);
+                var cors_jq = jQuery(cors_html).find('div[class="entry-content"]');
+                cors_jq.find('div[class*="essb_links"]').remove();
+                cors_jq.find('div[class*="post-ratings"]').remove();
+                cors_jq.find('div[class*="post-ratings-loading"]').remove();
+
+                // replace images with proxy for hotlinking
+                cors_jq.find('img').each(function () {
+                    var $this = jQuery(this);
+                    $this.prop('src', 'https://images.weserv.nl/?url=' + $this.prop('src'));
+                });
+
+                attachment.type = 'markdown';
+                attachment.display = 'markdown';
+                attachment.value = '**Source:** ' + attachment.value + ' \n\n----\n\n' + cors_jq.html();
+            }
+            catch (ex) {
+                console.log(ex);
+            }
+        }
+
+        if (attachment.value.startsWith('https://steemit.com')) {
+            try {
+                var cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + attachment.value);
+                var cors_jq = jQuery(cors_html).find('div[class*="MarkdownViewer"]');
+
+                attachment.type = 'markdown';
+                attachment.display = 'markdown';
+                attachment.value = '**Source:** ' + attachment.value + ' \n\n----\n\n' + cors_jq.html();
+            }
+            catch (ex) {
+                console.log(ex);
+            }
+        }
+
 
         // detect automatic
 
@@ -489,7 +547,7 @@ class Post {
     getUrlTitle() {
         var title = this.getTitle();
         var friendly = title;
-        friendly = friendly.replace(/ /g, "_");
+        friendly = friendly.replace(/\W/g, "_");
         return friendly;
     }
 
