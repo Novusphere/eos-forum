@@ -179,7 +179,7 @@ class Post {
         }, post);
 
         this._post = post;
-
+        this._content = '';
         this.score = post.score;
         this.parent = null;
         this.depth = 0;
@@ -388,7 +388,7 @@ class Post {
     }
 
     getContent() {
-        var str = this.data.content || '';
+        var str = this._content || this.data.content || '';
         if (this.referendum) {
             if (str) {
                 str += '\n\n---\n\n';
@@ -404,7 +404,7 @@ class Post {
         var content = this.data.content;
 
         // detect images
-        const rx = /(.|)https:\/\/(\w|[:\/\.%])+\.(png|jpg)(.|)/g;
+        const rx = /(.|)https:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg)(\?(\w|[:\/\.%-])+)?(.|)/g;
         content = content.replace(rx, function (x) {
             var tx = x.trim();
             if (!tx.startsWith('https')) {
@@ -413,7 +413,7 @@ class Post {
             return '<center>![' + tx + '](' + tx + ')</center>';
         });
 
-        this.data.content = content;
+        this._content = content;
     }
 
     async detectAttachment() {
@@ -453,7 +453,8 @@ class Post {
             }
         }
 
-        if (attachment.value.startsWith('https://steemit.com')) {
+        if (attachment.value.startsWith('https://steemit.com') ||
+            attachment.value.startsWith('https://whaleshares.io')) {
             try {
                 var cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + attachment.value);
                 var cors_jq = jQuery(cors_html).find('div[class*="MarkdownViewer"]');
