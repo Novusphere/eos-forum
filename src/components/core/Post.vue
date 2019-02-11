@@ -319,7 +319,7 @@ export default {
       const tips = {};
       this.post.children.forEach(child => {
         if (child.tips) {
-          child.tips.forEach(tip => {
+          child.tips.filter(t => t.to == this.post.data.poster).forEach(tip => {
             if (tips[tip.symbol] === undefined) {
               tips[tip.symbol] = Number(tip.amount);
             } else {
