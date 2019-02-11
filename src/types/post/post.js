@@ -440,8 +440,14 @@ class Post {
 
                 // replace images with proxy for hotlinking
                 cors_jq.find('img').each(function () {
+                    const cors_img = 'https://images.weserv.nl/?url=';
                     var $this = jQuery(this);
-                    $this.prop('src', 'https://images.weserv.nl/?url=' + $this.prop('src'));
+                    $this.prop('src', cors_img + $this.prop('src'));
+
+                    const srcset = $this.prop('srcset');
+                    if (srcset) {
+                        $this.prop('srcset', srcset.split(', ').map(i => cors_img + i).join(', '));
+                    }
                 });
 
                 attachment.type = 'markdown';
