@@ -26,6 +26,7 @@ async function HandleTip(post, json_metadata, parent_tx, actions, set_status, id
             tip_to = tip_args[3].substring(1);
         }
 
+        tip_args[2] = tip_args[2].toUpperCase(); // upper case sym, ignore case user typed
         const token = tokens.find(t => t.symbol == tip_args[2]);
         if (!token) {
             set_status(
