@@ -98,14 +98,19 @@ export default async function Home(current_page, sub, sorter) {
         ]
     })).cursor.firstBatch;
 
+    //console.log(_pinned_threads);
+
     _pinned_threads = _pinned_threads
         .map(txid => pinned_threads.find(pt => pt.transaction == txid))
         .filter(pt => pt);
 
+    //console.log(_pinned_threads.map(t => t.transaction + ' ' + t.data.json_metadata.title)); // == _pinned_threads[0].transaction));
+    //console.log(threads.map(t => t.transaction + ' ' + t.data.json_metadata.title)); // == _pinned_threads[0].transaction));
+
     threads = await Post.fromArray(Array.concat(
         _pinned_threads,
-        threads.filter(t => !_pinned_threads.find(t2 => t2.id == t.id))
-    ));
+        threads.filter(t => !_pinned_threads.find(t2 => t2.transaction == t.transaction))
+    )); 
 
     for (var i = 0; i < threads.length; i++) {
         var post = threads[i];

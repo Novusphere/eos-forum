@@ -51,7 +51,7 @@ class Moderation {
         var data;
 
         // lock
-        for (;;) {
+        for (; ;) {
             data = this.cache[key];
             if (data == 0) {
                 await requests.sleep(5);
@@ -169,9 +169,11 @@ class Moderation {
             }
         }
 
-        var p_sub = set1.pinned[sub];
-        if (p_sub) {
-            result = Array.concat(result, p_sub);
+        if (sub != "all") {
+            var p_sub = set1.pinned[sub];
+            if (p_sub) {
+                result = Array.concat(result, p_sub);
+            }
         }
 
         return result;
