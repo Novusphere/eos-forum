@@ -71,12 +71,13 @@ export default async function Home(current_page, sub, sorter) {
         ]
     })).cursor.firstBatch;
 
+    var _pinned_threads = await moderation.getPinned(sub); // txids
     var pinned_threads = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
         maxTimeMS: 7500,
         cursor: {},
         pipeline: [
-            { $match: novusphere.query.match.threadById(await moderation.getPinned(sub)) },
+            { $match: novusphere.query.match.threadById(_pinned_threads) },
             { $lookup: novusphere.query.lookup.postState() },
             {
                 $project: novusphere.query.project.post({
@@ -97,9 +98,13 @@ export default async function Home(current_page, sub, sorter) {
         ]
     })).cursor.firstBatch;
 
+    _pinned_threads = _pinned_threads
+        .map(txid => pinned_threads.find(pt => pt.transaction == txid))
+        .filter(pt => pt);
+
     threads = await Post.fromArray(Array.concat(
-        pinned_threads,
-        threads.filter(t => !pinned_threads.find(t2 => t2.id == t.id))
+        _pinned_threads,
+        threads.filter(t => !_pinned_threads.find(t2 => t2.id == t.id))
     ));
 
     for (var i = 0; i < threads.length; i++) {

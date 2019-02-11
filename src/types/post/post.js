@@ -513,6 +513,7 @@ class Post {
         this.transaction = edit.transaction;
         this.id = edit.id;
 
+        this._content = '';
         this.data.content = edit.data.content;
         this.data.json_metadata.edit = true;
 

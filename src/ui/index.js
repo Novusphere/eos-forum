@@ -1,7 +1,7 @@
 import { GetNovusphere } from "@/novusphere";
 import { GetEOS } from "@/eos";
 import { storage } from "@/storage";
-import { LoadAccountState } from "@/accountstate";
+import { LoadAccountState, SaveAccountState } from "@/accountstate";
 
 // views
 import Home from "./views/Home";
@@ -33,6 +33,7 @@ import { FORUM_BRAND } from "./constants";
 
 window.addEventListener('identity', async function() {
     await LoadAccountState();
+    await SaveAccountState();
 });
 
 window.addEventListener('identityUpdate', async function () {
