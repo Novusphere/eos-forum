@@ -45,16 +45,16 @@ export default class LynxWallet {
         try { 
             var eostx = await lynx.transact(lynx_actions);
             if (eostx == null) {
-                _alert('eostx is null');
+                //_alert('eostx is null');
             }
             else if (!eostx.transaction_id) {
-                _alert('eostx.transaction_id is not set');
+                //_alert('eostx.transaction_id is not set');
             }
             return eostx.transaction_id;
         }
         catch (err) {
-            _alert('An error occured from transact()');
-            _alert(err);
+            //_alert('An error occured from transact()');
+            //_alert(err);
 
             throw err;
         }

@@ -24,24 +24,33 @@ async function SaveAccountState() {
             if (!storage.accountstate[identity.account] ||
                 !(await novusphere.isAccountStateAuthorized(storage.accountstate[identity.account], identity.account, ''))) {
                 
-                //console.log('unauthorized');
+                //window._alert('unauthorized');
                 storage.accountstate[identity.account] = 0;
                 
-                const sig = await SignData(identity.publicKey, nonce.toString(), 'Start session');
+                const sig = await SignData(identity.publicKey, nonce.toString(), 'Start session');                
                 if (!sig) {
                     throw new Error('invalid signature');
+                }
+
+                if (!identity.publicKey) { // lynx
+                    identity.publicKey = ecc.recover(sig, nonce.toString());
                 }
 
                 const payload = await novusphere.authorizeAccountState(identity.account, identity.publicKey, nonce, sig);
                 //console.log(payload);
 
                 if (payload.session_key) {
-                    //console.log('authorized with key: ' + payload.session_key);
+                    //window._alert('authorized with key: ' + payload.session_key);
                     storage.accountstate[identity.account] = payload.session_key;
+                }
+                else {
+                    //window._alert('no session key');
+                    //window._alert(JSON.stringify(payload));
                 }
             }
         }
         catch (ex) {
+            //window._alert(ex);
             console.log(ex); // likely, signature was rejected
         }
 

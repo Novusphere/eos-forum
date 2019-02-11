@@ -1,6 +1,6 @@
 import { GetNovusphere } from "@/novusphere";
-import { GetEOS } from "@/eos";
-import { storage } from "@/storage";
+import { GetEOS, GetIdentity } from "@/eos";
+import { storage, SaveStorage } from "@/storage";
 import { LoadAccountState, SaveAccountState } from "@/accountstate";
 
 // views
@@ -26,7 +26,6 @@ import ReferendumActions from "./actions/Referendum";
 
 // helpers
 import UIHelpers from "./helpers";
-import { GetIdentity } from "../eos";
 
 // constants
 import { FORUM_BRAND } from "./constants";
@@ -34,6 +33,7 @@ import { FORUM_BRAND } from "./constants";
 window.addEventListener('identity', async function() {
     await LoadAccountState();
     await SaveAccountState();
+    SaveStorage();
 });
 
 window.addEventListener('identityUpdate', async function () {
