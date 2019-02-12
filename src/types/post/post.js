@@ -400,7 +400,6 @@ class Post {
     }
 
     async detectContent() {
-
         var content = this.data.content;
 
         // detect images
@@ -530,6 +529,7 @@ class Post {
         if (edit.data.json_metadata.attachment) {
             this.data.json_metadata.attachment = new PostAttachment(edit.data.json_metadata.attachment);
             await this.detectAttachment();
+            await this.detectContent();
             await this.setReferendumDetails();
         }
     }
