@@ -2,7 +2,7 @@
   <layout ref="layout" :load="load">
 
     <template slot="topic">
-      <span v-if="sub">e/{{sub}}</span>
+      <span v-if="$root.sub">e/{{$root.sub}}</span>
       <span v-else>Home</span>
     </template>
 
@@ -16,18 +16,6 @@
           </post-sorter>
         </div>
         <div class="ml-1 float-left" v-if="!loading">
-          <button v-if="sub && !is_subscribed"
-            v-on:click="subscribe(true)"
-            type="button"
-            class="btn btn-outline mr-1">
-            subscribe
-          </button>
-          <button v-if="sub && is_subscribed"
-            v-on:click="subscribe(false)"
-            type="button"
-            class="btn mr-1 btn-primary ">
-            subscribed
-          </button>
           <button
             type="button"
             class="btn btn-none"
@@ -161,11 +149,10 @@ export default {
       window.scrollTo(0,0);
       const novusphere = GetNovusphere();
       var home = await ui.views.Home(this.$route.query.page, this.sub, this.$refs.sorter.getSorter());
-      this.is_subscribed = home.is_subscribed;
+      this.sub = home.sub;
       this.posts = home.posts;
       this.pages = home.pages;
       this.current_page = home.current_page;
-      this.sub = home.sub;
       this.loading = false;
 
     },
@@ -178,16 +165,9 @@ export default {
         alert(reason);
       }
     },
-    postContent(txid) {
-      this.$router.push("/e/" + this.sub + "/" + txid);
-    },
-    async subscribe(sub) {
-      this.is_subscribed = await ui.actions.Subscribe(sub, this.sub);
-      this.$forceUpdate();
-    },
     openPost (postID, sub){
       this.selectedPostID = postID;
-      history.pushState({},"","#/e/" + sub + "/" + postID);
+      history.pushState({},"","#/e/" + this.sub + "/" + postID);
     },
     closePost () {
       this.selectedPostID = undefined;
@@ -205,10 +185,9 @@ export default {
   data() {
     return {
       loading: false,
-      is_subscribed: false,
       current_page: 0,
       pages: 0,
-      sub: "",
+      sub: '',
       posts: [], // for posts being displayed
       selectedPostID: undefined,
       eos_referendum: storage.eos_referendum,

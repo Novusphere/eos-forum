@@ -42,12 +42,6 @@
       </div>
     </template>
 
-    <template slot="right_sidebar">
-      <div class="sidebarblock">
-        <recently-visited></recently-visited>
-      </div>
-    </template>
-
   </layout>
 </template>
 
@@ -57,7 +51,6 @@ import ui from "@/ui";
 import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
-import RecentlyVisited from "@/components/core/RecentlyVisited";
 import Layout from "@/components/section/Layout";
 
 import Modal from "@/components/modal/Modal.vue";
@@ -70,7 +63,6 @@ export default {
     Pager,
     Post,
     PostSorter,
-    RecentlyVisited,
     Modal,
     ThreadModal,
   },

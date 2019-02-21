@@ -27,7 +27,6 @@ import { GetNovusphere } from "@/novusphere";
 import Pager from "@/components/core/Pager";
 import PostSorter from "@/components/core/PostSorter";
 import Post from "@/components/core/Post";
-import RecentlyVisited from "@/components/core/RecentlyVisited";
 
 import Layout from "@/components/section/Layout";
 
@@ -42,7 +41,6 @@ export default {
   components: {
     Pager,
     PostSorter,
-    RecentlyVisited,
     Post,
     Layout
   },

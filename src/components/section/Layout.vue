@@ -106,6 +106,7 @@
     <!-- content block -->
     <section class="Content">
       <div class="container">
+
         <div class="row">
           <div class="col-12 col-lg-12 col-xl-12">
             <div class="mt-1 mb-1"></div>
@@ -114,15 +115,15 @@
         </div>
 
         <div class="row">
-          <div class="col-0 col-lg-3 col-xl-3">
-            <div class="sidebarblock desktop">
-              <!-- <font-awesome-icon
-                @click="toggleSubs()"
-                class="sub-toggle"
-                :icon="['fas', $root.showSubs ? 'minus-square' : 'plus-square']" /> -->
+          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
+            <div class="desktop block">
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
                 Home
+              </router-link>
+              <router-link class="dropdown-item"
+                :to="{name: 'Sub', params: { sub: 'all' } }">
+                All
               </router-link>
               <router-link v-if="eos_referendum"
                 class="dropdown-item"
@@ -139,12 +140,39 @@
               </router-link>
             </div>
           </div>
-          <div class="col-12 col-lg-6 col-xl-6">
+          <div
+          class="col-12"
+          :class="[
+            {'col-lg-6': $root.mode === 'normal'},
+            {'col-xl-6': $root.mode === 'normal'},
+          ]"
+          >
             <slot name="content"></slot>
           </div>
-          <div class="col-0 col-lg-3 col-xl-3">
-            <div v-if="noRightBar" class="sidebarblock">
-              <recently-visited></recently-visited>
+          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
+            <div v-if="$route.params.sub" class="block">
+              <h3>
+                /e/{{ $route.params.sub }}
+              </h3>
+              <h3>
+                Subscribers: {{ sub_count }}
+              </h3>
+              <h3>
+                <button
+                  @click="subscribe(!is_subscribed())"
+                  type="button"
+                  class="btn subscribe"
+                  :class="[
+                    { 'btn-outline': !is_subscribed() },
+                    { 'btn-primary': is_subscribed() },
+                  ]"
+                  >
+                  {{ is_subscribed() ? 'subscribed' : 'subscribe' }}
+                </button>
+              </h3>
+            </div>
+            <div v-if="noRightBar" class="block">
+              <recently-visited />
             </div>
             <slot v-else name="right_sidebar" />
           </div>
@@ -238,7 +266,7 @@ export default {
     load: {
       type: Function,
       required: false
-    }
+    },
   },
   watch: {
     "$route.params.sub": function() {
@@ -246,6 +274,9 @@ export default {
     }
   },
   computed: {
+    subscribed_subs() {
+      return storage.subscribed_subs;
+    },
     noRightBar() {
       return !this.$slots["right_sidebar"];
     }
@@ -259,11 +290,18 @@ export default {
     window.removeEventListener("identity", this.updateIdentity);
   },
   methods: {
+    is_subscribed() {
+      return this.subscribed_subs.includes(this.$route.params.sub);
+    },
+    async subscribe(sub) {
+      await ui.actions.Subscribe(sub, this.$root.sub);
+      this.$forceUpdate();
+    },
     subs() {
       var subs = storage.subscribed_subs.map(s => ({
         sub: s,
         logo: BRANDS["novusphere"].logo
-      }));
+      })).filter(x => !this.defaultSubs.includes(x.sub));
 
       for (var i = 0; i < subs.length; i++) {
         const brand = BRANDS[subs[i].sub];
@@ -271,7 +309,6 @@ export default {
           subs[i].logo = brand.logo;
         }
       }
-
       return subs;
     },
     updateBrand() {
@@ -314,7 +351,12 @@ export default {
       brand_logo: "",
       brand_icon: "",
       brand_symbol: "",
-      brand_banner: ""
+      brand_banner: "",
+      sub_count: 0,
+      defaultSubs: [
+        'all',
+        'referendum'
+      ]
     };
   }
 };
@@ -344,6 +386,10 @@ export default {
   text-transform: capitalize;
   font-size: 18px;
   color: black;
+}
+
+.subscribe {
+  width: 100%;
 }
 
 .sub-toggle:hover {
