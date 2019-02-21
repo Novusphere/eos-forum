@@ -117,13 +117,13 @@
         <div class="row">
           <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
             <div class="desktop block">
-              <!-- <font-awesome-icon
-                @click="toggleSubs()"
-                class="sub-toggle"
-                :icon="['fas', $root.showSubs ? 'minus-square' : 'plus-square']" /> -->
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
                 Home
+              </router-link>
+              <router-link class="dropdown-item"
+                :to="{name: 'Sub', params: { sub: 'all' } }">
+                All
               </router-link>
               <router-link v-if="eos_referendum"
                 class="dropdown-item"
@@ -297,7 +297,7 @@ export default {
       var subs = storage.subscribed_subs.map(s => ({
         sub: s,
         logo: BRANDS["novusphere"].logo
-      }));
+      })).filter(x => !this.defaultSubs.includes(x.sub));
 
       for (var i = 0; i < subs.length; i++) {
         const brand = BRANDS[subs[i].sub];
@@ -305,7 +305,6 @@ export default {
           subs[i].logo = brand.logo;
         }
       }
-
       return subs;
     },
     updateBrand() {
@@ -350,6 +349,10 @@ export default {
       brand_symbol: "",
       brand_banner: "",
       sub_count: 0,
+      defaultSubs: [
+        'all',
+        'referendum'
+      ]
     };
   }
 };
