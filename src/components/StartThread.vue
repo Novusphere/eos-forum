@@ -171,12 +171,6 @@
       </div>
       <!-- POST -->
     </template>
-
-  <template slot="sidebar">
-    <div class="sidebarblock">
-      <recently-visited></recently-visited>
-    </div>
-  </template>
 </layout>
 
 </template>
@@ -192,7 +186,6 @@ import { GetIdentity } from "@/eos";
 import Pager from "@/components/core/Pager";
 import PostComponent from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
-import RecentlyVisited from "@/components/core/RecentlyVisited";
 
 import Layout from "@/components/section/Layout";
 
@@ -205,7 +198,6 @@ export default {
     Pager,
     Post: PostComponent,
     PostSorter,
-    RecentlyVisited,
     Layout
   },
   watch: {},
