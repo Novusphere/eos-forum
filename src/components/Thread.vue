@@ -32,18 +32,12 @@
         </button>
       </div>
       <post class="mb-2 pb-2"
-        v-if="opening_post.id"
+        v-if="opening_post.id && !loading"
         :post="main_post"
         :thread="opening_post">
       </post>
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
-      </div>
-    </template>
-
-    <template slot="right_sidebar">
-      <div class="sidebarblock">
-        <recently-visited></recently-visited>
       </div>
     </template>
   </layout>
@@ -101,6 +95,7 @@ export default {
       id = this.$route.params.id,
       child_id = this.$route.params.child_id,
     ) {
+      this.loading = true;
       if (this.inactive) {
         return;
       }
@@ -115,6 +110,7 @@ export default {
       if (!child_id) {
         //setTimeout(() => this.load(id, child_id), 7500);
       }
+      this.loading = false;
     },
     postContent(txid, data) {
       this.load(); // reload thread
@@ -125,7 +121,8 @@ export default {
       opening_post: ui.helpers.PlaceholderPost(),
       main_post: ui.helpers.PlaceholderPost(),
       count: 0,
-      inactive: false
+      inactive: false,
+      loading: false,
     };
   }
 };
