@@ -1,5 +1,8 @@
 <template>
-  <layout :load="load">
+  <layout
+    :load="load"
+    :mode="$route.params.mode"
+    >
     <template slot="topic">
       <span>Thread</span>
     </template>
@@ -8,7 +11,9 @@
       <div class="mb-1" v-if="opening_post.id">
         <button
           class="btn btn-sm btn-primary"
-          @click="$router.push({
+          @click="
+            $root.mode = 'normal',
+            $router.push({
             name: is_perma ? 'Thread' : 'Sub',
             params: {
               sub: $route.params.sub,
@@ -29,7 +34,8 @@
       <post class="mb-2 pb-2"
         v-if="opening_post.id"
         :post="main_post"
-        :thread="opening_post"></post>
+        :thread="opening_post">
+      </post>
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
       </div>
@@ -79,6 +85,7 @@ export default {
   },
   beforeDestroy() {
     this.inactive = true;
+    this.$root.mode = 'normal';
   },
   async mounted() {
     this.load();

@@ -614,19 +614,16 @@ td.chbox {
 
 .postinfobot .prev a {
     font-size: 18px;
-    color: #bdc3c7;
 }
 
 .postinfobot .posted {
     margin-left: 18px;
     font-size: 12px;
-    color: #bdc3c7;
     font-family: 'Open Sans Regular', sans-serif;
 }
 
 .postinfobot .posted i {
     font-size: 18px;
-    color: #bdc3c7;
     padding-right: 8px;
 }
 
@@ -637,7 +634,6 @@ td.chbox {
 
 .postinfobot .next a {
     font-size: 18px;
-    color: #bdc3c7;
 }
 
 .postinfobot .next a i {

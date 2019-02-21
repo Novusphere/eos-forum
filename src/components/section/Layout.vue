@@ -106,6 +106,7 @@
     <!-- content block -->
     <section class="Content">
       <div class="container">
+
         <div class="row">
           <div class="col-12 col-lg-12 col-xl-12">
             <div class="mt-1 mb-1"></div>
@@ -114,7 +115,7 @@
         </div>
 
         <div class="row">
-          <div class="col-0 col-lg-3 col-xl-3">
+          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3">
             <div class="sidebarblock desktop">
               <!-- <font-awesome-icon
                 @click="toggleSubs()"
@@ -139,10 +140,16 @@
               </router-link>
             </div>
           </div>
-          <div class="col-12 col-lg-6 col-xl-6">
+          <div
+          class="col-12"
+          :class="[
+            {'col-lg-6': $root.mode === 'normal'},
+            {'col-xl-6': $root.mode === 'normal'},
+          ]"
+          >
             <slot name="content"></slot>
           </div>
-          <div class="col-0 col-lg-3 col-xl-3">
+          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3">
             <div v-if="noRightBar" class="sidebarblock">
               <recently-visited></recently-visited>
             </div>
@@ -238,7 +245,7 @@ export default {
     load: {
       type: Function,
       required: false
-    }
+    },
   },
   watch: {
     "$route.params.sub": function() {

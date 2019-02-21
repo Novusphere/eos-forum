@@ -4,7 +4,7 @@
     v-if="!(!showChildren && hide_spam_threads && is_spam)"
     @click="openPost"
     class="post">
-    <template v-if="!is_op">
+    <template v-if="post.depth !== 0">
       <div
         @click.stop="togglePost()"
         class="post-toggle">
@@ -174,7 +174,7 @@
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 <span v-if="!post.parent">{{ post.total_replies }} comments</span>
               </router-link>
-              <a class="reply" v-else @click.stop="showQuickReply()">
+              <a class="reply black" v-else @click.stop="showQuickReply()">
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 reply
               </a>
@@ -184,14 +184,20 @@
               {{ post.referendum.details.total_eos.toFixed(4) }}
             </li>
             <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
-              <div v-if="is_op" @click.stop="$router.push({ name: 'EditThread', params: { sub: sub, edit_id: post.o_transaction} })">
+              <div
+                class="hover"
+                @click.stop="is_op ?
+                $router.push({
+                  name: 'EditThread',
+                  params: {
+                    sub: sub,
+                    edit_id: post.o_transaction
+                  }
+                }) :
+                showQuickEdit()">
                 <font-awesome-icon :icon="['fas', 'edit']" />
                 edit
               </div>
-              <a v-else @click.stop="showQuickEdit()">
-                <font-awesome-icon :icon="['fas', 'edit']" />
-                edit
-              </a>
             </li>
             <li class="list-inline-item" v-if="is_op">
               <template v-if="!post.referendum">
@@ -231,6 +237,17 @@
                 <font-awesome-icon :icon="['fas', 'link']" />
               </a>
             </li>
+            <li class="list-inline-item" v-if="post.depth >= 5">
+              <a
+                @click="
+                  $root.mode = 'zen',
+                  $router.push(zen_mode)
+                "
+                class="hover black"
+              >
+                follow the discussion...
+              </a> 
+            </li>
           </ul>
         </div>
 
@@ -252,7 +269,7 @@
         <div class="clearfix"></div>
       </div>
     </div>
-    <template v-if="showChildren && post.depth <= 5">
+    <template v-if="showChildren && post.depth < 5">
       <div
         v-for="child in post.children"
         :key="child.o_id">
@@ -382,6 +399,18 @@ export default {
     },
     selectedPostTitle() {
       return this.thread ? this.thread.getUrlTitle() : this.post.getUrlTitle();
+    },
+    zen_mode() {
+      const id = this.selectedPostID;
+      return {
+        name: "Thread",
+        params: {
+          sub: this.sub,
+          id: id,
+          title: this.selectedPostTitle,
+          child_id: this.post.o_id || this.post.o_transaction,
+        }
+      };
     },
     thread_link() {
       const id = this.selectedPostID;
@@ -667,6 +696,9 @@ export default {
 </script>
 
 <style scoped>
+.black {
+  color: black !important;
+}
 .referendum {
   display: none;
 }
