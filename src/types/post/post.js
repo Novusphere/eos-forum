@@ -403,7 +403,7 @@ class Post {
         var content = this.data.content;
 
         // detect images
-        const rx = /(.|)https:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg)(\?(\w|[:\/\.%-])+)?(.|)/g;
+        const rx = /(.|)https:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/\.%-])+)?(.|)/g;
         content = content.replace(rx, function (x) {
             var tx = x.trim();
             if (!tx.startsWith('https')) {
@@ -462,7 +462,10 @@ class Post {
             attachment.value.startsWith('https://whaleshares.io')) {
             try {
                 var cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + attachment.value);
-                var cors_jq = jQuery(cors_html).find('div[class*="MarkdownViewer"]');
+                var cors_jq = jQuery(cors_html).find(
+                    attachment.value.startsWith('https://steemit.com') ? 
+                    'div[class*="MarkdownViewer"]' :
+                    'div[class*="StoryFull__content"]');
 
                 attachment.type = 'markdown';
                 attachment.display = 'markdown';

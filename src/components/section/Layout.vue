@@ -154,7 +154,7 @@
               <h3>
                 /e/{{ $route.params.sub }}
               </h3>
-              <h3>
+              <h3 v-if="false">
                 Subscribers: {{ sub_count }}
               </h3>
               <h3>

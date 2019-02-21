@@ -9,7 +9,7 @@ var DEFAULT_STORAGE = {
     subscribed_subs: ["all", "novusphere", "eos", "anon-r-eos", "anon-pol-econ"],
     unsubscribed_subs: [], // used with syncing from default list
     new_posts: {},
-    last_notification: 0,   
+    last_notification: 0,
     moderation: {
         hide_spam_threads: true,
         mods: [],
@@ -140,7 +140,7 @@ function SyncDefaultSubs() {
         const sub = DEFAULT_STORAGE.subscribed_subs[i];
         if (!storage.subscribed_subs.includes(sub) &&
             !storage.unsubscribed_subs.includes(sub)) {
-            
+
             storage.subscribed_subs.push(sub);
         }
     }
@@ -169,12 +169,18 @@ async function LoadStorage() {
             console.log('Failed to import/migrate storage');
             console.log(oldStorageJson);
         }
-        SaveStorage();
     }
     catch (ex) {
         console.log('Failed to load storage');
         console.log(ex);
     }
+
+    // generate anon identity if we don't have one
+    if (!storage.anon_id.key) {
+        storage.anon_id.key = await ecc.randomKey();
+    }
+
+    SaveStorage();
 }
 
 export { DEFAULT_STORAGE, storage, SaveStorage, LoadStorage, SyncDefaultSubs };
