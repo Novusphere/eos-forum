@@ -34,7 +34,7 @@
 
 /*-----------------------------------------------------------------*/
 /*--- General ---*/
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 991px) {
     .mobile {
         display: block;
     }
@@ -42,7 +42,7 @@
         display: none;
     }
 }
-@media screen and (min-width: 601px) {
+@media screen and (min-width: 992px) {
     .mobile {
         display: none;
     }
@@ -68,6 +68,10 @@ a {
 }
 a:hover {
     color: #989c9e;
+}
+
+.capitalize {
+    text-transform: capitalize;
 }
 
 .hidden {
@@ -233,16 +237,18 @@ ul.socialicons li a:hover {
 
 
 /*--- Sidebar ---*/
-
 .sidebarblock {
+    max-height: calc(100vh - 55px - 15px);
+    overflow: auto;
+    position: sticky;
+    top: 60px;
+}
+
+.sidebarblock .block {
     background-color: #ffffff;
     border-radius: 2px;
     box-shadow: 0 1px 2px #c9cccd;
     margin-bottom: 20px;
-    position: sticky;
-    top: 60px;
-    max-height: calc(100vh - 55px - 15px);
-    overflow: auto;
 }
 
 .sidebarblock h3 {

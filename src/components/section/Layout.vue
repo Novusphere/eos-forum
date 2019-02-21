@@ -115,8 +115,8 @@
         </div>
 
         <div class="row">
-          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3">
-            <div class="sidebarblock desktop">
+          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
+            <div class="desktop block">
               <!-- <font-awesome-icon
                 @click="toggleSubs()"
                 class="sub-toggle"
@@ -149,8 +149,31 @@
           >
             <slot name="content"></slot>
           </div>
-          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3">
-            <div v-if="noRightBar" class="sidebarblock">
+          <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
+            <div v-if="$route.params.sub" class="block">
+              <h3>
+                /e/{{ $route.params.sub }}
+              </h3>
+              <h3>
+                Subscribers: {{ sub_count }}
+              </h3>
+              <h3>
+                <button
+                  @click="subscribe(!$root.is_subscribed)"
+                  type="button"
+                  class="btn subscribe"
+                  :class="[
+                    { 'btn-outline': !$root.is_subscribed },
+                    { 'btn-primary': $root.is_subscribed },
+                  ]"
+                  >
+                  {{
+                    $root.is_subscribed ? 'subscribed' : 'subscribe'
+                  }}
+                </button>
+              </h3>
+            </div>
+            <div v-if="noRightBar" class="block">
               <recently-visited></recently-visited>
             </div>
             <slot v-else name="right_sidebar" />
@@ -266,6 +289,10 @@ export default {
     window.removeEventListener("identity", this.updateIdentity);
   },
   methods: {
+    async subscribe(sub) {
+      this.$root.is_subscribed = await ui.actions.Subscribe(sub, this.$root.sub);
+      this.$forceUpdate();
+    },
     subs() {
       var subs = storage.subscribed_subs.map(s => ({
         sub: s,
@@ -321,7 +348,8 @@ export default {
       brand_logo: "",
       brand_icon: "",
       brand_symbol: "",
-      brand_banner: ""
+      brand_banner: "",
+      sub_count: 0,
     };
   }
 };
@@ -351,6 +379,10 @@ export default {
   text-transform: capitalize;
   font-size: 18px;
   color: black;
+}
+
+.subscribe {
+  width: 100%;
 }
 
 .sub-toggle:hover {

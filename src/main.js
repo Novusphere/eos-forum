@@ -53,7 +53,9 @@ Vue.config.productionTip = false;
         icons: [],
         showSubs: true,
         showPreview: true,
-        mode: 'normal'
+        mode: 'normal',
+        is_subscribed: false,
+        sub: '',
       }
     },
     template: '<App/>'
