@@ -99,7 +99,7 @@ import ThreadModal from "@/components/ThreadModal.vue";
 export default {
   name: "Home2",
   metaInfo() {
-    const sub = (this.$root.sub) ? `e/${this.$root.sub}` : 'Home';
+    const sub = (this.sub) ? `e/${this.sub}` : 'Home';
     return {
       titleTemplate: `%s | ${sub}`,
     };
@@ -122,12 +122,12 @@ export default {
   },
   computed: {
     default_sorter() {
-      if (this.$root.sub == 'referendum')
+      if (this.sub == 'referendum')
         return 'active';
       return 'popular';
     },
     sorter_options() {
-      if (this.$root.sub == 'referendum')
+      if (this.sub == 'referendum')
         return ['active', 'old'];
 
       return ['popular', 'time'];
@@ -142,13 +142,14 @@ export default {
   methods: {
     async load() {
       this.loading = true;
-      this.$root.sub = this.$route.params.sub;
+      this.sub = this.$route.params.sub;
       this.posts = [];
       this.pages = 0;
       this.selectedPostID = undefined;
       window.scrollTo(0,0);
       const novusphere = GetNovusphere();
-      var home = await ui.views.Home(this.$route.query.page, this.$root.sub, this.$refs.sorter.getSorter());
+      var home = await ui.views.Home(this.$route.query.page, this.sub, this.$refs.sorter.getSorter());
+      this.sub = home.sub;
       this.posts = home.posts;
       this.pages = home.pages;
       this.current_page = home.current_page;
@@ -157,7 +158,7 @@ export default {
     },
     async newThread() {
       try {
-        await ui.actions.CheckCreateThread(this.$root.sub);
+        await ui.actions.CheckCreateThread(this.sub);
         this.$refs.submit_modal.showModal();
       }
       catch (reason) {
@@ -166,7 +167,7 @@ export default {
     },
     openPost (postID, sub){
       this.selectedPostID = postID;
-      history.pushState({},"","#/e/" + this.$root.sub + "/" + postID);
+      history.pushState({},"","#/e/" + this.sub + "/" + postID);
     },
     closePost () {
       this.selectedPostID = undefined;
@@ -186,6 +187,7 @@ export default {
       loading: false,
       current_page: 0,
       pages: 0,
+      sub: '',
       posts: [], // for posts being displayed
       selectedPostID: undefined,
       eos_referendum: storage.eos_referendum,
