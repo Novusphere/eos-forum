@@ -54,7 +54,6 @@ Vue.config.productionTip = false;
         showSubs: true,
         showPreview: true,
         mode: 'normal',
-        is_subscribed: false,
         sub: '',
       }
     },

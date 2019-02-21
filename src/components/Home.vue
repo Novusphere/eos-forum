@@ -149,7 +149,6 @@ export default {
       window.scrollTo(0,0);
       const novusphere = GetNovusphere();
       var home = await ui.views.Home(this.$route.query.page, this.$root.sub, this.$refs.sorter.getSorter());
-      this.$root.is_subscribed = home.is_subscribed;
       this.posts = home.posts;
       this.pages = home.pages;
       this.current_page = home.current_page;

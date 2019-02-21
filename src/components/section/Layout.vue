@@ -159,22 +159,20 @@
               </h3>
               <h3>
                 <button
-                  @click="subscribe(!$root.is_subscribed)"
+                  @click="subscribe(!is_subscribed())"
                   type="button"
                   class="btn subscribe"
                   :class="[
-                    { 'btn-outline': !$root.is_subscribed },
-                    { 'btn-primary': $root.is_subscribed },
+                    { 'btn-outline': !is_subscribed() },
+                    { 'btn-primary': is_subscribed() },
                   ]"
                   >
-                  {{
-                    $root.is_subscribed ? 'subscribed' : 'subscribe'
-                  }}
+                  {{ is_subscribed() ? 'subscribed' : 'subscribe' }}
                 </button>
               </h3>
             </div>
             <div v-if="noRightBar" class="block">
-              <recently-visited></recently-visited>
+              <recently-visited />
             </div>
             <slot v-else name="right_sidebar" />
           </div>
@@ -276,6 +274,9 @@ export default {
     }
   },
   computed: {
+    subscribed_subs() {
+      return storage.subscribed_subs;
+    },
     noRightBar() {
       return !this.$slots["right_sidebar"];
     }
@@ -289,8 +290,11 @@ export default {
     window.removeEventListener("identity", this.updateIdentity);
   },
   methods: {
+    is_subscribed() {
+      return this.subscribed_subs.includes(this.$route.params.sub);
+    },
     async subscribe(sub) {
-      this.$root.is_subscribed = await ui.actions.Subscribe(sub, this.$root.sub);
+      await ui.actions.Subscribe(sub, this.$root.sub);
       this.$forceUpdate();
     },
     subs() {
