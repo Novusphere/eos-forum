@@ -30,8 +30,10 @@ export default async function Subscribe(subscribe, sub) {
         storage.unsubscribed_subs.push(sub);
     }
 
-    console.log(storage.subscribed_subs);
-    console.log(storage.unsubscribed_subs);
+    storage.subscribed_subs = storage.subscribed_subs.sort();
+
+    //console.log(storage.subscribed_subs);
+    //console.log(storage.unsubscribed_subs);
 
     SaveStorage();
     await SaveAccountState();
