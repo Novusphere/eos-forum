@@ -25,6 +25,9 @@
                 <b-dropdown-item @click="$router.push({name: 'Index'})">
                   Home
                 </b-dropdown-item>
+                <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'all' } })">
+                  All
+                </b-dropdown-item>
                 <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'referendum' } })">
                     Referendum
                 </b-dropdown-item>
