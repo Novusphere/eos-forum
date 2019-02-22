@@ -39,12 +39,13 @@ class MarkdownParser {
             // idk why I need to use \\ for the link instead of /, it just breaks if I don't
             // but hey, at least it works
             //
+            const pre = window.__ROUTER_MODE__ == "hash" ? "\\#" : "";
+
             extensions.push(twitter(
                 (username) => {
-                    return '<a href="\\#/u/' + username.trim().substring(1) + '">' + username + '</a>';
+                    return `<a href="${pre}/u/${username.trim().substring(1)}">${username}</a>`;
                 },
-                //(tag) => '<a href="">#' + tag + '</a>'
-                (tag) => ' <a href="\\#/tag/' + tag + '">#' + tag + '</a>'
+                (tag) => ` <a href="${pre}/tag/${tag}">#${tag}</a>`
             ));
         }
 

@@ -13,10 +13,13 @@ import History from "@/components/History";
 import StartThread from "@/components/StartThread";
 import Settings from "@/components/Settings";
 
-Vue.use(Router)
+Vue.use(Router);
+
+window.__ROUTER_MODE__ = window.__ROUTER_MODE__ || "hash";
+window.__PRE_ROUTE__ = (window.__ROUTER_MODE__ == "hash") ? "#" : "";
 
 const router = new Router({
-  //mode: "history",
+  mode: window.__ROUTER_MODE__,
   routes: [
     { // default route
       path: '/',
@@ -79,7 +82,7 @@ const router = new Router({
       component: Test
     }
   ]
-})
+});
 
 router.beforeEach((to, from, next) => {
   window.scrollTo(0,0);

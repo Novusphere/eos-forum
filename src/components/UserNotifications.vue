@@ -92,11 +92,11 @@ export default {
     },
     openPost (postID, sub){
       this.selectedPostID = postID;
-      history.pushState({},"","#/e/" + sub + "/" + postID);
+      history.pushState({},"",`${window.__PRE_ROUTE__}/e/${sub}/${postID}`);
     },
     closePost () {
       this.selectedPostID = undefined;
-      history.pushState({},"","#/");
+      history.pushState({},"",`${window.__PRE_ROUTE__}/`);
     }
   },
   data() {
