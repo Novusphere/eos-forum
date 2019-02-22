@@ -144,6 +144,9 @@ function SyncDefaultSubs() {
             storage.subscribed_subs.push(sub);
         }
     }
+
+    // sort alphabetically
+    storage.subscribed_subs = storage.subscribed_subs.sort();
 }
 
 function SaveStorage() {
