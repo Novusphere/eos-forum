@@ -31,10 +31,17 @@ Vue.component('v-select', vSelect)
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(BootstrapVue);
 Vue.use(Meta);
-Vue.use(VueAnalytics, {
+
+var analytics = {
   id: 'UA-131745808-1',
   router
-})
+};
+
+if (window.__ANALYTICS__) {
+  analytics.customResourceURL = window.__ANALYTICS__;
+}
+
+Vue.use(VueAnalytics, analytics)
 Vue.config.productionTip = false;
 
 (async function () {
