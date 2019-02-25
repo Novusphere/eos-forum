@@ -47,7 +47,7 @@
           </div>
 
           <div class="text-right navbar-actions">
-            <button class="btn btn-outline-primary mx-2 mx-lg-4 ConnectButton"
+            <button class="btn btn-primary mx-2 mx-lg-4 ConnectButton"
               v-if="!identity.account"
               v-on:click="login()">
               login
@@ -142,6 +142,27 @@
                 e/{{ s.sub }}
               </router-link>
             </div>
+            <div v-if="$route.params.sub" class="block mobile">
+              <h3>
+                /e/{{ $route.params.sub }}
+              </h3>
+              <!-- <h3>
+                Subscribers: {{ sub_count }}
+              </h3> -->
+              <h3>
+                <button
+                  @click="subscribe(!is_subscribed())"
+                  type="button"
+                  class="btn subscribe"
+                  :class="[
+                    { 'btn-outline': !is_subscribed() },
+                    { 'btn-primary': is_subscribed() },
+                  ]"
+                  >
+                  {{ is_subscribed() ? 'subscribed' : 'subscribe' }}
+                </button>
+              </h3>
+            </div>
           </div>
           <div
           class="col-12"
@@ -153,13 +174,13 @@
             <slot name="content"></slot>
           </div>
           <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
-            <div v-if="$route.params.sub" class="block">
+            <div v-if="$route.params.sub" class="block desktop">
               <h3>
                 /e/{{ $route.params.sub }}
               </h3>
-              <h3 v-if="false">
+              <!-- <h3>
                 Subscribers: {{ sub_count }}
-              </h3>
+              </h3> -->
               <h3>
                 <button
                   @click="subscribe(!is_subscribed())"
@@ -297,7 +318,7 @@ export default {
       return this.subscribed_subs.includes(this.$route.params.sub);
     },
     async subscribe(sub) {
-      await ui.actions.Subscribe(sub, this.$route.params.sub);
+      await ui.actions.Subscribe(sub, this.$root.sub);
       this.$forceUpdate();
     },
     subs() {

@@ -121,7 +121,7 @@
             <a
               class="up"
               @click.stop="upvote()">
-              <font-awesome-icon :icon="['far', 'thumbs-up']" />
+              <font-awesome-icon :icon="['fas', 'caret-up']" />
               {{ post.up }}
             </a>
           </div>
@@ -149,7 +149,7 @@
             </div>
 
             <div class="text-center" v-if="identity.account">
-              <a class="btn btn-sm btn-outline-primary" :class="{'referendum' : post.referendum}" @click.stop="referendumVote()" v-if="!post.referendum.expired">vote</a>
+              <a class="btn btn-sm btn-primary" :class="{'referendum' : post.referendum}" @click.stop="referendumVote()" v-if="!post.referendum.expired">vote</a>
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumExpire()" v-if="!post.referendum.expired && post.data.poster == identity.account">expire</a>
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
@@ -167,14 +167,18 @@
                 class="up"
                 style="margin-right: 10px;display: inline"
                 @click.stop="upvote()">
-                <font-awesome-icon :icon="['far', 'thumbs-up']" />
+                <font-awesome-icon :icon="['fas', 'caret-up']" />
                 {{ post.up }}
               </a>
-              <router-link @click.stop v-if="!thread && post.transaction" :to="thread_link">
+              <a
+                v-if="!thread && post.transaction"
+                class="link"
+                @click.stop.prevent="$router.push(thread_link)"
+              >
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 <span v-if="!post.parent">{{ post.total_replies }} comments</span>
-              </router-link>
-              <a class="reply black" v-else @click.stop="showQuickReply()">
+              </a>
+              <a class="reply" v-else @click.stop="showQuickReply()">
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 reply
               </a>
@@ -243,9 +247,9 @@
                   $root.mode = 'zen',
                   $router.push(zen_mode)
                 "
-                class="hover black"
+                class="hover black follow-discussion"
               >
-                follow the discussion...
+                follow the discussion
               </a> 
             </li>
           </ul>
@@ -260,9 +264,9 @@
             <span>{{ status }}</span>
           </div>
           <div class="col-sm-12 mt-1 mb-2">
-            <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
-            <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-outline-primary" @click="quickReply(true)">post anon</button>
-            <button v-if="identity.account" type="button" class="btn btn-sm btn-outline-primary" @click="addTip()">tip</button>
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
+            <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-primary" @click="quickReply(true)">post anon</button>
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="addTip()">tip</button>
           </div>
         </div>
 
@@ -660,7 +664,8 @@ export default {
         this.$emit(
           "openPost",
           this.selectedPostID,
-          this.post.data.json_metadata.sub
+          this.post.data.json_metadata.sub,
+          this.selectedPostTitle
         );
       } else {
         this.$router.push(this.thread_link);
@@ -696,6 +701,17 @@ export default {
 </script>
 
 <style scoped>
+.reply {
+  color: teal!important;
+  border: 1px solid teal;
+  border-radius: 4px;
+  padding: 2px;
+}
+.follow-discussion {
+  border-radius: 5px;
+  padding: 2px;
+  border: 1px solid black;
+}
 .black {
   color: black !important;
 }
@@ -769,5 +785,8 @@ export default {
 }
 .op-upvote .up {
   white-space:nowrap;
+}
+.up {
+  color: black!important;
 }
 </style>

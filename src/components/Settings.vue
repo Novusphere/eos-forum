@@ -7,7 +7,7 @@
     </template>
 
     <template slot="content">
-      <b-button @click="$router.go(-1)" class="btn btn-sm btn-outline-primary mb-1">
+      <b-button @click="$router.go(-1)" class="btn btn-sm btn-primary mb-1">
         <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
         back
       </b-button>
@@ -80,7 +80,7 @@
               </div>
               <div class="col-2">
                 <button type="button"
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   v-on:click="addMod()">
                   add
                 </button>
@@ -98,7 +98,7 @@
               </div>
               <div class="col-2">
                 <button type="button"
-                  class="btn btn-outline-danger"
+                  class="btn btn-danger"
                   v-on:click="removeMod(index)">
                   <font-awesome-icon :icon="['fas', 'times']" ></font-awesome-icon>
                 </button>
@@ -134,8 +134,8 @@
               </div>
             </div>
             <div class="text-center">
-                <button type="button" class="btn btn-outline-primary" v-on:click="newAnonId()">new</button>
-                <button type="button" class="btn btn-outline-primary" v-on:click="saveAnonId()" data-dismiss="modal">save</button>
+                <button type="button" class="btn btn-primary" v-on:click="newAnonId()">new</button>
+                <button type="button" class="btn btn-primary" v-on:click="saveAnonId()" data-dismiss="modal">save</button>
             </div>
           </form>
         </div>
@@ -153,9 +153,9 @@
               </div>
             </div>
             <div class="text-center">
-              <button type="button" class="btn btn-outline-primary" data-dismiss="modal" v-on:click="save()">save</button>
-              <button type="button" class="btn btn-outline-primary" v-on:click="reset()">reset</button>
-              <button type="button" class="btn btn-outline-danger" v-on:click="forgetAll()">forget all</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="save()">save</button>
+              <button type="button" class="btn btn-primary" v-on:click="reset()">reset</button>
+              <button type="button" class="btn btn-danger" v-on:click="forgetAll()">forget all</button>
             </div>
           </form>
         </div>
@@ -183,7 +183,7 @@
                 <input type="text" class="form-control" v-model="new_theme" placeholder="theme css url">
               </div>
               <div class="col-2">
-                <button type="button" class="btn btn-outline-primary" v-on:click="saveTheme()">save</button>
+                <button type="button" class="btn btn-primary" v-on:click="saveTheme()">save</button>
               </div>
             </div>
           </form>

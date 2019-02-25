@@ -8,7 +8,7 @@
 
     <template slot="content">
       <!-- POST -->
-      <b-button @click="$router.go(-1)" class="btn btn-sm btn-outline-primary mb-1">
+      <b-button @click="$router.go(-1)" class="btn btn-sm btn-primary mb-1">
         <font-awesome-icon :icon="['fas', 'arrow-left']" ></font-awesome-icon>
         back
       </b-button>

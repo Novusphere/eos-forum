@@ -66,9 +66,12 @@ body {
 a {
     color: #363838;
 }
-a:hover {
-    color: #989c9e;
+
+.link:hover {
+    color: #0056b3!important;
+    text-decoration: underline!important;
 }
+
 
 .capitalize {
     text-transform: capitalize;
@@ -237,6 +240,11 @@ ul.socialicons li a:hover {
 
 
 /*--- Sidebar ---*/
+@media screen and (max-width: 991px) {
+    .sidebarblock {
+        position: initial!important;
+    }
+}
 .sidebarblock {
     max-height: calc(100vh - 55px - 15px);
     overflow: auto;
@@ -753,7 +761,7 @@ a.down:hover {
 .btn-primary:active,
 .btn-primary:focus {
     border-color: transparent;
-    background-color: #20e1bb;
+    background-color: #20e1bb!important;
     box-shadow: none;
 }
 

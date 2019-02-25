@@ -15,7 +15,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-success" v-on:click="resolve(true)">ok</button>
-                <button type="button" class="btn btn-outline-danger" v-on:click="resolve(false)">cancel</button>
+                <button type="button" class="btn btn-danger" v-on:click="resolve(false)">cancel</button>
             </div>
           </div>
         </div>

@@ -25,11 +25,11 @@
           v-for="p in posts"
           :key="p.transaction"
           :notification="true"
-          @openPost="openPost"
+          @openPost="$_openPost"
           :post="p"
         />
         <modal
-          @click.native="closePost"
+          @click.native="$_closePost"
           v-if="selectedPostID">
           <thread-modal
             @click.native.stop
@@ -90,14 +90,6 @@ export default {
 
       this.loading = false;
     },
-    openPost (postID, sub){
-      this.selectedPostID = postID;
-      history.pushState({},"",`${window.__PRE_ROUTE__}/e/${sub}/${postID}`);
-    },
-    closePost () {
-      this.selectedPostID = undefined;
-      history.pushState({},"",`${window.__PRE_ROUTE__}/`);
-    }
   },
   data() {
     return {

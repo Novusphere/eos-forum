@@ -13,7 +13,7 @@
               <post-sorter ref="sorter" :change="load"></post-sorter>
             </div>
             <div class="float-left ml-1">
-              <b-button class="btn btn-outline-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</b-button>
+              <b-button class="btn btn-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</b-button>
             </div>
             <div class="float-right">
               <pager :pages="pages" :current_page="current_page"></pager>
@@ -32,11 +32,11 @@
               v-for="p in posts"
               class="post-parent"
               :key="p.o_id"
-              @openPost="openPost"
+              @openPost="$_openPost"
               :post="p"
             />
             <modal
-              @click.native="closePost"
+              @click.native="$_closePost"
               v-if="selectedPostID">
               <thread-modal
                 @click.native.stop
@@ -148,14 +148,6 @@ export default {
       await ui.actions.BlockUser(this.account, this.is_blocked);
       await this.load();
     },
-    openPost (postID, sub){
-      this.selectedPostID = postID;
-      history.pushState({},"",`${window.__PRE_ROUTE__}/e/${sub}/${postID}`);
-    },
-    closePost () {
-      this.selectedPostID = undefined;
-      history.pushState({},"",`${window.__PRE_ROUTE__}/`);
-    }
   },
   data() {
     return {
