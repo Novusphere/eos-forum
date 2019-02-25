@@ -243,9 +243,9 @@
                   $root.mode = 'zen',
                   $router.push(zen_mode)
                 "
-                class="hover black"
+                class="hover black follow-discussion"
               >
-                follow the discussion...
+                follow the discussion
               </a> 
             </li>
           </ul>
@@ -696,6 +696,11 @@ export default {
 </script>
 
 <style scoped>
+.follow-discussion {
+  border-radius: 5px;
+  padding: 2px;
+  border: 1px solid black;
+}
 .black {
   color: black !important;
 }
