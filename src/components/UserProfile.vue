@@ -20,7 +20,7 @@
             </div>
             <div class="clearfix"></div>
           </div>
-          
+
           <div class="post-container" v-if="!loading">
             <div v-if="posts.length == 0">
               <div class="text-center">
@@ -58,22 +58,20 @@
     </template>
 
     <template slot="right_sidebar">
-      <div class="sidebarblock">
-        <div>
-          <h3>{{ account }}</h3>
-          <div class="divline"></div>
-          <div class="blocktxt">
-            Balances: {{ balances.atmos }} ATMOS
-          </div>
-          <div class="blocktxt">
-            Comments: {{ comments }}
-          </div>
-          <div class="blocktxt">
-            Threads: {{ threads }}
-          </div>
-          <div class="blocktxt">
-            Last Activity: {{ last_activity }}
-          </div>
+      <div class="block">
+        <h3>{{ account }}</h3>
+        <div class="divline"></div>
+        <div class="blocktxt">
+          Balances: {{ balances.atmos }} ATMOS
+        </div>
+        <div class="blocktxt">
+          Comments: {{ comments }}
+        </div>
+        <div class="blocktxt">
+          Threads: {{ threads }}
+        </div>
+        <div class="blocktxt">
+          Last Activity: {{ last_activity }}
         </div>
       </div>
     </template>

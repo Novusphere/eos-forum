@@ -21,7 +21,7 @@
           </a>
           <router-link
             v-else-if="post.transaction"
-            @click.stop
+            @click.native.stop
             :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
             <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
             {{ poster_name }}
@@ -99,7 +99,7 @@
                   </a>
                   <router-link
                     v-else-if="post.transaction"
-                    @click.stop
+                    @click.native.stop
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
                     <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
                     {{ poster_name }}
@@ -109,7 +109,7 @@
                   class="list-inline-item">
                   in
                   <router-link
-                    @click.stop
+                    @click.native.stop
                     v-if="post.id"
                     :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
                     {{ post.data.json_metadata.sub }}
@@ -209,7 +209,7 @@
                 {{ new Date(post.createdAt * 1000).toLocaleString() }}
               </template>
               <router-link
-                @click.stop
+                @click.native.stop
                 v-if="post.id && is_edit"
                 :to="{ name: 'History', params: { id: post.o_transaction } }">
                 <font-awesome-icon :icon="['fas', 'history']" />
@@ -230,7 +230,7 @@
                 permalink
               </a>
               <router-link
-                @click.stop
+                @click.native.stop
                 v-else-if="post.transaction"
                 :to="perma_link">
                 permalink
@@ -250,7 +250,7 @@
                 class="hover black follow-discussion"
               >
                 follow the discussion
-              </a> 
+              </a>
             </li>
           </ul>
         </div>
