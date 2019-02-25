@@ -28,7 +28,7 @@
           </router-link>
         </li>
         <div class="date">
-          {{ new Date(post.createdAt * 1000).toLocaleString() }}
+          {{ created_at }}
         </div>
         <div class="flex-center received-tips ml-1">
           <div
@@ -206,7 +206,7 @@
             <li class="list-inline-item" v-if="is_op">
               <template v-if="!post.referendum">
                 <font-awesome-icon :icon="['fas', 'clock']" />
-                {{ new Date(post.createdAt * 1000).toLocaleString() }}
+                {{ created_at }}
               </template>
               <router-link
                 @click.native.stop
@@ -301,7 +301,7 @@ import { GetIdentity, GetTokensInfo } from "@/eos";
 import { MarkdownParser } from "@/markdown";
 import { moderation } from "@/moderation";
 import PostAttachment from "@/components/core/PostAttachment.vue";
-
+import moment from 'moment';
 import { Post } from "@/types/post";
 
 export default {
@@ -336,6 +336,9 @@ export default {
     }
   },
   computed: {
+    created_at() {
+      return moment(this.post.createdAt * 1000).fromNow();
+    },
     received_tips() {
       const tips = {};
       this.post.children.forEach(child => {
