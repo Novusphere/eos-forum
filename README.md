@@ -1,4 +1,4 @@
-# novusphere-eos
+# eos-forum (discussions.app)
 
 > A simple reddit-like interface built on EOS using novusphere-db
 

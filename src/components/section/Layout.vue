@@ -318,7 +318,7 @@ export default {
       return this.subscribed_subs.includes(this.$route.params.sub);
     },
     async subscribe(sub) {
-      await ui.actions.Subscribe(sub, this.$root.sub);
+      await ui.actions.Subscribe(sub, this.$route.params.sub);
       this.$forceUpdate();
     },
     subs() {

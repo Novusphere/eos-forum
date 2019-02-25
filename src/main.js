@@ -28,26 +28,34 @@ import VueAnalytics from 'vue-analytics'
 import vSelect from 'vue-select'
 import { SaveStorage } from "./storage";
 
-Vue.component('v-select', vSelect)
-Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.use(BootstrapVue);
-Vue.use(Meta);
-Vue.mixin(postMixin);
-
-
-var analytics = {
-  id: 'UA-131745808-1',
-  router
-};
-
-if (window.__ANALYTICS__) {
-  analytics.customResourceURL = window.__ANALYTICS__;
-}
-
-Vue.use(VueAnalytics, analytics)
-Vue.config.productionTip = false;
-
 (async function () {
+
+  // redirect to correct url
+  if (window.__ROUTER_MODE__ == "history") {
+    if (window.location.hash) {
+      window.location.href = window.location.origin + window.location.hash.substring(1);
+      return;
+    }
+  }
+
+  Vue.component('v-select', vSelect);
+  Vue.component('font-awesome-icon', FontAwesomeIcon);
+  Vue.use(BootstrapVue);
+  Vue.use(Meta);
+  Vue.mixin(postMixin);
+  
+  
+  var analytics = {
+    id: 'UA-131745808-1',
+    router
+  };
+  
+  if (window.__ANALYTICS__) {
+    analytics.customResourceURL = window.__ANALYTICS__;
+  }
+  
+  Vue.use(VueAnalytics, analytics)
+  Vue.config.productionTip = false;
 
   await LoadStorage();
   await LoadConstants();
