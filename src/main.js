@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
+import postMixin from '@/mixins/post';
 
 import jQuery from "jquery";
 window._jQuery = jQuery;
@@ -31,6 +32,8 @@ Vue.component('v-select', vSelect)
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(BootstrapVue);
 Vue.use(Meta);
+Vue.mixin(postMixin);
+
 
 var analytics = {
   id: 'UA-131745808-1',

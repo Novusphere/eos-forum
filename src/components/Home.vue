@@ -58,15 +58,15 @@
           class="post-parent"
           :class="{'hide-preview': $root.showPreview === false}"
           :key="p.transaction"
-          @openPost="openPost"
+          @openPost="$_openPost"
           :post="p"
           :showChildren="false"
         />
         <modal
-          @click.native.stop="closePost"
+          @click.native.stop="$_closePost"
           v-if="selectedPostID">
           <thread-modal
-            @close="closePost"
+            @close="$_closePost"
             :id="selectedPostID"
           />
         </modal>
@@ -164,14 +164,6 @@ export default {
       catch (reason) {
         alert(reason);
       }
-    },
-    openPost (postID, sub){
-      this.selectedPostID = postID;
-      history.pushState({},"",`${window.__PRE_ROUTE__}/e/${sub}/${postID}`);
-    },
-    closePost () {
-      this.selectedPostID = undefined;
-      history.pushState({},"",`${window.__PRE_ROUTE__}/`);
     },
     hidePreview () {
       this.$root.showPreview = false;
