@@ -21,6 +21,7 @@
     "eosjs-ecc": "^4.0.4",
     "gh-pages": "^1.2.0",
     "jquery": "^3.3.1",
+    "moment": "^2.24.0",
     "readable-stream": "^3.1.1",
     "scatter-js": "^2.5.2",
     "scatterjs-core": "^2.7.9",

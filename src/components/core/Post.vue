@@ -21,14 +21,14 @@
           </a>
           <router-link
             v-else-if="post.transaction"
-            @click.stop
+            @click.native.stop
             :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
             <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
             {{ poster_name }}
           </router-link>
         </li>
         <div class="date">
-          {{ new Date(post.createdAt * 1000).toLocaleString() }}
+          {{ created_at }}
         </div>
         <div class="flex-center received-tips ml-1">
           <div
@@ -99,7 +99,7 @@
                   </a>
                   <router-link
                     v-else-if="post.transaction"
-                    @click.stop
+                    @click.native.stop
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
                     <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
                     {{ poster_name }}
@@ -109,7 +109,7 @@
                   class="list-inline-item">
                   in
                   <router-link
-                    @click.stop
+                    @click.native.stop
                     v-if="post.id"
                     :to="{ name: 'Sub', params: { sub: post.data.json_metadata.sub } }">
                     {{ post.data.json_metadata.sub }}
@@ -206,10 +206,10 @@
             <li class="list-inline-item" v-if="is_op">
               <template v-if="!post.referendum">
                 <font-awesome-icon :icon="['fas', 'clock']" />
-                {{ new Date(post.createdAt * 1000).toLocaleString() }}
+                {{ created_at }}
               </template>
               <router-link
-                @click.stop
+                @click.native.stop
                 v-if="post.id && is_edit"
                 :to="{ name: 'History', params: { id: post.o_transaction } }">
                 <font-awesome-icon :icon="['fas', 'history']" />
@@ -230,7 +230,7 @@
                 permalink
               </a>
               <router-link
-                @click.stop
+                @click.native.stop
                 v-else-if="post.transaction"
                 :to="perma_link">
                 permalink
@@ -250,7 +250,7 @@
                 class="hover black follow-discussion"
               >
                 follow the discussion
-              </a> 
+              </a>
             </li>
           </ul>
         </div>
@@ -301,7 +301,7 @@ import { GetIdentity, GetTokensInfo } from "@/eos";
 import { MarkdownParser } from "@/markdown";
 import { moderation } from "@/moderation";
 import PostAttachment from "@/components/core/PostAttachment.vue";
-
+import moment from 'moment';
 import { Post } from "@/types/post";
 
 export default {
@@ -336,6 +336,9 @@ export default {
     }
   },
   computed: {
+    created_at() {
+      return moment(this.post.createdAt * 1000).fromNow();
+    },
     received_tips() {
       const tips = {};
       this.post.children.forEach(child => {
