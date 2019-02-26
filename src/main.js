@@ -8,7 +8,7 @@ import jQuery from "jquery";
 window._jQuery = jQuery;
 
 
-import { LoadStorage } from "@/storage"
+import { InitStorage } from "@/storage"
 import { LoadConstants } from "@/ui/constants"
 import { GetTokensInfo } from "@/eos";
 
@@ -26,7 +26,6 @@ import router from '@/router'
 import Meta from 'vue-meta'
 import VueAnalytics from 'vue-analytics'
 import vSelect from 'vue-select'
-import { SaveStorage } from "./storage";
 
 (async function () {
 
@@ -57,8 +56,8 @@ import { SaveStorage } from "./storage";
   Vue.use(VueAnalytics, analytics)
   Vue.config.productionTip = false;
 
-  await LoadStorage();
   await LoadConstants();
+  await InitStorage(); // --> LoadStorage()
   await GetTokensInfo(); // build cache
 
   /* eslint-disable no-new */

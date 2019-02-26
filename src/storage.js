@@ -35,30 +35,6 @@ var DEFAULT_STORAGE = {
     }
 };
 
-window.__PRESETS__ = window.localStorage.getItem('presets');
-if (window.__PRESETS__) {
-    console.log('Found presets');
-
-    try {
-        window.__PRESETS__ = JSON.parse(window.__PRESETS__);
-        console.log('Loaded presets');
-    }
-    catch (ex) {
-        window.__PRESETS__ = null;
-        console.log('Failed to load presets');
-        console.log(ex);
-    }
-
-    if (window.__PRESETS__.storage) {
-        const p_storage = window.__PRESETS__.storage;
-
-        DEFAULT_STORAGE = jQuery.extend(true, DEFAULT_STORAGE, p_storage);
-        if (p_storage.subscribed_subs) {
-            DEFAULT_STORAGE.subscribed_subs = p_storage.subscribed_subs;
-        }
-    }
-}
-
 var storage = jQuery.extend(true, {}, DEFAULT_STORAGE);
 
 function importStorage(obj) {
@@ -163,6 +139,25 @@ function SaveStorage() {
     //console.log(storage);
 }
 
+async function InitStorage() {
+
+    if (window.__PRESETS__) {
+        if (window.__PRESETS__.storage) {
+            const p_storage = window.__PRESETS__.storage;
+    
+            DEFAULT_STORAGE = jQuery.extend(true, DEFAULT_STORAGE, p_storage);
+            if (p_storage.subscribed_subs) {
+                DEFAULT_STORAGE.subscribed_subs = p_storage.subscribed_subs;
+            }
+
+            // assign deep copy
+            Object.assign(storage, JSON.parse(JSON.stringify(DEFAULT_STORAGE)));
+        }
+    }
+
+    await LoadStorage();
+}
+
 async function LoadStorage() {
     var oldStorageJson = window.localStorage.getItem('eosforum');
     var oldStorage;
@@ -186,4 +181,4 @@ async function LoadStorage() {
     SaveStorage();
 }
 
-export { DEFAULT_STORAGE, storage, SaveStorage, LoadStorage, SyncDefaultSubs };
+export { DEFAULT_STORAGE, storage, SaveStorage, LoadStorage, InitStorage, SyncDefaultSubs };
