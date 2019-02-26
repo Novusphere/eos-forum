@@ -19,6 +19,21 @@ var BRANDS = null;
 var FORUM_BRAND = {};
 
 async function LoadConstants() {
+    if (!window.__PRESETS__) { // try to load from global settings
+        try {
+            window.__PRESETS__ = JSON.parse(
+                await requests.get(
+                    `https://raw.githubusercontent.com/Novusphere/eos-forum-settings/master/presets/${window.location.host}.json`
+                )
+            );
+
+            console.log(`Retrieved presets for ${window.location.host}`)
+        }
+        catch (ex) {
+            // couldn't auto load a preset
+        }
+    }
+
     if (window.__PRESETS__) {
         var presets = window.__PRESETS__;
 
