@@ -5,6 +5,9 @@
 
     <div class="col-md-12">
       <Tweet v-if="twitterID" :id="twitterID" />
+      <div v-else-if="telegramID" :id="id + '-telegram'">
+        <!-- append -->
+      </div>
       <div v-else-if="iframe" class="text-center">
         <iframe :src="this.show_iframe ? attachment.value : ''"
           style="max-width: 100%"
@@ -66,6 +69,16 @@ export default {
   },
   async mounted() {
     this.show_iframe = !this.collapse;
+
+    // unfortunately, there's no vue component for this :(
+    if (this.telegramID) {
+      var child = document.getElementById(this.id + '-telegram');
+      var script = document.createElement('script');
+      script.setAttribute('src', 'https://telegram.org/js/telegram-widget.js?5');
+      script.setAttribute('data-telegram-post', this.telegramID);
+      script.setAttribute('data-width', '100%');
+      child.appendChild(script);
+    }
   },
   computed: {
     twitterID () {
@@ -74,6 +87,15 @@ export default {
         if (s && s.length>0) {
           return s[0].split('/')[1];
         }
+      }
+      return '';
+    },
+    telegramID() {
+      const t_me = '://t.me/';
+      const t_me_i = this.attachment.value.indexOf(t_me);
+      if (t_me_i > -1) {
+        const s = this.attachment.value.substring(t_me_i + t_me.length);
+        return s;
       }
       return '';
     },

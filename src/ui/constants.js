@@ -21,7 +21,7 @@ var FORUM_BRAND = {};
 async function LoadConstants() {
     if (!window.__PRESETS__) { // try to load from global settings
         try {
-            const host = 'discussions.app'; //window.location.host;
+            const host = window.location.host;
 
             window.__PRESETS__ = JSON.parse(
                 await requests.get(

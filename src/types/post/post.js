@@ -501,6 +501,10 @@ class Post {
             {
                 match: /https:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/i,
                 handle: (m) => attach(m[0], 'url', 'link')
+            },
+            {
+                match: /https:\/\/t.me\/[\w]+\/[0-9]+/i,
+                handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
 
