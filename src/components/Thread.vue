@@ -77,7 +77,7 @@ export default {
   },
   beforeDestroy() {
     this.inactive = true;
-    this.$root.mode = 'normal';
+    this.$root.mode = "normal";
   },
   async mounted() {
     this.load();
@@ -91,7 +91,7 @@ export default {
     async load(
       force = false,
       id = this.$route.params.id,
-      child_id = this.$route.params.child_id,
+      child_id = this.$route.params.child_id
     ) {
       this.loading = true;
       if (this.inactive) {
@@ -108,11 +108,12 @@ export default {
       if (!child_id) {
         //setTimeout(() => this.load(id, child_id), 7500);
       }
+
       this.loading = false;
     },
     postContent(txid, data) {
       this.load(); // reload thread
-    },
+    }
   },
   data() {
     return {
@@ -120,7 +121,7 @@ export default {
       main_post: ui.helpers.PlaceholderPost(),
       count: 0,
       inactive: false,
-      loading: false,
+      loading: false
     };
   }
 };

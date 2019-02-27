@@ -5,7 +5,7 @@
 
     <div class="col-md-12">
       <Tweet v-if="twitterID" :id="twitterID" />
-      <div v-else-if="telegramID" :id="id + '-telegram'">
+      <div v-else-if="telegramID" :id="random_id + '-telegram'">
         <!-- append -->
       </div>
       <div v-else-if="iframe" class="text-center">
@@ -46,6 +46,7 @@
 <script>
 import { Tweet } from "vue-tweet-embed";
 import { MarkdownParser } from "@/markdown";
+import telegram from "@/telegram";
 
 export default {
   name: "PostAttachment",
@@ -72,15 +73,14 @@ export default {
 
     // unfortunately, there's no vue component for this :(
     if (this.telegramID) {
-      var child = document.getElementById(this.id + "-telegram");
+      var child = document.getElementById(this.random_id + "-telegram");
       var script = document.createElement("script");
-      script.setAttribute(
-        "src",
-        "https://telegram.org/js/telegram-widget.js?5"
-      );
       script.setAttribute("data-telegram-post", this.telegramID);
+      script.setAttribute("data-telegram-rn", this.random_id);
       script.setAttribute("data-width", "100%");
       child.appendChild(script);
+
+      telegram(window);
     }
   },
   computed: {
@@ -142,6 +142,7 @@ export default {
   },
   data() {
     return {
+      random_id: (Math.random() * 0x7FFFFFFF) | 0,
       show_iframe: false
     };
   }
