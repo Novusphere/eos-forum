@@ -44,13 +44,13 @@
 </template>
 
 <script>
-import { Tweet } from 'vue-tweet-embed'
+import { Tweet } from "vue-tweet-embed";
 import { MarkdownParser } from "@/markdown";
 
 export default {
   name: "PostAttachment",
   components: {
-    Tweet,
+    Tweet
   },
   props: {
     attachment: {
@@ -72,35 +72,43 @@ export default {
 
     // unfortunately, there's no vue component for this :(
     if (this.telegramID) {
-      var child = document.getElementById(this.id + '-telegram');
-      var script = document.createElement('script');
-      script.setAttribute('src', 'https://telegram.org/js/telegram-widget.js?5');
-      script.setAttribute('data-telegram-post', this.telegramID);
-      script.setAttribute('data-width', '100%');
+      var child = document.getElementById(this.id + "-telegram");
+      var script = document.createElement("script");
+      script.setAttribute(
+        "src",
+        "https://telegram.org/js/telegram-widget.js?5"
+      );
+      script.setAttribute("data-telegram-post", this.telegramID);
+      script.setAttribute("data-width", "100%");
       child.appendChild(script);
     }
   },
   computed: {
-    twitterID () {
-      if (this.attachment.value.includes('twitframe.com/show')) {
+    twitterID() {
+      if (this.attachment.value.includes("twitframe.com/show")) {
         const s = this.attachment.value.match(/status\/[0-9]+/);
-        if (s && s.length>0) {
-          return s[0].split('/')[1];
+        if (s && s.length > 0) {
+          return s[0].split("/")[1];
         }
       }
-      return '';
+      return "";
     },
     telegramID() {
-      const t_me = '://t.me/';
-      const t_me_i = this.attachment.value.indexOf(t_me);
-      if (t_me_i > -1) {
-        const s = this.attachment.value.substring(t_me_i + t_me.length);
-        return s;
+      if (this.attachment.type == "url") {
+        const t_me = "://t.me/";
+        const t_me_i = this.attachment.value.indexOf(t_me);
+        if (t_me_i > -1) {
+          const s = this.attachment.value.substring(t_me_i + t_me.length);
+          return s;
+        }
       }
-      return '';
+      return "";
     },
     iframe() {
-      return this.hasAttachment("iframe") && !this.attachment.value.includes('twitframe.com/show');
+      return (
+        this.hasAttachment("iframe") &&
+        !this.attachment.value.includes("twitframe.com/show")
+      );
     },
     img() {
       return this.hasAttachment("img");
@@ -115,7 +123,7 @@ export default {
       return this.hasAttachment("link");
     },
     markdown() {
-      return this.hasAttachment('markdown');
+      return this.hasAttachment("markdown");
     },
     markdown_html() {
       var md = new MarkdownParser(this.attachment.value);
@@ -142,7 +150,7 @@ export default {
 
 <style scoped>
 .limit-height {
-  max-height:500px;
-  width: auto
+  max-height: 500px;
+  width: auto;
 }
 </style>
