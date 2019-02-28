@@ -16,14 +16,14 @@
           <a v-if="reddit.author"
             @click.stop
             :href="`https://www.reddit.com/user/${reddit.author}`">
-            <font-awesome-icon :icon="['fab', 'reddit']" />
+            <font-awesome-icon class="fas" :icon="['fab', 'reddit']" />
             {{ poster_name }}
           </a>
           <router-link
             v-else-if="post.transaction"
             @click.native.stop
             :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-            <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
+            <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
             {{ poster_name }}
           </router-link>
         </li>
@@ -101,7 +101,7 @@
                     v-else-if="post.transaction"
                     @click.native.stop
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-                    <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
+                    <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
                     {{ poster_name }}
                   </router-link>
                 </li>
@@ -127,7 +127,12 @@
           </div>
         </div>
 
-        <div class="posttext float-left">
+        <div
+          class="posttext float-left"
+          :class="{
+            'op-posttext': is_op
+          }"
+        >
           <div>
             <post-attachment
               ref="post_attachment"
@@ -704,6 +709,10 @@ export default {
 </script>
 
 <style scoped>
+.fas {
+  font-size: 20px;
+  margin-bottom: -3px;
+}
 .reply {
   color: teal!important;
   border: 1px solid teal;
@@ -788,6 +797,10 @@ export default {
 }
 .op-upvote .up {
   white-space:nowrap;
+}
+.post-parent .op-posttext {
+  margin-top: 10px;
+  margin-bottom: 30px;
 }
 .up {
   color: black!important;
