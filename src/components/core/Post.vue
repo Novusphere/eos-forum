@@ -16,14 +16,14 @@
           <a v-if="reddit.author"
             @click.stop
             :href="`https://www.reddit.com/user/${reddit.author}`">
-            <font-awesome-icon :icon="['fab', 'reddit']" />
+            <font-awesome-icon class="fas" :icon="['fab', 'reddit']" />
             {{ poster_name }}
           </a>
           <router-link
             v-else-if="post.transaction"
             @click.native.stop
             :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-            <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
+            <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
             {{ poster_name }}
           </router-link>
         </li>
@@ -101,7 +101,7 @@
                     v-else-if="post.transaction"
                     @click.native.stop
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-                    <font-awesome-icon v-if="is_anon_alias" :icon="['fas', 'user-secret']" />
+                    <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
                     {{ poster_name }}
                   </router-link>
                 </li>
@@ -127,7 +127,12 @@
           </div>
         </div>
 
-        <div class="posttext float-left">
+        <div
+          class="posttext float-left"
+          :class="{
+            'op-posttext': is_op
+          }"
+        >
           <div>
             <post-attachment
               ref="post_attachment"
@@ -154,7 +159,7 @@
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
           </div>
-          <p v-if="post_content_html" v-html="post_content_html" />
+          <p v-if="post_content_html()" v-html="post_content_html()" />
         </div>
         <div class="clearfix"></div>
       </div>
@@ -435,10 +440,6 @@ export default {
       link.params.child_id = this.post.o_id || this.post.o_transaction;
       return link;
     },
-    post_content_html() {
-      var md = new MarkdownParser(this.post.getContent(), this.post.createdAt);
-      return md.html;
-    },
     reddit() {
       return this.post.data.json_metadata.reddit;
     },
@@ -498,6 +499,20 @@ export default {
         )));
   },
   methods: {
+    post_content_html() {
+      let content = this.post.getContent();
+      let token;
+      // this is really rough lol needs to be improved
+      if (content.split('#tip')[1]) {
+        token = content.split('#tip')[1].split(' ')[2];
+        content = content.replace(token, `<img width="25" height="25" src="${this.$root.icons[token].logo}" /> `);
+        content = content.replace('#tip', 'tip');
+        content = content.split('@')[0];
+      }
+      console.log(content);
+      var md = new MarkdownParser(content, this.post.createdAt);
+      return md.html;
+    },
     goToSub(token) {
       const brand = Object.keys(BRANDS).find(k => {
         if (BRANDS[k].token_symbol === token) {
@@ -704,6 +719,10 @@ export default {
 </script>
 
 <style scoped>
+.fas {
+  font-size: 20px;
+  margin-bottom: -3px;
+}
 .reply {
   color: teal!important;
   border: 1px solid teal;
@@ -788,6 +807,10 @@ export default {
 }
 .op-upvote .up {
   white-space:nowrap;
+}
+.post-parent .op-posttext {
+  margin-top: 10px;
+  margin-bottom: 30px;
 }
 .up {
   color: black!important;
