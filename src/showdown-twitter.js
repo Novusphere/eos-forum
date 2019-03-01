@@ -11,7 +11,7 @@ export default function (makeUser, makeTag) {
             // @username syntax
             {
                 type: 'lang',
-                regex: '\\s([@][\\w_-]+)', //'\\B(\\\\)?@([\\w_-]+)\\b',
+                regex: '\\s([@][\\w\.]+)', //'\\B(\\\\)?@([\\w_-]+)\\b',
                 replace: function (match, leadingSlash, username) {
                     // Check if we matched the leading \ and return nothing changed if so
                     if (leadingSlash === '\\') {
