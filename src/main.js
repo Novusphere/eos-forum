@@ -42,17 +42,23 @@ import vSelect from 'vue-select'
   Vue.use(BootstrapVue);
   Vue.use(Meta);
   Vue.mixin(postMixin);
-  
-  
+
+
   var analytics = {
     id: 'UA-131745808-1',
     router
   };
-  
-  if (window.__ANALYTICS__) {
-    analytics.customResourceURL = window.__ANALYTICS__;
+
+  // only apply custom analytics if adblock detected
+  const adBanner = document.getElementById('adBanner'); 
+  if (!adBanner || adBanner.clientHeight == 0) {
+    console.log('Ad-blocker detected');
+
+    if (window.__ANALYTICS__) {
+      analytics.customResourceURL = window.__ANALYTICS__;
+    }
   }
-  
+
   Vue.use(VueAnalytics, analytics)
   Vue.config.productionTip = false;
 
