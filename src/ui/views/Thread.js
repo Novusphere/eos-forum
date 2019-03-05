@@ -14,6 +14,7 @@ export default async function Thread(id, child_id) {
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.threadById(id) },
+            { $limit: 1 },
             { $lookup: novusphere.query.lookup.postState() },
             { $lookup: novusphere.query.lookup.postMyVote(identity.account) },
             {
@@ -24,6 +25,15 @@ export default async function Thread(id, child_id) {
             }
         ]
     })).cursor.firstBatch[0];
+
+    // thread not found
+    if (!main_post || !main_post.transaction) {
+        return {
+            opening_post: null,
+            main_post: null,
+            count: 0
+        }
+    }
 
     main_post = new Post(main_post);
     await main_post.normalize();

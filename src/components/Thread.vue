@@ -8,7 +8,8 @@
     </template>
 
     <template slot="content">
-      <div class="mb-1" v-if="opening_post.id">
+
+      <div class="mb-1" v-if="!loading">
         <button
           class="btn btn-sm btn-primary"
           @click="
@@ -27,16 +28,22 @@
           </template>
           <template v-else>
             <font-awesome-icon :icon="['fas', 'arrow-left']" />
-            e/{{ opening_post.data.json_metadata.sub }}
+            e/{{ $route.params.sub }}
           </template>
         </button>
       </div>
+
+      <div class="text-center" v-if="(!opening_post || !opening_post.id) && !loading">
+        <h1>Thread not found</h1>
+      </div>
+
       <post class="mb-2 pb-2"
-        v-if="opening_post.id && !loading"
+        v-if="opening_post && opening_post.id && !loading"
         :post="main_post"
         :thread="opening_post">
       </post>
-      <div class="text-center" v-else>
+
+      <div class="text-center" v-if="loading">
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
       </div>
     </template>

@@ -10,6 +10,9 @@ function score() {
         adder = [{ $add: adder }, { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] }];
     }
 
+    // add bias against anon-r-eos
+    adder = [ {$add: adder}, { $cond:[ { $ne: ["$data.json_metadata.sub", "anon-r-eos"] }, 1, 0]}]
+
     return {
         // (p+1)/(T+2)^G -- p=upvotes, T=time since post in hrs, G=1.8
         $divide: [
