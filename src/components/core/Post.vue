@@ -159,7 +159,7 @@
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
           </div>
-          <p v-if="post_content_html" v-html="post_content_html" />
+          <p v-if="post_content_html()" v-html="post_content_html()" />
         </div>
         <div class="clearfix"></div>
       </div>
@@ -440,10 +440,6 @@ export default {
       link.params.child_id = this.post.o_id || this.post.o_transaction;
       return link;
     },
-    post_content_html() {
-      var md = new MarkdownParser(this.post.getContent(), this.post.createdAt);
-      return md.html;
-    },
     reddit() {
       return this.post.data.json_metadata.reddit;
     },
@@ -503,6 +499,20 @@ export default {
         )));
   },
   methods: {
+    post_content_html() {
+      let content = this.post.getContent();
+      let token;
+      // this is really rough lol needs to be improved
+      if (content.split('#tip')[1]) {
+        token = content.split('#tip')[1].split(' ')[2];
+        content = content.replace(token, `<img width="25" height="25" src="${this.$root.icons[token].logo}" /> `);
+        content = content.replace('#tip', 'tip');
+        content = content.split('@')[0];
+      }
+      console.log(content);
+      var md = new MarkdownParser(content, this.post.createdAt);
+      return md.html;
+    },
     goToSub(token) {
       const brand = Object.keys(BRANDS).find(k => {
         if (BRANDS[k].token_symbol === token) {
