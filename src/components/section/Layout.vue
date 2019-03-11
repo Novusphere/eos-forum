@@ -47,13 +47,18 @@
           </div>
 
           <div class="text-right navbar-actions">
-            <button class="btn btn-primary mx-2 mx-lg-4 ConnectButton"
-              v-if="!identity.account"
-              v-on:click="login()">
-              login
-            </button>
+            <template v-if="!identity.account">
+              <button class="btn btn-primary mx-2 ConnectButton"
+                @click="login()">
+                login
+              </button>
 
-            <div class="d-inline-block MenuIconButton">
+              <button @click="$router.push({name: 'setID'})" class="btn btn-primary mx-2 ConnectButton">
+                Set ID
+              </button>
+            </template>
+
+            <div v-if="identity.account || validAnonID()" class="d-inline-block MenuIconButton">
               <router-link :to="{ name: 'StartThread', params: { sub: $route.params.sub ? $route.params.sub : 'all' } }">
                 <font-awesome-icon :icon="['fas', 'pen']" ></font-awesome-icon>
               </router-link>
@@ -80,6 +85,11 @@
                   </router-link>
                 </li>
                 <li class="dropdown-item">
+                  <router-link :to="{ name: 'Settings' }">
+                    settings
+                  </router-link>
+                </li>
+                <li class="dropdown-item">
                     {{ identity.atmos }} ATMOS
                 </li>
                 <li v-if="brand_symbol && (brand_symbol != 'ATMOS')" class="dropdown-item">
@@ -94,12 +104,6 @@
                     </a>
                 </li>
               </ul>
-            </div>
-
-            <div class="d-inline-block MenuIconButton">
-              <router-link :to="{ name: 'Settings' }">
-                <font-awesome-icon :icon="['fas', 'cog']" ></font-awesome-icon>
-              </router-link>
             </div>
           </div>
         </div>
@@ -314,6 +318,9 @@ export default {
     window.removeEventListener("identity", this.updateIdentity);
   },
   methods: {
+    validAnonID() {
+      return storage.anon_id.name !== '';
+    },
     is_subscribed() {
       return this.subscribed_subs.includes(this.$route.params.sub);
     },

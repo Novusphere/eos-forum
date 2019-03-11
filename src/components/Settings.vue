@@ -25,7 +25,7 @@
             data-toggle="tab"
             href="#anonid"
             role="tab">
-            Anon Id
+            Set ID
           </a>
         </li>
         <li class="nav-item" v-if="false">
@@ -108,11 +108,11 @@
         </div>
         <div class="tab-pane fade" id="anonid" role="tabpanel">
           <div class="text-center">
-              <p class="">
-                  Use this panel to control your anonymous identity.
-                  This is used when posting anonymously to identify your posts.
-                  You can regenerate a new anonymous identity at any time.
-              </p>
+            <p>
+              Use this panel to set your ID.
+              This is used when posting anonymously to identify your posts.
+              You can regenerate a new ID / Key at any time.
+            </p>
           </div>
           <form class="mx-4">
             <div class="form-group row">

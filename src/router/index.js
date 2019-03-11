@@ -66,11 +66,11 @@ const router = new Router({
       name: "Tag",
       component: Tag
     },
-    /*{
-      path: '/search',
-      name: "Search",
-      component: Search
-    },*/
+    {
+      path: '/setID',
+      name: "setID",
+      component: () => import('@/components/SetID'),
+    },
     {
       path: '/notifications',
       name: 'UserNotifications',
