@@ -335,6 +335,7 @@ class Post {
         }
 
         await this.detectAttachment();
+        await this.detectInlineAttachment();
         await this.detectContent();
         await this.setReferendumDetails();
         await this.data.json_metadata.attachment.normalize();
@@ -415,18 +416,13 @@ class Post {
         this._content = content;
     }
 
-    async detectAttachment() {
-        var attachment = this.data.json_metadata.attachment;
-
-        if (attachment.value &&
-            attachment.display == 'referendum') {
-
-            const rp = await ui.actions.Referendum.GetProposal(attachment.value);
-            if (rp) {
-                this.setReferendum(this, rp);
-            }
-
+    async detectInlineAttachment() {
+        if (!attachment.value) {
             return;
+        }
+
+        if (attachment.value.startsWith('https://medium.com')) {
+            // TO-DO: medium parser...
         }
 
         if (attachment.value.startsWith('https://trybe.one/')) {
@@ -465,13 +461,15 @@ class Post {
                 var cors_jq = jQuery(cors_html);
 
                 // this is kind of annoying, but Steem sometimes does this redirect thing
-                var canonical = cors_html.indexOf('link rel="canonical"');
-                if (canonical > -1) {
-                    canonical = cors_html.substring(canonical + 27, cors_html.indexOf('"', canonical + 27));
+                if (attachment.value.indexOf('steemit.com') > -1) {
+                    var canonical = cors_html.indexOf('link rel="canonical"');
+                    if (canonical > -1) {
+                        canonical = cors_html.substring(canonical + 27, cors_html.indexOf('"', canonical + 27)).toLowerCase();
 
-                    if (canonical.toLowerCase() != attachment.value.toLowerCase()) {
-                        cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + canonical);
-                        cors_jq = jQuery(cors_html);
+                        if (canonical.indexOf('steemit.com') > -1 && canonical != attachment.value.toLowerCase()) {
+                            cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + canonical);
+                            cors_jq = jQuery(cors_html);
+                        }
                     }
                 }
 
@@ -488,7 +486,21 @@ class Post {
                 console.log(ex);
             }
         }
+    }
 
+    async detectAttachment() {
+        var attachment = this.data.json_metadata.attachment;
+
+        if (attachment.value &&
+            attachment.display == 'referendum') {
+
+            const rp = await ui.actions.Referendum.GetProposal(attachment.value);
+            if (rp) {
+                this.setReferendum(this, rp);
+            }
+
+            return;
+        }
 
         // detect automatic
 
@@ -517,6 +529,11 @@ class Post {
             },
             {
                 match: /https:\/\/t.me\/[\w]+\/[0-9]+/i,
+                handle: (m) => attach(m[0], 'url', 'link')
+            },
+            {
+                
+                match: /https:\/\/medium.com\/@[\w]+\/.+/i,
                 handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
@@ -549,6 +566,7 @@ class Post {
         if (edit.data.json_metadata.attachment) {
             this.data.json_metadata.attachment = new PostAttachment(edit.data.json_metadata.attachment);
             await this.detectAttachment();
+            await this.detectInlineAttachment();
             await this.detectContent();
             await this.setReferendumDetails();
         }
