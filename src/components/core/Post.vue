@@ -503,12 +503,12 @@ export default {
       let content = this.post.getContent();
       let token;
       // this is really rough lol needs to be improved
-      // if (content.split('#tip')[1]) {
-      //   token = content.split('#tip')[1].split(' ')[2];
-      //   content = content.replace(token, `<img width="25" height="25" src="${this.$root.icons[token].logo}" /> `);
-      //   content = content.replace('#tip', 'tip');
-      //   content = content.split('@')[0];
-      // }
+      /*if (content.split('#tip')[1]) {
+        token = content.split('#tip')[1].split(' ')[2];
+        content = content.replace(token, `<img width="25" height="25" src="${this.$root.icons[token].logo}" /> `);
+        content = content.replace('#tip', 'tip');
+        content = content.split('@')[0];
+      }*/
       var md = new MarkdownParser(content, this.post.createdAt);
       return md.html;
     },

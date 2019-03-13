@@ -462,10 +462,23 @@ class Post {
             attachment.value.startsWith('https://whaleshares.io')) {
             try {
                 var cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + attachment.value);
-                var cors_jq = jQuery(cors_html).find(
-                    attachment.value.startsWith('https://steemit.com') ? 
-                    'div[class*="MarkdownViewer"]' :
-                    'div[class*="StoryFull__content"]');
+                var cors_jq = jQuery(cors_html);
+
+                // this is kind of annoying, but Steem sometimes does this redirect thing
+                var canonical = cors_html.indexOf('link rel="canonical"');
+                if (canonical > -1) {
+                    canonical = cors_html.substring(canonical + 27, cors_html.indexOf('"', canonical + 27));
+
+                    if (canonical.toLowerCase() != attachment.value.toLowerCase()) {
+                        cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + canonical);
+                        cors_jq = jQuery(cors_html);
+                    }
+                }
+
+                cors_jq = cors_jq.find(
+                    attachment.value.startsWith('https://steemit.com') ?
+                        'div[class*="MarkdownViewer"]' :
+                        'div[class*="StoryFull__content"]');
 
                 attachment.type = 'markdown';
                 attachment.display = 'markdown';

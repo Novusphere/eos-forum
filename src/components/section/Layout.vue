@@ -24,21 +24,12 @@
               <b-dropdown variant="link" :text="$route.params.sub || 'Home'" class="mobile">
                 <b-dropdown-item @click="$router.push({name: 'Index'})">
                   Home
-                  <b-badge variant="dark">
-                    0
-                  </b-badge>
                 </b-dropdown-item>
                 <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'all' } })">
                   All
-                  <b-badge variant="dark">
-                    0
-                  </b-badge>
                 </b-dropdown-item>
                 <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'referendum' } })">
-                    Referendum
-                    <b-badge variant="dark">
-                      0
-                    </b-badge>
+                  Referendum 
                 </b-dropdown-item>
                 <b-dropdown-item
                   v-for="s in subs()"
@@ -49,7 +40,7 @@
                   <div style="flex:1">
                     e/{{ s.sub }}
                   </div>
-                  <b-badge variant="dark">
+                  <b-badge variant="dark" v-if="false">
                     0
                   </b-badge>
                 </b-dropdown-item>
@@ -141,24 +132,15 @@
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
                 Home
-                <b-badge variant="dark">
-                  0
-                </b-badge>
               </router-link>
               <router-link class="dropdown-item"
                 :to="{name: 'Sub', params: { sub: 'all' } }">
                 All
-                <b-badge variant="dark">
-                  0
-                </b-badge>
               </router-link>
               <router-link v-if="eos_referendum"
                 class="dropdown-item"
                 :to="{name: 'Sub', params: { sub: 'referendum' } }">
                   Referendum
-                  <b-badge variant="dark">
-                    0
-                  </b-badge>
               </router-link>
               <div class="divline" />
               <router-link v-for="s in subs()"
@@ -169,7 +151,7 @@
                 <div>
                   e/{{ s.sub }}
                 </div>
-                <b-badge variant="dark">
+                <b-badge variant="dark" v-if="false">
                   0
                 </b-badge>
               </router-link>
