@@ -12,15 +12,15 @@
     <!-- header navigation -->
     <div class="HeaderNavigation">
       <div class="container">
-        <div class="row navbar">
-          <div class="flex-center">
-            <div class="d-inline-block px-2 px-lg-4">
+        <div class="navbar">
+          <div class="brand">
+            <div>
               <router-link :to="{ name: 'Index' }">
                 <img :src="brand_logo" style="height: 38px;">
               </router-link>
             </div>
 
-            <div class="d-sm-inline-block">
+            <div class="flex">
               <b-dropdown variant="link" :text="$route.params.sub || 'Home'" class="mobile">
                 <b-dropdown-item @click="$router.push({name: 'Index'})">
                   home
@@ -331,7 +331,7 @@ export default {
   },
   methods: {
     validAnonID() {
-      return ecc.isValidPrivate(this.anon_id.key);
+      return this.anon_id.name !== '' && ecc.isValidPrivate(this.anon_id.key);
     },
     is_subscribed() {
       return this.subscribed_subs.includes(this.$route.params.sub);
@@ -432,11 +432,22 @@ export default {
   font-size: 18px;
   color: black;
   padding: 0px;
+  max-width: calc(100vw - 295px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
 <style scoped>
+.brand {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-wrap: nowrap;
+}
 .navbar {
   display: flex;
+  flex-wrap: nowrap;
   justify-content:space-between;
 }
 .sub {
@@ -461,6 +472,6 @@ export default {
   background-color: white;
 }
 .navbar-actions {
-  display: inherit;
+  display: flex;
 }
 </style>
