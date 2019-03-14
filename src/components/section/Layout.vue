@@ -12,24 +12,24 @@
     <!-- header navigation -->
     <div class="HeaderNavigation">
       <div class="container">
-        <div class="row navbar">
-          <div class="flex-center">
-            <div class="d-inline-block px-2 px-lg-4">
+        <div class="navbar">
+          <div class="brand">
+            <div>
               <router-link :to="{ name: 'Index' }">
                 <img :src="brand_logo" style="height: 38px;">
               </router-link>
             </div>
 
-            <div class="d-sm-inline-block">
+            <div class="flex">
               <b-dropdown variant="link" :text="$route.params.sub || 'Home'" class="mobile">
                 <b-dropdown-item @click="$router.push({name: 'Index'})">
-                  Home
+                  home
                 </b-dropdown-item>
                 <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'all' } })">
-                  All
+                  all
                 </b-dropdown-item>
                 <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'referendum' } })">
-                  Referendum 
+                  referendum
                 </b-dropdown-item>
                 <b-dropdown-item
                   v-for="s in subs()"
@@ -46,7 +46,7 @@
                 </b-dropdown-item>
               </b-dropdown>
               <div class="desktop sub">
-                {{ $route.params.sub || 'Home' }}
+                {{ $route.params.sub || 'home' }}
               </div>
             </div>
           </div>
@@ -55,11 +55,11 @@
             <template v-if="!identity.account">
               <button class="btn btn-primary mx-2 ConnectButton"
                 @click="login()">
-                login
+                Login
               </button>
 
               <button @click="$router.push({name: 'setID'})" class="btn btn-primary mx-2 ConnectButton">
-                Set ID
+                {{ validAnonID() ? anon_id.name : 'Set ID' }}
               </button>
             </template>
 
@@ -131,16 +131,16 @@
             <div class="desktop block">
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
-                Home
+                home
               </router-link>
               <router-link class="dropdown-item"
                 :to="{name: 'Sub', params: { sub: 'all' } }">
-                All
+                all
               </router-link>
               <router-link v-if="eos_referendum"
                 class="dropdown-item"
                 :to="{name: 'Sub', params: { sub: 'referendum' } }">
-                  Referendum
+                  referendum
               </router-link>
               <div class="divline" />
               <router-link v-for="s in subs()"
@@ -278,6 +278,7 @@
 import "@/assets/css/style2.css";
 import "@/assets/css/custom.css";
 
+import ecc from "eosjs-ecc";
 import ui from "@/ui";
 import { BRANDS, FORUM_BRAND } from "@/ui/constants";
 import { storage } from "@/storage";
@@ -321,6 +322,7 @@ export default {
   },
   async mounted() {
     this.updateBrand();
+    this.anon_id = storage.anon_id;
     this.identity = await GetIdentity();
     window.addEventListener("identity", this.updateIdentity);
   },
@@ -329,7 +331,7 @@ export default {
   },
   methods: {
     validAnonID() {
-      return storage.anon_id.name !== '';
+      return this.anon_id.name !== '' && ecc.isValidPrivate(this.anon_id.key);
     },
     is_subscribed() {
       return this.subscribed_subs.includes(this.$route.params.sub);
@@ -389,6 +391,7 @@ export default {
     return {
       eos_referendum: storage.eos_referendum,
       identity: {},
+      anon_id: {},
       brand_logo: "",
       brand_icon: "",
       brand_symbol: "",
@@ -426,19 +429,28 @@ export default {
   overflow: auto;
 }
 .mobile .dropdown-toggle {
-  text-transform: capitalize;
   font-size: 18px;
   color: black;
   padding: 0px;
+  max-width: calc(100vw - 295px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
 <style scoped>
+.brand {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-wrap: nowrap;
+}
 .navbar {
   display: flex;
+  flex-wrap: nowrap;
   justify-content:space-between;
 }
 .sub {
-  text-transform: capitalize;
   font-size: 18px;
   color: black;
 }
@@ -460,6 +472,6 @@ export default {
   background-color: white;
 }
 .navbar-actions {
-  display: inherit;
+  display: flex;
 }
 </style>
