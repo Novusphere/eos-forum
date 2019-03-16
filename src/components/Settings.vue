@@ -44,6 +44,14 @@
             Raw
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link"
+            data-toggle="tab"
+            href="#account"
+            role="tab">
+            Account
+          </a>
+        </li>
       </ul>
       <div class="tab-content mt-2">
         <div class="tab-pane fade show active" id="anonid" role="tabpanel">
@@ -186,6 +194,12 @@
                 <button type="button" class="btn btn-primary" v-on:click="saveTheme()">save</button>
               </div>
             </div>
+          </form>
+        </div>
+        <div class="tab-pane fade" id="account" role="tabpanel">
+          <div class="text-center">
+          </div>
+          <form class="mx-4">
           </form>
         </div>
       </div>

@@ -6,7 +6,7 @@
       <div class="BrandBanner__Banner">
         <object class="BrandBanner__Image" v-if="brand_banner.endsWith('.svg')" :data="brand_banner" type="image/svg+xml"></object>
         <img v-else class="BrandBanner__Image" :src="brand_banner">
-        <button class="buy-banner btn btn-primary">
+        <button v-if="buyableBanner()" class="buy-banner btn btn-primary">
           Buy Banner
         </button>
       </div>
@@ -350,6 +350,10 @@ export default {
     window.removeEventListener("identity", this.updateIdentity);
   },
   methods: {
+    buyableBanner() {
+      const buyableBannerPages = [undefined]; // home page sub param is undefined 
+      return buyableBannerPages.includes(this.$route.params.sub);
+    },
     validAnonID() {
       return this.anon_id.name !== '' && ecc.isValidPrivate(this.anon_id.key);
     },
