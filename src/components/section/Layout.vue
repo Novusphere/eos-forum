@@ -6,6 +6,9 @@
       <div class="BrandBanner__Banner">
         <object class="BrandBanner__Image" v-if="brand_banner.endsWith('.svg')" :data="brand_banner" type="image/svg+xml"></object>
         <img v-else class="BrandBanner__Image" :src="brand_banner">
+        <button class="buy-banner btn btn-primary">
+          Buy Banner
+        </button>
       </div>
     </div>
 
@@ -58,7 +61,7 @@
                 Login
               </button>
 
-              <button @click="$router.push({name: 'setID'})" class="btn btn-primary mx-2 ConnectButton">
+              <button @click="$router.push({name: 'Settings'})" class="btn btn-primary mx-2 ConnectButton">
                 {{ validAnonID() ? anon_id.name : 'Set ID' }}
               </button>
             </template>
@@ -142,6 +145,23 @@
                 :to="{name: 'Sub', params: { sub: 'referendum' } }">
                   referendum
               </router-link>
+              <div class="divline" />
+              <template v-if="userSubs()">
+                <router-link v-for="user in userSubs()"
+                  :key="user.id"
+                  class="dropdown-item"
+                  :to="{ name: 'UserProfile', params: { account: user.name } }">
+                  <font-awesome-icon class="fas follow-user-icon" :icon="['fas', 'user-circle']" />
+                  <div>
+                    {{user.name}}
+                  </div>
+                </router-link>
+              </template>
+              <template v-else>
+                <div class="dropdown-item">
+                  no users followed
+                </div>
+              </template>
               <div class="divline" />
               <router-link v-for="s in subs()"
                 :key="s.sub"
@@ -354,6 +374,14 @@ export default {
       }
       return subs;
     },
+    userSubs() {
+      return  [
+        {
+          id: 1,
+          name: 'bigbluewhale'
+        },
+      ]
+    },
     updateBrand() {
       ui.helpers.UpdateBrand(this.$route.params.sub);
       this.brand_logo = FORUM_BRAND.logo;
@@ -439,11 +467,21 @@ export default {
 }
 </style>
 <style scoped>
+.follow-user-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
 .brand {
   align-items: center;
   justify-content: center;
   display: flex;
   flex-wrap: nowrap;
+}
+.buy-banner {
+  position: absolute;
+  top: 10px;
+  right: 50px;
 }
 .navbar {
   display: flex;
