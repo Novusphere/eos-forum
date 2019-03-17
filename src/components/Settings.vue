@@ -15,17 +15,17 @@
         <li class="nav-item">
           <a class="nav-link active"
             data-toggle="tab"
-            href="#mod"
+            href="#anonid"
             role="tab">
-            Moderation
+            Set ID
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link"
             data-toggle="tab"
-            href="#anonid"
+            href="#mod"
             role="tab">
-            Set ID
+            Moderation
           </a>
         </li>
         <li class="nav-item" v-if="false">
@@ -44,9 +44,50 @@
             Raw
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link"
+            data-toggle="tab"
+            href="#account"
+            role="tab">
+            Account
+          </a>
+        </li>
       </ul>
       <div class="tab-content mt-2">
-        <div class="tab-pane fade show active" id="mod" role="tabpanel">
+        <div class="tab-pane fade show active" id="anonid" role="tabpanel">
+          <div class="text-center">
+            <p>
+              Use this panel to set your ID.
+              This is used when posting anonymously to identify your posts.
+              You can regenerate a new ID / Key at any time.
+            </p>
+          </div>
+          <form class="mx-4">
+            <div class="form-group row">
+              <label class="col-2 col-form-label">Name</label>
+              <div class="col-8">
+                <input type="text" class="form-control" v-model="anon_name" placeholder="name">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-2 col-form-label">Key</label>
+              <div class="col-8">
+                <input type="text" class="form-control" v-model="anon_key" placeholder="identity key">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-2 col-form-label"></label>
+              <div class="col-8">
+                <input type="text" class="form-control" v-model="anon_identity" readonly placeholder="identity public key">
+              </div>
+            </div>
+            <div class="text-center">
+                <button type="button" class="btn btn-primary" v-on:click="newAnonId()">new</button>
+                <button type="button" class="btn btn-primary" v-on:click="saveAnonId()" data-dismiss="modal">save</button>
+            </div>
+          </form>
+        </div>
+        <div class="tab-pane fade" id="mod" role="tabpanel">
           <div class="text-center">
               <p class="">
                   Use this panel to control your delegated moderation settings.
@@ -106,39 +147,6 @@
             </div>
           </form>
         </div>
-        <div class="tab-pane fade" id="anonid" role="tabpanel">
-          <div class="text-center">
-            <p>
-              Use this panel to set your ID.
-              This is used when posting anonymously to identify your posts.
-              You can regenerate a new ID / Key at any time.
-            </p>
-          </div>
-          <form class="mx-4">
-            <div class="form-group row">
-              <label class="col-2 col-form-label">Name</label>
-              <div class="col-8">
-                <input type="text" class="form-control" v-model="anon_name" placeholder="name">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-2 col-form-label">Key</label>
-              <div class="col-8">
-                <input type="text" class="form-control" v-model="anon_key" placeholder="identity key">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-2 col-form-label"></label>
-              <div class="col-8">
-                <input type="text" class="form-control" v-model="anon_identity" readonly placeholder="identity public key">
-              </div>
-            </div>
-            <div class="text-center">
-                <button type="button" class="btn btn-primary" v-on:click="newAnonId()">new</button>
-                <button type="button" class="btn btn-primary" v-on:click="saveAnonId()" data-dismiss="modal">save</button>
-            </div>
-          </form>
-        </div>
         <div class="tab-pane fade" id="api" role="tabpanel">
           <div class="text-center">
               <p class="text-alert">
@@ -186,6 +194,12 @@
                 <button type="button" class="btn btn-primary" v-on:click="saveTheme()">save</button>
               </div>
             </div>
+          </form>
+        </div>
+        <div class="tab-pane fade" id="account" role="tabpanel">
+          <div class="text-center">
+          </div>
+          <form class="mx-4">
           </form>
         </div>
       </div>

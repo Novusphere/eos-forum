@@ -22,6 +22,7 @@
           <router-link
             v-else-if="post.transaction"
             @click.native.stop
+            :class="{'disabled': is_anon_alias}"
             :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
             <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
             {{ poster_name }}
@@ -100,6 +101,7 @@
                   <router-link
                     v-else-if="post.transaction"
                     @click.native.stop
+                    :class="{'disabled': is_anon_alias}"
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
                     <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
                     {{ poster_name }}
