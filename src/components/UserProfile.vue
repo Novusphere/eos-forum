@@ -59,7 +59,12 @@
 
     <template slot="right_sidebar">
       <div class="block">
-        <h3>{{ account }}</h3>
+        <div class="blocktxt">
+          <div> {{ account }} </div>
+          <button class="btn btn-primary mt-3">
+            Follow user
+          </button>
+        </div>
         <div class="divline"></div>
         <div class="blocktxt">
           Balances: {{ balances.atmos }} ATMOS
