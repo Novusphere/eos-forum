@@ -61,7 +61,7 @@
       <div class="block">
         <div class="blocktxt">
           <div> {{ account }} </div>
-          <button class="btn btn-primary mt-3">
+          <button v-if="false" class="btn btn-primary mt-3">
             Follow user
           </button>
         </div>

@@ -2,6 +2,7 @@ import jQuery from 'jquery';
 import { storage } from "@/storage";
 import ui from "@/ui";
 import requests from "@/requests";
+import { GetUserIcons } from "@/usericon";
 
 import { GetEOS, EOSBinaryReader, GetTokensInfo, GetTokenPrecision } from "@/eos";
 
@@ -322,6 +323,7 @@ class Post {
 
         this.data = new PostData(post.data, this.createdAt);
         this.o_attachment = new PostAttachment(this.data.json_metadata.attachment);
+        this.user_icons = await GetUserIcons(this.data.poster);
 
         if (post.recent_edit) {
             await this.applyEdit(post.recent_edit);
@@ -417,6 +419,8 @@ class Post {
     }
 
     async detectInlineAttachment() {
+        var attachment = this.data.json_metadata.attachment;
+        
         if (!attachment.value) {
             return;
         }

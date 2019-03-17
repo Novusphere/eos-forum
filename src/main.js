@@ -11,6 +11,7 @@ window._jQuery = jQuery;
 import { InitStorage } from "@/storage"
 import { LoadConstants } from "@/ui/constants"
 import { GetTokensInfo } from "@/eos";
+import { GetUserIcons } from "@/usericon";
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -65,6 +66,7 @@ import vSelect from 'vue-select'
   await LoadConstants();
   await InitStorage(); // --> LoadStorage()
   await GetTokensInfo(); // build cache
+  await GetUserIcons(); // load icon cache
 
   /* eslint-disable no-new */
   new Vue({

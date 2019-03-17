@@ -103,7 +103,10 @@
                     @click.native.stop
                     :class="{'disabled': is_anon_alias}"
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+                    
+                    <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">
                     <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
+
                     {{ poster_name }}
                   </router-link>
                 </li>

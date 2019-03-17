@@ -6,7 +6,7 @@
       <div class="BrandBanner__Banner">
         <object class="BrandBanner__Image" v-if="brand_banner.endsWith('.svg')" :data="brand_banner" type="image/svg+xml"></object>
         <img v-else class="BrandBanner__Image" :src="brand_banner">
-        <button v-if="buyableBanner()" class="buy-banner btn btn-primary">
+        <button v-if="false && buyableBanner()" class="buy-banner btn btn-primary">
           Buy Banner
         </button>
       </div>
@@ -62,7 +62,13 @@
               </button>
 
               <button @click="$router.push({name: 'Settings'})" class="btn btn-primary mx-2 ConnectButton">
-                {{ validAnonID() ? anon_id.name : 'Set ID' }}
+                <span v-if="validAnonID()">
+                  <font-awesome-icon class="fas" :icon="['fas', 'user-secret']" />
+                  {{ anon_id.name }}
+                </span>
+                <span v-else>
+                  Set ID
+                </span>
               </button>
             </template>
 
@@ -380,10 +386,10 @@ export default {
     },
     userSubs() {
       return  [
-        {
+        /*{
           id: 1,
           name: 'bigbluewhale'
-        },
+        },*/
       ]
     },
     updateBrand() {
