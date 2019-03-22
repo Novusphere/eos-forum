@@ -26,7 +26,7 @@
             :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
 
             <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">     
-            <font-awesome-icon v-else class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
+            <font-awesome-icon v-if="post.user_icons.length == 0" class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
 
             {{ poster_name }}
           </router-link>
@@ -108,7 +108,7 @@
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
                     
                     <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">
-                    <font-awesome-icon v-else class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
+                    <font-awesome-icon v-if="post.user_icons.length == 0"  class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
 
                     {{ poster_name }}
                   </router-link>
@@ -167,6 +167,7 @@
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
           </div>
+          
           <p v-if="post_content_html()" v-html="post_content_html()" />
         </div>
         <div class="clearfix"></div>
@@ -198,7 +199,7 @@
             </li>
             <li v-if="post.referendum && post.referendum.details" class="list-inline-item">
               <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
-              {{ post.referendum.details.total_eos.toFixed(4) }}
+              {{ post.referendum.details.total_toFixed(4) }}
             </li>
             <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
               <div
@@ -277,7 +278,7 @@
             <span>{{ status }}</span>
           </div>
           <div class="col-sm-12 mt-1 mb-2">
-            <button v-if="true || identity.account" type="button" class="btn btn-sm btn-primary" @click="quickReply(false)">{{ show_quick_edit ? 'Edit' : 'Post' }}</button>
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="quickReply(false)">{{ show_quick_edit ? 'Edit' : 'Post' }}</button>
             <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-primary" @click="quickReply(true)">Post ID</button>
             <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="addTip()">Tip</button>
           </div>
@@ -517,6 +518,7 @@ export default {
         content = content.replace('#tip', 'tip');
         content = content.split('@')[0];
       }*/
+
       var md = new MarkdownParser(content, this.post.createdAt);
       return md.html;
     },

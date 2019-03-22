@@ -9,7 +9,9 @@ import {
     MAX_ITEMS_PER_PAGE,
 } from "@/ui/constants";
 
-export default async function UserProfile(current_page, account, sorter) {
+export default async function UserProfile(current_page, account, sorter) {    
+    var benchmark = (new Date()).getTime();
+    
     current_page = parseInt(current_page ? current_page : 1);
     var is_blocked = await moderation.isBlocked(0, null, account);
 
@@ -17,9 +19,11 @@ export default async function UserProfile(current_page, account, sorter) {
     const novusphere = GetNovusphere();
 
     var balance_atmos = parseFloat(
-        (await eos.getCurrencyBalance("novusphereio", account, "ATMOS"))[0]
+        (await eos.rpc.get_currency_balance("novusphereio", account, "ATMOS"))[0]
     );
     balance_atmos = (isNaN(balance_atmos) ? 0 : balance_atmos).toFixed(3);
+
+    console.log(`loaded (1) in ${(new Date()).getTime() - benchmark} ms`);
 
     var n_comments = (await novusphere.api({
         count: novusphere.config.collection_forum,
@@ -27,11 +31,15 @@ export default async function UserProfile(current_page, account, sorter) {
         query: novusphere.query.match.postsByAccount(account, true)
     })).n;
 
+    console.log(`loaded (2) in ${(new Date()).getTime() - benchmark} ms`);
+
     var n_threads = (await novusphere.api({
         count: novusphere.config.collection_forum,
         maxTimeMS: 10000,
         query: novusphere.query.match.threadsByAccount(account)
     })).n;
+
+    console.log(`loaded (3) in ${(new Date()).getTime() - benchmark} ms`);
 
     var pages = Math.ceil((n_comments + n_threads) / MAX_ITEMS_PER_PAGE);
 
@@ -44,11 +52,9 @@ export default async function UserProfile(current_page, account, sorter) {
         pipeline: [
             { $match: novusphere.query.match.postsByAccount(account, false) },
             { $lookup: novusphere.query.lookup.postState() },
-            { $lookup: novusphere.query.lookup.postParent() },
             {
                 $project: novusphere.query.project.post({
                     normalize_up: true,
-                    normalize_parent: true,
                     score: true 
                 })
             },
@@ -57,15 +63,19 @@ export default async function UserProfile(current_page, account, sorter) {
             { $limit: MAX_ITEMS_PER_PAGE },
             { $lookup: novusphere.query.lookup.postReplies() },
             { $lookup: novusphere.query.lookup.postMyVote(identity.account) },
+            { $lookup: novusphere.query.lookup.postParent() },
             {
                 $project: novusphere.query.project.post({
                     normalize_my_vote: true,
+                    normalize_parent: true,
                     recent_edit: true
                 })
             },
             { $match: novusphere.query.match.validParent() }
         ]
     })).cursor.firstBatch;
+
+    console.log(`loaded (4) in ${(new Date()).getTime() - benchmark} ms`);
 
     posts = await Post.fromArray(posts);
 
@@ -74,6 +84,8 @@ export default async function UserProfile(current_page, account, sorter) {
         : "N/A";
 
     var user_icons = await GetUserIcons(account);
+
+    console.log(`loaded (5) in ${(new Date()).getTime() - benchmark} ms`);
 
     return {
         current_page: current_page,

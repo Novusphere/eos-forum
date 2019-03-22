@@ -43,7 +43,7 @@ window.addEventListener('identityUpdate', async function () {
     const identity = await GetIdentity();
 
     var atmos = parseFloat(
-        (await eos.getCurrencyBalance(
+        (await eos.rpc.get_currency_balance(
             "novusphereio",
             identity.account,
             "ATMOS"
@@ -56,7 +56,7 @@ window.addEventListener('identityUpdate', async function () {
         FORUM_BRAND.token_symbol != 'ATMOS')) {
             
         token = parseFloat(
-            (await eos.getCurrencyBalance(
+            (await eos.rpc.get_currency_balance(
                 FORUM_BRAND.token_contract,
                 identity.account,
                 FORUM_BRAND.token_symbol

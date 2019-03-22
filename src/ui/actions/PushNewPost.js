@@ -163,7 +163,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
             // use eos-service to make anonymous post
             if (warn_anon) {
 
-                if (!(await confirm('Are you sure you want to post this anonymously?'))) {
+                if (!(await confirm('Are you sure you want to post this with your forum ID?'))) {
                     set_status("Error: post canceled");
                     return false;
                 }

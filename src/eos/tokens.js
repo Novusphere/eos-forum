@@ -1,6 +1,7 @@
 import requests from "@/requests";
 
 var token_cache = null;
+var precision_cache = {};
 
 async function GetTokensInfo() {
     if (!token_cache) {
@@ -47,14 +48,21 @@ async function GetTokensInfo() {
 
 async function GetTokenPrecision(eos, account, sym) {
     try {
-        const stats = await eos.getCurrencyStats(
-            account,
-            sym
-        );
+        const key = account + ':' + sym;
+        var precision = precision_cache[key];
 
-        const precision = stats[sym].supply
-            .split(" ")[0]
-            .split(".")[1].length;
+        if (!precision) {
+            const stats = await eos.rpc.get_currency_stats(
+                account,
+                sym
+            );
+
+            precision = stats[sym].supply
+                .split(" ")[0]
+                .split(".")[1].length;
+
+            precision_cache[key] = precision;
+        }
 
         return precision;
     }

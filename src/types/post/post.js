@@ -4,7 +4,7 @@ import ui from "@/ui";
 import requests from "@/requests";
 import { GetUserIcons } from "@/usericon";
 
-import { GetEOS, EOSBinaryReader, GetTokensInfo, GetTokenPrecision } from "@/eos";
+import { GetEOS, GetTransaction, EOSBinaryReader, GetTokensInfo, GetTokenPrecision } from "@/eos";
 
 import { PostReddit } from "./reddit";
 import { PostAttachment } from "./attachment";
@@ -49,8 +49,8 @@ async function DecensorData(txid, data) {
         return data;
     }
 
-    const eos = GetEOS();
-    const tx = await eos.getTransaction(txid);
+    //const eos = GetEOS();
+    const tx = await GetTransaction(txid);
 
     var hex = tx.trx.trx.actions[0].data;
     var rdr = new EOSBinaryReader(hex);
@@ -351,7 +351,7 @@ class Post {
 
         if (this.tags.includes('tip')) {
             const eos = GetEOS();
-            const tx = await eos.getTransaction(this.transaction);
+            const tx = await GetTransaction(this.transaction);
             const actions = tx.trx.trx.actions;
 
             for (var i = 0; i < actions.length; i++) {

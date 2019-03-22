@@ -1,4 +1,6 @@
-import EOSFormat from "eosjs/lib/format";
+import { Serialize } from 'eosjs';
+import { GetEOS } from './index';
+const EOSNameType = GetEOS().transactionTypes.get('name');
 
 export default class EOSBinaryReader {
 
@@ -58,10 +60,7 @@ export default class EOSBinaryReader {
     }
 
     readName() {
-        var bytes = this.readBytes(8);
-        var str = '';
-        for (var i = 0; i < bytes.length; i++)
-            str += ((bytes[i] <= 0x0f) ? '0' : '') + bytes[i].toString(16);
-        return EOSFormat.decodeNameHex(str);
+        var sbuf = new Serialize.SerialBuffer({ array: this.readBytes(8) });
+        return EOSNameType.deserialize(sbuf);
     }
 };
