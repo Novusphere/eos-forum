@@ -13,7 +13,7 @@ import lynx from 'eos-transit-lynx-provider';
 const accessContext = initAccessContext({
     appName: 'eosforum',
     network: {
-        host: 'public.eosinfra.io', // https://github.com/eostitan/transit-vue-basic/blob/master/src/components/Login.vue#L128
+        host: 'eos.greymass.com',
         port: 443,
         protocol: 'https',
         chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
@@ -133,8 +133,8 @@ async function ExecuteEOSActions(actions) {
                     ],
                     data: {
                         from: wallet.auth.accountName,
-                        to: 'receiver_name',
-                        quantity: '10 EOS',
+                        to: 'novusphereio',
+                        quantity: '10.0000 EOS',
                         memo: ''
                     }
                 }
@@ -147,23 +147,7 @@ async function ExecuteEOSActions(actions) {
             }
         );
 
-    /*transit_actions = [{
-        account: 'eosio.token',
-        name: 'transfer',
-        authorization: [
-            {
-                actor: wallet.auth.accountName,
-                permission: wallet.auth.permission
-            }
-        ],
-        data: {
-            from: wallet.auth.accountName,
-            to: 'novusphereio',
-            quantity: '0.1000 EOS',
-            memo: 'hello'
-        }
-    }];
-
+    /*
     const tx = await wallet.eosApi
         .transact({ actions: transit_actions },
             {
@@ -179,10 +163,8 @@ async function ExecuteEOSActions(actions) {
 }
 
 async function SignData(pub, data, reason) {
-    if (!g_wallet.sign) {
-        return '';
-    }
-    return await g_wallet.sign(pub, data, reason);
+    // TO-DO: reimplement for transit
+    return '';
 }
 
 export {
