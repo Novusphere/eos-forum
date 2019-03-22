@@ -1,6 +1,7 @@
 import { GetEOS, GetIdentity, ExecuteEOSActions } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { moderation } from "@/moderation";
+import { GetUserIcons } from "@/usericon";
 
 import { Post } from "@/types/post";
 
@@ -72,9 +73,12 @@ export default async function UserProfile(current_page, account, sorter) {
         ? new Date(posts[0].createdAt * 1000).toLocaleString()
         : "N/A";
 
+    var user_icons = await GetUserIcons(account);
+
     return {
         current_page: current_page,
         account: account,
+        user_icons: user_icons,
         is_blocked: is_blocked,
         balance_atmos: balance_atmos,
         n_comments: n_comments,

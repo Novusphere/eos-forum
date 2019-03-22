@@ -57,6 +57,9 @@ export default {
         }*/
         else if (Array.isArray(sub)) {
             query["data.json_metadata.sub"] = { $in: sub };
+
+            // this is mainly used with the home sub, the $gte change helps cut down on load time
+            //query["createdAt"]["$gte"] = parseInt((new Date()).getTime() / 1000) - (60*60*24*31*2);
         }
 
         if (ignore_accounts && ignore_accounts.length > 0) {

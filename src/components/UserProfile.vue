@@ -60,7 +60,12 @@
     <template slot="right_sidebar">
       <div class="block">
         <div class="blocktxt">
-          <div> {{ account }} </div>
+          <div> 
+            <img v-if="user_icons.length > 0" v-for="(icon, i) in user_icons" :key="i" width="25" height="25" :src="icon">     
+            <font-awesome-icon v-else class="fas" :icon="['fas', 'user-circle']" />
+
+            {{ account }} 
+          </div>
           <button v-if="false" class="btn btn-primary mt-3">
             Follow user
           </button>
@@ -137,7 +142,7 @@ export default {
 
       this.current_page = profile.current_page;
       this.account = profile.account;
-
+      this.user_icons = profile.user_icons;
       this.is_blocked = profile.is_blocked;
       this.balances.atmos = profile.balance_atmos;
       this.comments = profile.n_comments;
@@ -164,6 +169,7 @@ export default {
       threads: 0,
       last_activity: "",
       posts: [],
+      user_icons: [],
       current_page: 1,
       pages: 0,
       selectedPostID: undefined,

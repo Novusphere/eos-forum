@@ -143,7 +143,7 @@ class Post {
                 content: '',
                 reply_to_poster: '',
                 reply_to_post_uuid: '',
-                certify: 0,
+                certify: false,
                 json_metadata: {
                     title: data.title,
                     type: "novusphere-forum",
@@ -337,7 +337,7 @@ class Post {
         }
 
         await this.detectAttachment();
-        await this.detectInlineAttachment();
+        this.detectInlineAttachment();
         await this.detectContent();
         await this.setReferendumDetails();
         await this.data.json_metadata.attachment.normalize();
@@ -400,6 +400,10 @@ class Post {
         }
 
         return str;
+    }
+
+    async detect() {
+        
     }
 
     async detectContent() {
@@ -570,7 +574,7 @@ class Post {
         if (edit.data.json_metadata.attachment) {
             this.data.json_metadata.attachment = new PostAttachment(edit.data.json_metadata.attachment);
             await this.detectAttachment();
-            await this.detectInlineAttachment();
+            this.detectInlineAttachment();
             await this.detectContent();
             await this.setReferendumDetails();
         }

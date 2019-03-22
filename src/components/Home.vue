@@ -147,13 +147,15 @@ export default {
       this.pages = 0;
       this.selectedPostID = undefined;
       window.scrollTo(0,0);
-      const novusphere = GetNovusphere();
+
       var home = await ui.views.Home(this.$route.query.page, this.sub, this.$refs.sorter.getSorter());
+
       this.sub = home.sub;
       this.posts = home.posts;
       this.pages = home.pages;
       this.current_page = home.current_page;
       this.loading = false;
+
 
     },
     async newThread() {

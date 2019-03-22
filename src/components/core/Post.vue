@@ -24,7 +24,10 @@
             @click.native.stop
             :class="{'disabled': is_anon_alias}"
             :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
-            <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
+
+            <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">     
+            <font-awesome-icon v-else class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
+
             {{ poster_name }}
           </router-link>
         </li>
@@ -105,7 +108,7 @@
                     :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
                     
                     <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">
-                    <font-awesome-icon class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
+                    <font-awesome-icon v-else class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
 
                     {{ poster_name }}
                   </router-link>
@@ -274,9 +277,9 @@
             <span>{{ status }}</span>
           </div>
           <div class="col-sm-12 mt-1 mb-2">
-            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="quickReply(false)">{{ show_quick_edit ? 'edit' : 'post' }}</button>
-            <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-primary" @click="quickReply(true)">post anon</button>
-            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="addTip()">tip</button>
+            <button v-if="true || identity.account" type="button" class="btn btn-sm btn-primary" @click="quickReply(false)">{{ show_quick_edit ? 'Edit' : 'Post' }}</button>
+            <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-primary" @click="quickReply(true)">Post ID</button>
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="addTip()">Tip</button>
           </div>
         </div>
 
@@ -580,7 +583,7 @@ export default {
           this.post.data.reply_to_poster || this.post.data.poster, // thread creator
         reply_to_post_uuid:
           this.post.data.reply_to_post_uuid || this.post.data.post_uuid, // thread uuid
-        certify: 0,
+        certify: false,
         content: content,
         post_uuid: ui.helpers.GeneratePostUuid(),
         json_metadata: JSON.stringify({

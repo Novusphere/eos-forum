@@ -56,10 +56,14 @@
 
           <div class="text-right navbar-actions">
             <template v-if="!identity.account">
-              <button class="btn btn-primary mx-2 ConnectButton"
-                @click="login()">
+
+              <button class="btn btn-primary mx-2 ConnectButton" type="button" @click="login()">
                 Login
               </button>
+              <div v-if="false" div class="dropdown-menu">
+                <a class="dropdown-item" href="javascript:void(0)" @click="login(0)">Scatter</a>
+                <a class="dropdown-item" href="javascript:void(0)" @click="login(1)">Lynx</a>
+              </div>
 
               <button @click="$router.push({name: 'Settings'})" class="btn btn-primary mx-2 ConnectButton">
                 <span v-if="validAnonID()">
@@ -408,8 +412,8 @@ export default {
     async setIdentity(wait) {
       this.identity = await GetIdentity(wait);
     },
-    async login() {
-      this.identity = await GetIdentity(true);
+    async login(walletIndex) {
+      this.identity = await GetIdentity(true, walletIndex);
       if (!this.identity.account) {
         alert(
           "Failed to detect a compatible EOS wallet!" +

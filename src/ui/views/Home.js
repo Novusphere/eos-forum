@@ -31,11 +31,16 @@ export default async function Home(current_page, sub, sorter) {
         ? await moderation.getBlockedAccounts()
         : [];
 
+        
+    var benchmark = (new Date()).getTime();
+
     var n_posts = (await novusphere.api({
         count: novusphere.config.collection_forum,
         maxTimeMS: 7500,
         query: novusphere.query.match.threadsBySub(sub, blocked_accounts)
     })).n;
+
+    console.log(`loaded (1) in ${(new Date()).getTime() - benchmark} ms`);
 
     var num_pages = Math.ceil(n_posts / MAX_ITEMS_PER_PAGE);
     const identity = await GetIdentity();
@@ -70,6 +75,9 @@ export default async function Home(current_page, sub, sorter) {
             },
         ]
     })).cursor.firstBatch;
+
+    
+    console.log(`loaded (2) in ${(new Date()).getTime() - benchmark} ms`);
 
     var _pinned_threads = await moderation.getPinned(sub); // txids
     var pinned_threads = (await novusphere.api({
@@ -107,6 +115,8 @@ export default async function Home(current_page, sub, sorter) {
     //console.log(_pinned_threads.map(t => t.transaction + ' ' + t.data.json_metadata.title)); // == _pinned_threads[0].transaction));
     //console.log(threads.map(t => t.transaction + ' ' + t.data.json_metadata.title)); // == _pinned_threads[0].transaction));
 
+    console.log(`loaded (3) in ${(new Date()).getTime() - benchmark} ms`);
+
     threads = await Post.fromArray(Array.concat(
         _pinned_threads,
         threads.filter(t => !_pinned_threads.find(t2 => t2.transaction == t.transaction))
@@ -139,6 +149,9 @@ export default async function Home(current_page, sub, sorter) {
                 : post.total_replies - old_replies;
         post.new_replies = Math.max(post.new_replies, 0); // bug fix
     }
+
+    
+    console.log(`loaded (4) in ${(new Date()).getTime() - benchmark} ms`);
 
     return {
         is_subscribed: storage.subscribed_subs.includes(sub),

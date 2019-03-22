@@ -9,7 +9,7 @@ class PostData {
             content: "",
             reply_to_poster: "",
             reply_to_post_uuid: "",
-            certify: 0,
+            certify: false,
             json_metadata: null,
             tags: []
             

@@ -155,7 +155,7 @@
                 <div class="row">
                   <div class="offset-sm-2 col-sm-10">
                     <button type="button" class="btn btn-primary" v-on:click="postContent(false)" v-if="identity.account">Post</button>
-                    <button type="button" class="btn btn-primary" v-on:click="postContent(true, true)" v-if="!edit_post && !is_referendum">Post Anon</button>
+                    <button type="button" class="btn btn-primary" v-on:click="postContent(true, true)" v-if="!edit_post && !is_referendum">Post ID</button>
                     <button type="button" class="btn btn-secondary" v-on:click="updatePreview()">Preview</button>
                   </div>
                 </div>
@@ -329,7 +329,7 @@ export default {
         reply_to_post_uuid: edit_post
           ? edit_post.data.reply_to_post_uuid || edit_post.data.post_uuid
           : "",
-        certify: 0,
+        certify: false,
         content: this.content,
         post_uuid: ui.helpers.GeneratePostUuid(),
         json_metadata: JSON.stringify({
