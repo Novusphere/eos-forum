@@ -125,7 +125,7 @@
                 </li>
               </div>
           </div>
-          <div v-if="is_op" class="op-upvote">
+          <div v-if="is_op && !showQuickReply" class="op-upvote">
             <a
               class="up"
               @click.stop="upvote()">
@@ -177,7 +177,7 @@
           <ul class="list-inline">
             <li class="list-inline-item">
               <a
-                v-if="!is_op"
+                v-if="!is_op || showReplyFooter"
                 class="up"
                 style="margin-right: 10px;display: inline"
                 @click.stop="upvote()">
@@ -185,12 +185,16 @@
                 {{ post.up }}
               </a>
               <a
-                v-if="!thread && post.transaction"
+                v-if="!thread && post.transaction && !showReplyFooter"
                 class="link"
                 @click.stop.prevent="$router.push(thread_link)"
               >
                 <font-awesome-icon :icon="['fas', 'reply']" />
-                <span v-if="!post.parent">{{ post.total_replies }} comments</span>
+                <span v-if="!post.parent ">{{ post.total_replies }} comments</span>
+              </a>
+              <a class="reply" v-else-if="showReplyFooter">
+                <font-awesome-icon :icon="['fas', 'reply']" />
+                reply
               </a>
               <a class="reply" v-else @click.stop="showQuickReply()">
                 <font-awesome-icon :icon="['fas', 'reply']" />
@@ -217,7 +221,7 @@
                 edit
               </div>
             </li>
-            <li class="list-inline-item" v-if="is_op">
+            <li class="list-inline-item" v-if="is_op || showReplyFooter">
               <template v-if="!post.referendum">
                 <font-awesome-icon :icon="['fas', 'clock']" />
                 {{ created_at }}
@@ -233,7 +237,7 @@
               <span v-if="post.referendum.expired" class="text-danger">expired</span>
               <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
             </li>
-            <li v-if="!is_op"
+            <li v-if="!is_op || showReplyFooter"
               class="list-inline-item">
               <a
                 @click.stop
@@ -251,7 +255,9 @@
               </router-link>
             </li>
             <li class="list-inline-item">
-              <a @click.stop :href="`https://eosq.app/tx/${post.transaction}`">
+              <a @click.stop
+                :href="`https://eosq.app/tx/${post.transaction}`"
+                target="_blank">
                 <font-awesome-icon :icon="['fas', 'link']" />
               </a>
             </li>
@@ -347,6 +353,11 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    showReplyFooter: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -540,7 +551,7 @@ export default {
 
       this.show_quick_reply = false;
     },
-    showQuickReply() {
+    showQuickReply(e) {
       this.show_quick_reply = !this.show_quick_reply;
       if (this.show_quick_edit) {
         this.quick_reply = "";
