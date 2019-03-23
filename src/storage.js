@@ -4,10 +4,11 @@ import ecc from "eosjs-ecc";
 const MAX_TRACK_NEW_POSTS = 1000;
 
 var DEFAULT_STORAGE = {
-    version: 17,
+    version: 18,
     eos_referendum: true,
     subscribed_subs: ["all", "novusphere", "eos", "anon-r-eos", "anon-pol-econ"],
     unsubscribed_subs: [], // used with syncing from default list
+    following: [], // users being followed
     new_posts: {},
     last_notification: 0,
     moderation: {
@@ -72,6 +73,9 @@ function importStorage(obj) {
         }
         else if (obj.version < 17) {
             obj.unsubscribed_subs = [];
+        }
+        else if (obj.version < 18) {
+            obj.following = [];
         }
 
         obj.version++;

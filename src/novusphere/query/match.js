@@ -68,6 +68,16 @@ export default {
 
         return query;
     },
+    feed(following) {
+        var two_months_ago = parseInt(new Date().getTime() / 1000) - (60*60*24*31*2);
+
+        return {
+            createdAt: { $gte: two_months_ago },
+            "data.json_metadata.edit": false,
+            "data.json_metadata.sub": { $exists: true, $ne: "" },
+            "data.poster": { $in: following },
+        };
+    },
     threadsByAccount(account) {
         return {
             "data.json_metadata.edit": false,

@@ -5,6 +5,7 @@ import { LoadAccountState, SaveAccountState } from "@/accountstate";
 
 // views
 import Home from "./views/Home";
+import Feed from "./views/Feed";
 import Tag from "./views/Tag";
 import PostHistory from "./views/PostHistory";
 import Thread from "./views/Thread";
@@ -17,7 +18,8 @@ import Referendum from "./views/Referendum";
 import CheckCreateThread from "./actions/CheckCreateThread";
 import Subscribe from "./actions/Subscribe";
 import MarkNotificationsAsRead from "./actions/MarkNotificationsAsRead";
-import BlockUser from "./actions/BlockUser";
+import ToggleBlockUser from "./actions/ToggleBlockUser";
+import ToggleFollowUser from "./actions/ToggleFollowUser";
 import UpvotePaid from "./actions/UpvotePaid";
 import UpvoteFree from "./actions/UpvoteFree";
 import GetReccomendedModList from "./actions/GetReccomendedModList";
@@ -88,6 +90,7 @@ window.addEventListener('identityUpdate', async function () {
 export default {
     views: {
         Home,
+        Feed,
         Tag,
         Thread,
         UserNotifications,
@@ -100,7 +103,8 @@ export default {
         CheckCreateThread,
         Subscribe,
         MarkNotificationsAsRead,
-        BlockUser,
+        ToggleBlockUser,
+        ToggleFollowUser,
         UpvotePaid,
         UpvoteFree,
         GetReccomendedModList,

@@ -28,6 +28,9 @@
                 <b-dropdown-item @click="$router.push({name: 'Index'})">
                   home
                 </b-dropdown-item>
+                <b-dropdown-item @click="$router.push({name: 'Feed'})">
+                  feed
+                </b-dropdown-item>
                 <b-dropdown-item @click="$router.push({name: 'Sub', params: { sub: 'all' } })">
                   all
                 </b-dropdown-item>
@@ -145,6 +148,10 @@
               <router-link class="dropdown-item"
                 :to="{name: 'Index' }">
                 home
+              </router-link>
+              <router-link class="dropdown-item"
+                :to="{name: 'Feed' }">
+                feed
               </router-link>
               <router-link class="dropdown-item"
                 :to="{name: 'Sub', params: { sub: 'all' } }">

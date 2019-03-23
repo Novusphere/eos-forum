@@ -70,6 +70,7 @@ async function Login() {
             g_identity.atmos = '0.000';
             g_identity.token = '0.000';
             g_identity.notifications = 0;
+            await g_identity.update(true);
         }
     }
     catch (ex) {
@@ -143,8 +144,12 @@ async function ExecuteEOSActions(actions) {
 }
 
 async function SignData(pub, data, reason) {
-    // TO-DO: reimplement for transit
-    return '';
+    if (!g_wallet || !g_wallet.auth.accountName) {
+        return '';
+    }
+
+    const sig = await g_wallet.signArbitrary(data, reason);
+    return sig;
 }
 
 export {

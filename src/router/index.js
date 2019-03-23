@@ -14,6 +14,11 @@ const router = new Router({
       name: 'Index',
       component: () => import('@/components/Home')
     },
+    { // default route
+      path: '/feed',
+      name: 'Feed',
+      component: () => import('@/components/Feed')
+    },
     {
       path: '/e/:sub?',
       name: 'Sub',

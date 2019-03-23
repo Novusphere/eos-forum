@@ -9,12 +9,6 @@
         <b-tabs>
         <b-tab title="comments" active>
           <div class="mt-2 mb-2">
-            <div class="float-left">
-              <post-sorter ref="sorter" :change="load"></post-sorter>
-            </div>
-            <div class="float-left ml-1">
-              <b-button class="btn btn-danger" v-on:click="toggleBlock()">{{ is_blocked ? 'unblock' : 'block' }}</b-button>
-            </div>
             <div class="float-right">
               <pager :pages="pages" :current_page="current_page"></pager>
             </div>
@@ -67,8 +61,11 @@
 
             {{ account }} 
           </div>
-          <button v-if="false" class="btn btn-primary mt-3">
-            Follow user
+          <button class="btn btn-primary mt-3" v-on:click="toggleFollow()">
+            {{ is_followed ? 'Unfollow' : 'Follow' }}
+          </button>
+          <button class="btn btn-danger mt-3" v-on:click="toggleBlock()">
+            {{ is_blocked ? 'Unblock' : 'Block' }}
           </button>
         </div>
         <div class="divline"></div>
@@ -94,11 +91,7 @@
 <script>
 import ui from "@/ui";
 
-import {
-  GetEOS,
-  GetIdentity,
-  ScatterEosOptions
-} from "@/eos";
+import { GetEOS, GetIdentity, ScatterEosOptions } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import { storage, SaveStorage } from "@/storage";
 import { moderation } from "@/moderation";
@@ -119,7 +112,7 @@ export default {
     Post,
     PostSorter,
     Modal,
-    ThreadModal,
+    ThreadModal
   },
   watch: {
     "$route.query.page": function() {
@@ -130,21 +123,26 @@ export default {
     }
   },
   async mounted() {
-    this.$refs.sorter.by = "time";
+    //this.$refs.sorter.by = "time";
     this.load();
   },
-  computed: {
-  },
+  computed: {},
   methods: {
     async load() {
       this.loading = true;
 
-      var profile = await ui.views.UserProfile(this.$route.query.page, this.$route.params.account, this.$refs.sorter.getSorter());
+      const novusphere = GetNovusphere();
+      var profile = await ui.views.UserProfile(
+        this.$route.query.page,
+        this.$route.params.account,
+        novusphere.query.sort.time()
+      );
 
       this.current_page = profile.current_page;
       this.account = profile.account;
       this.user_icons = profile.user_icons;
       this.is_blocked = profile.is_blocked;
+      this.is_followed = profile.is_followed;
       this.balances.atmos = profile.balance_atmos;
       this.comments = profile.n_comments;
       this.threads = profile.n_threads;
@@ -154,14 +152,19 @@ export default {
       this.loading = false;
     },
     async toggleBlock() {
-      await ui.actions.BlockUser(this.account, this.is_blocked);
-      await this.load();
+      await ui.actions.ToggleBlockUser(this.account, this.is_blocked);
+      this.is_blocked = !this.is_blocked;
     },
+    async toggleFollow() {
+      await ui.actions.ToggleFollowUser(this.account, this.is_followed);
+      this.is_followed = !this.is_followed;
+    }
   },
   data() {
     return {
       loading: false,
       is_blocked: false,
+      is_followed: false,
       account: "",
       balances: {
         atmos: 0
@@ -173,7 +176,7 @@ export default {
       user_icons: [],
       current_page: 1,
       pages: 0,
-      selectedPostID: undefined,
+      selectedPostID: undefined
     };
   }
 };

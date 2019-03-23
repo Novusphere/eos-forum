@@ -10,7 +10,8 @@ async function SaveAccountState() {
     const account_state = {
         subscribed_subs: storage.subscribed_subs,
         unsubscribed_subs: storage.unsubscribed_subs,
-        last_notification: storage.last_notification
+        last_notification: storage.last_notification,
+        following: storage.following
     };
 
     const nonce = parseInt((new Date()).getTime() / 1000);
@@ -121,6 +122,8 @@ async function ApplyLoadedState(ns_account) {
         importArray(state.subscribed_subs, storage.subscribed_subs);
         importArray(state.unsubscribed_subs, storage.unsubscribed_subs);
         SyncDefaultSubs();
+
+        importArray(state.following, storage.following);
 
         if (state.last_notification && !isNaN(state.last_notification)) {
             storage.last_notification = state.last_notification;

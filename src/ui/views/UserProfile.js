@@ -9,11 +9,14 @@ import {
     MAX_ITEMS_PER_PAGE,
 } from "@/ui/constants";
 
+import { storage } from "@/storage";
+
 export default async function UserProfile(current_page, account, sorter) {    
     var benchmark = (new Date()).getTime();
     
     current_page = parseInt(current_page ? current_page : 1);
     var is_blocked = await moderation.isBlocked(0, null, account);
+    var is_followed = storage.following.includes(account);
 
     const eos = GetEOS();
     const novusphere = GetNovusphere();
@@ -92,6 +95,7 @@ export default async function UserProfile(current_page, account, sorter) {
         account: account,
         user_icons: user_icons,
         is_blocked: is_blocked,
+        is_followed: is_followed,
         balance_atmos: balance_atmos,
         n_comments: n_comments,
         n_threads: n_threads,
