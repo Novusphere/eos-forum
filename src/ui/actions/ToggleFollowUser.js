@@ -1,6 +1,10 @@
 import { storage, SaveStorage } from "@/storage";
 
 export default async function ToggleFollowUser(account, is_followed) {
+    if (!account) {
+        return;
+    }
+    
     if (is_followed) {
         var i = storage.following.indexOf(account);
         if (i > -1) {

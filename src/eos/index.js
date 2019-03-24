@@ -4,7 +4,6 @@ import { TextEncoder, TextDecoder } from 'text-encoding';
 import { storage } from '@/storage';
 
 import EOSBinaryReader from "./binaryreader";
-window._EOSBR = EOSBinaryReader;
 
 import { GetTokensInfo, GetTokenPrecision } from "./tokens";
 import Identity from "./identity";
@@ -34,23 +33,32 @@ var g_identity = new Identity();
 
 DetectWallet();
 
-async function DetectWallet() {
+async function DetectWallet(once) {
+    if (g_wallet) {
+        return;
+    }
+
     const providers = accessContext.getWalletProviders();
     for (var i = 0; i < 6; i++) {
         console.log('Wallet detection round ' + i);
-
-        const selectedProvider = providers[i];
-        try {
-            const wallet = accessContext.initWallet(selectedProvider);
-            await wallet.connect();
-            if (wallet.connected) {
-                console.log('Detected, and connected to wallet index ' + i);
-                g_wallet = wallet;
-                break;
+        for (var j = 0; j < providers.length; j++) {
+            const selectedProvider = providers[j];
+            try {
+                const wallet = accessContext.initWallet(selectedProvider);
+                await wallet.connect();
+                if (wallet.connected) {
+                    console.log('Detected, and connected to wallet index ' + i);
+                    g_wallet = wallet;
+                    break;
+                }
+            }
+            catch (ex) {
+                // failed to connect...
             }
         }
-        catch (ex) {
-            // failed to connect...
+
+        if (g_wallet || once) {
+            break;
         }
     }
 
@@ -157,6 +165,7 @@ export {
     DEFAULT_IDENTITY,
     GetEOS,
     GetTransaction,
+    DetectWallet,
     GetIdentity,
     ForgetIdentity,
     ExecuteEOSActions,

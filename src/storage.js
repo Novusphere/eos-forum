@@ -87,6 +87,9 @@ function importStorage(obj) {
         // import possibly new default subs
         SyncDefaultSubs();
 
+        // santization
+        storage.following = storage.following.filter(f => f);
+
         console.log('Loaded storage version ' + storage.version);
         //console.log(storage);
         return true;

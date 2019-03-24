@@ -130,6 +130,7 @@ export default {
   methods: {
     async load() {
       this.loading = true;
+      this.account = this.$route.params.account;
 
       const novusphere = GetNovusphere();
       var profile = await ui.views.UserProfile(
@@ -152,10 +153,18 @@ export default {
       this.loading = false;
     },
     async toggleBlock() {
+      if (!this.account) {
+        return;
+      }
+
       await ui.actions.ToggleBlockUser(this.account, this.is_blocked);
       this.is_blocked = !this.is_blocked;
     },
     async toggleFollow() {
+      if (!this.account) {
+        return;
+      }
+
       await ui.actions.ToggleFollowUser(this.account, this.is_followed);
       this.is_followed = !this.is_followed;
     }

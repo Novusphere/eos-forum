@@ -319,7 +319,7 @@ import ecc from "eosjs-ecc";
 import ui from "@/ui";
 import { BRANDS, FORUM_BRAND } from "@/ui/constants";
 import { storage } from "@/storage";
-import { ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
+import { DetectWallet, ForgetIdentity, GetIdentity, GetEOS } from "@/eos";
 import { GetNovusphere } from "@/novusphere";
 import RecentlyVisited from "@/components/core/RecentlyVisited";
 
@@ -424,6 +424,8 @@ export default {
       this.identity = await GetIdentity(wait);
     },
     async login(walletIndex) {
+      await DetectWallet(true);
+      
       this.identity = await GetIdentity(true, walletIndex);
       if (!this.identity.account) {
         alert(

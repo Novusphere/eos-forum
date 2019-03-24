@@ -1,6 +1,10 @@
 import { storage, SaveStorage } from "@/storage";
 
 export default async function ToggleBlockUser(account, is_blocked) {
+    if (!account) {
+        return;
+    }
+    
     if (is_blocked) {
         var i = storage.moderation.accounts.indexOf(account);
         if (i > -1) {

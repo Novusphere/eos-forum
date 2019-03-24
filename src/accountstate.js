@@ -123,7 +123,7 @@ async function ApplyLoadedState(ns_account) {
         importArray(state.unsubscribed_subs, storage.unsubscribed_subs);
         SyncDefaultSubs();
 
-        importArray(state.following, storage.following);
+        importArray(state.following.filter(f => f), storage.following);
 
         if (state.last_notification && !isNaN(state.last_notification)) {
             storage.last_notification = state.last_notification;
