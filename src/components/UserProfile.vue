@@ -26,7 +26,7 @@
               v-for="p in posts"
               class="post-parent"
               :key="p.o_id"
-              :showReplyFooter="true"
+              :showAsFeed="true"
               @openPost="$_openPost"
               :post="p"
             />

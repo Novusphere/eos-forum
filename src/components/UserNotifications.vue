@@ -24,7 +24,7 @@
           class="notification post-parent"
           v-for="p in posts"
           :key="p.transaction"
-          :notification="true"
+          :showAsFeed="true"
           @openPost="$_openPost"
           :post="p"
         />
