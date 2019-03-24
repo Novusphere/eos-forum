@@ -413,7 +413,7 @@ class Post {
         const rx = /(.|)http[s]?:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/\.%-])+)?(.|)/g;
         content = content.replace(rx, function (x) {
             var tx = x.trim();
-            if (!tx.startsWith('https')) {
+            if (!tx.startsWith('http')) {
                 return x;
             }
             return '<center>![' + tx + '](' + tx + ')</center>';

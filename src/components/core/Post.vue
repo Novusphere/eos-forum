@@ -559,7 +559,8 @@ export default {
         brand = BRANDS[this.sub];
       }
 
-      var tip = `#tip 1 ${brand.token_symbol} @${this.post.data.poster}`;
+      const tip_amount = brand.default_tip || '1';
+      const tip = `#tip ${tip_amount} ${brand.token_symbol} @${this.post.data.poster}`;
 
       this.quick_reply += ' ' + tip;
     },
