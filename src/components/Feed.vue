@@ -32,7 +32,7 @@
           @openPost="$_openPost"
           :post="p"
           :showChildren="false"
-          :showReplyFooter="true"
+          :showAsFeed="true"
         />
         <modal
           @click.native.stop="$_closePost"

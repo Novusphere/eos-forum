@@ -24,7 +24,7 @@
             </div>
 
             <div class="flex">
-              <b-dropdown variant="link" :text="$route.params.sub || 'Home'" class="mobile">
+              <b-dropdown variant="link" :text="brandText" class="mobile">
                 <b-dropdown-item @click="$router.push({name: 'Index'})">
                   home
                 </b-dropdown-item>
@@ -52,7 +52,7 @@
                 </b-dropdown-item>
               </b-dropdown>
               <div class="desktop sub">
-                {{ $route.params.sub || 'home' }}
+                {{ brandText }}
               </div>
             </div>
           </div>
@@ -164,13 +164,13 @@
               </router-link>
               <div class="divline" />
               <template v-if="userSubs()">
-                <router-link v-for="user in userSubs()"
-                  :key="user.id"
+                <router-link v-for="(user, i) in userSubs()"
+                  :key="`userSub-${i}`"
                   class="dropdown-item"
-                  :to="{ name: 'UserProfile', params: { account: user.name } }">
+                  :to="{ name: 'UserProfile', params: { account: user } }">
                   <font-awesome-icon class="fas follow-user-icon" :icon="['fas', 'user-circle']" />
                   <div>
-                    {{user.name}}
+                    {{ user }}
                   </div>
                 </router-link>
               </template>
@@ -355,6 +355,15 @@ export default {
     },
     noRightBar() {
       return !this.$slots["right_sidebar"];
+    },
+    brandText() {
+      if (this.$route.name === 'Feed') {
+        return 'feed'
+      } else if (this.$route.name === 'UserProfile') {
+        return 'user'
+      } else {
+        return this.$route.params.sub || 'home'
+      }
     }
   },
   async mounted() {
@@ -396,12 +405,7 @@ export default {
       return subs;
     },
     userSubs() {
-      return  [
-        /*{
-          id: 1,
-          name: 'bigbluewhale'
-        },*/
-      ]
+      return storage.following
     },
     updateBrand() {
       ui.helpers.UpdateBrand(this.$route.params.sub);
@@ -475,7 +479,8 @@ export default {
 }
 .mobile .dropdown-menu {
   max-height: 50vh;
-  overflow: auto;
+  overflow: hidden;
+  width: 200px;
 }
 .mobile .dropdown-toggle {
   font-size: 18px;

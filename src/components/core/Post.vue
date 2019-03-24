@@ -125,7 +125,7 @@
                 </li>
               </div>
           </div>
-          <div v-if="is_op && !showQuickReply" class="op-upvote">
+          <div v-if="is_op" class="op-upvote">
             <a
               class="up"
               @click.stop="upvote()">
@@ -177,7 +177,7 @@
           <ul class="list-inline">
             <li class="list-inline-item">
               <a
-                v-if="!is_op || showReplyFooter"
+                v-if="!is_op"
                 class="up"
                 style="margin-right: 10px;display: inline"
                 @click.stop="upvote()">
@@ -185,14 +185,14 @@
                 {{ post.up }}
               </a>
               <a
-                v-if="!thread && post.transaction && !showReplyFooter"
+                v-if="!thread && post.transaction && !showAsFeed"
                 class="link"
                 @click.stop.prevent="$router.push(thread_link)"
               >
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 <span v-if="!post.parent ">{{ post.total_replies }} comments</span>
               </a>
-              <a class="reply" v-else-if="showReplyFooter">
+              <a class="reply" v-else-if="showAsFeed">
                 <font-awesome-icon :icon="['fas', 'reply']" />
                 reply
               </a>
@@ -221,7 +221,7 @@
                 edit
               </div>
             </li>
-            <li class="list-inline-item" v-if="is_op || showReplyFooter">
+            <li class="list-inline-item" v-if="is_op">
               <template v-if="!post.referendum">
                 <font-awesome-icon :icon="['fas', 'clock']" />
                 {{ created_at }}
@@ -237,7 +237,7 @@
               <span v-if="post.referendum.expired" class="text-danger">expired</span>
               <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
             </li>
-            <li v-if="!is_op || showReplyFooter"
+            <li v-if="!is_op"
               class="list-inline-item">
               <a
                 @click.stop
@@ -330,11 +330,6 @@ export default {
     PostAttachment
   },
   props: {
-    notification: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     preview: {
       type: Boolean,
       required: false,
@@ -354,7 +349,7 @@ export default {
       required: false,
       default: true
     },
-    showReplyFooter: {
+    showAsFeed: {
       type: Boolean,
       required: false,
       default: false
@@ -404,7 +399,7 @@ export default {
       );
     },
     is_op() {
-      return !this.post.data.reply_to_poster || this.notification;
+      return !this.post.data.reply_to_poster || this.showAsFeed;
     },
     offsite() {
       if (
