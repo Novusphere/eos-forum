@@ -410,7 +410,7 @@ class Post {
         var content = this.data.content;
 
         // detect images
-        const rx = /(.|)https:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/\.%-])+)?(.|)/g;
+        const rx = /(.|)http[s]?:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/\.%-])+)?(.|)/g;
         content = content.replace(rx, function (x) {
             var tx = x.trim();
             if (!tx.startsWith('https')) {
