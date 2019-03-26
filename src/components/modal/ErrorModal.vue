@@ -35,7 +35,7 @@ export default {
     // 
     var __alert = window.alert;
     window._alert = function (msg) {
-      //if (!window.lynxMobile) return;
+      if (!window.lynxMobile) return;
       __alert(msg);
     }
 

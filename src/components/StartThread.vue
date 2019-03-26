@@ -354,6 +354,7 @@ export default {
       this.setStatus("Creating tx and broadcasting to EOS...");
       var eos_post = await this.makePost(anon);
       if (!eos_post) {
+        this.setStatus('Unable to create transaction data!');
         return null;
       }
 

@@ -24,11 +24,11 @@ async function SaveAccountState() {
         try {
             if (!storage.accountstate[identity.account] ||
                 !(await novusphere.isAccountStateAuthorized(storage.accountstate[identity.account], identity.account, ''))) {
-                
+
                 //window._alert('unauthorized');
                 storage.accountstate[identity.account] = 0;
-                
-                const sig = await SignData(identity.publicKey, nonce.toString(), 'Start session');                
+
+                const sig = await SignData(identity.publicKey, nonce.toString(), 'Start session');
                 if (!sig) {
                     throw new Error('invalid signature');
                 }
@@ -71,19 +71,19 @@ async function SaveAccountState() {
 
     // save to anonymous ID
     if (storage.anon_id.key && ecc.isValidPrivate(storage.anon_id.key)) {
-        const pubkey =  ecc.privateToPublic(storage.anon_id.key);
+        const pubkey = ecc.privateToPublic(storage.anon_id.key);
 
         if (!storage.accountstate[pubkey] ||
             !(await novusphere.isAccountStateAuthorized(storage.accountstate[pubkey], '', pubkey))) {
-              
+
             //console.log('unauthorized');
             storage.accountstate[pubkey] = 0;
-            
+
             const sig = ecc.sign(nonce.toString(), storage.anon_id.key);
 
             const payload = await novusphere.authorizeAccountState('', pubkey, nonce, sig);
             //console.log(payload);
-            
+
             if (payload.session_key) {
                 //console.log('authorized with key: ' + payload.session_key);
                 storage.accountstate[pubkey] = payload.session_key;
@@ -123,7 +123,9 @@ async function ApplyLoadedState(ns_account) {
         importArray(state.unsubscribed_subs, storage.unsubscribed_subs);
         SyncDefaultSubs();
 
-        importArray(state.following.filter(f => f), storage.following);
+        if (state.following) {
+            importArray(state.following.filter(f => f), storage.following);
+        }
 
         if (state.last_notification && !isNaN(state.last_notification)) {
             storage.last_notification = state.last_notification;

@@ -180,7 +180,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
             txid = eostx.transaction_id;
 
         } else {
-            const eos = GetEOS();
+            
             const json_metadata = JSON.parse(post.json_metadata);
 
             var actions = [
@@ -191,11 +191,15 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
                 }
             ];
 
+            //set_status('Handling tips... ');
             await HandleTip(post, json_metadata, parent_tx, actions, set_status, identity);
+            //set_status('Handling tips (2)...');
             await HandleTipAccount(post, json_metadata, parent_tx, actions, set_status, identity);
+            //set_status('Handling extensions...');
             await HandleExtension(post, actions, identity);
-
+            //set_status('Waiting to execute EOS action...');
             txid = await ExecuteEOSActions(actions);
+            //set_status('Created transaction ' + txid);
         }
 
     } catch (ex) {

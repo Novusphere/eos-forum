@@ -139,16 +139,22 @@ async function ExecuteEOSActions(actions) {
         };
     });
 
-    const tx = await wallet.eosApi
-        .transact({ actions: transit_actions },
-            {
-                broadcast: true,
-                blocksBehind: 3,
-                expireSeconds: 180
-            }
-        );
+    var tx = null;
+    if (window.lynxMobile) {
+        tx = await window.lynxMobile.transact(transit_actions);
+    }
+    else {
+        tx = await wallet.eosApi
+            .transact({ actions: transit_actions },
+                {
+                    broadcast: true,
+                    blocksBehind: 3,
+                    expireSeconds: 180
+                }
+            );
+    }
 
-    return tx;
+    return tx ? tx.transaction_id : null;
 }
 
 async function SignData(pub, data, reason) {

@@ -201,9 +201,9 @@
                 reply
               </a>
             </li>
-            <li v-if="post.referendum && post.referendum.details" class="list-inline-item">
+            <li v-if="post.referendum && post.referendum.details && (post.referendum.details.total != undefined)" class="list-inline-item">
               <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
-              {{ post.referendum.details.total_toFixed(4) }}
+              {{ post.referendum.details.total.toFixed(4) }}
             </li>
             <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
               <div
