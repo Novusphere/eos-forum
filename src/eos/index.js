@@ -11,6 +11,8 @@ import Identity from "./identity";
 import { initAccessContext } from 'eos-transit';
 import scatter from 'eos-transit-scatter-provider';
 import lynx from 'eos-transit-lynx-provider';
+import tokenpocket from 'eos-transit-tokenpocket-provider';
+import { resolve } from 'url';
 
 const network = {
     host: 'eos.greymass.com',
@@ -24,6 +26,7 @@ const accessContext = initAccessContext({
     network: network,
     walletProviders: [
         lynx(),
+        tokenpocket(),
         scatter()
     ]
 });
@@ -39,31 +42,36 @@ async function DetectWallet(once) {
     }
 
     const providers = accessContext.getWalletProviders();
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 5; i++) {
         console.log('Wallet detection round ' + i);
+        var promises = [];
+
         for (var j = 0; j < providers.length; j++) {
             const selectedProvider = providers[j];
-            try {
-                const wallet = accessContext.initWallet(selectedProvider);
-                await wallet.connect();
-                if (wallet.connected) {
-                    console.log('Detected, and connected to wallet index ' + i);
-                    g_wallet = wallet;
-                    break;
+            const wallet = accessContext.initWallet(selectedProvider);
+            promises.push(new Promise(async (resolve, reject) => {
+                try {
+                    await wallet.connect();
+                    if (!g_wallet && wallet.connected) {
+                        g_wallet = wallet;
+
+                        console.log('Detected and connected to ' + selectedProvider.meta.name); 
+                        await Login();
+                    }
+                    else {
+                        throw new Error('Undetected');
+                    }
                 }
-            }
-            catch (ex) {
-                // failed to connect...
-            }
+                catch (ex) {
+                    console.log('Undetected ' + selectedProvider.meta.name);
+                }
+            }));
         }
 
+        await Promise.all(promises);
         if (g_wallet || once) {
             break;
         }
-    }
-
-    if (g_wallet) {
-        await Login();
     }
 }
 
@@ -140,19 +148,19 @@ async function ExecuteEOSActions(actions) {
     });
 
     var tx = null;
-    if (window.lynxMobile) {
-        tx = await window.lynxMobile.transact(transit_actions);
-    }
-    else {
-        tx = await wallet.eosApi
-            .transact({ actions: transit_actions },
-                {
-                    broadcast: true,
-                    blocksBehind: 3,
-                    expireSeconds: 180
-                }
-            );
-    }
+    //if (window.lynxMobile) {
+    //    tx = await window.lynxMobile.transact(transit_actions);
+    //}
+    //else {
+    tx = await wallet.eosApi
+        .transact({ actions: transit_actions },
+            {
+                broadcast: true,
+                blocksBehind: 3,
+                expireSeconds: 180
+            }
+        );
+    //}
 
     return tx ? tx.transaction_id : null;
 }
