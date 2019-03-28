@@ -226,6 +226,8 @@
                 <font-awesome-icon :icon="['fas', 'clock']" />
                 {{ created_at }}
               </template>
+            </li>
+            <li class="list-inline-item">
               <router-link
                 @click.native.stop
                 v-if="post.id && is_edit"

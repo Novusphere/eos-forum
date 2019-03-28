@@ -63,6 +63,8 @@ class NovusphereAdapter {
         endpoint += '&name=' + name;
 
         var result = await requests.get(endpoint);
+        //console.log(JSON.stringify(result));
+
         if (result.error) {
             return false;
         }

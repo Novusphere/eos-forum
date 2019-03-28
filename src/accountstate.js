@@ -4,6 +4,8 @@ import { GetNovusphere } from "@/novusphere";
 import { GetEOS, GetIdentity, SignData } from "@/eos";
 
 async function SaveAccountState() {
+    //console.log('SaveAccountState()');
+
     const novusphere = GetNovusphere();
     const eos = GetEOS();
 
@@ -20,10 +22,21 @@ async function SaveAccountState() {
 
     // save to EOS account
     if (identity.account) {
+        //console.log('SaveAccountState() 2');
 
         try {
-            if (!storage.accountstate[identity.account] ||
-                !(await novusphere.isAccountStateAuthorized(storage.accountstate[identity.account], identity.account, ''))) {
+            var is_authorized = false;
+            if (storage.accountstate[identity.account] &&
+                (await novusphere.isAccountStateAuthorized(storage.accountstate[identity.account], identity.account, ''))) {
+
+                is_authorized = true;
+            }
+
+            //console.log('SaveAccountState() -- is_authorized ' + is_authorized);
+
+            if (!is_authorized) {
+
+                //console.log('SaveAccountState() 3');
 
                 //window._alert('unauthorized');
                 storage.accountstate[identity.account] = 0;
@@ -48,6 +61,7 @@ async function SaveAccountState() {
                     //window._alert('no session key');
                     //window._alert(JSON.stringify(payload));
                 }
+
             }
         }
         catch (ex) {
@@ -66,6 +80,7 @@ async function SaveAccountState() {
             //console.log('saving with key ' + account.session_key);
             const r = await novusphere.saveAccountState(account);
             //console.log(r);
+            //console.log(JSON.stringify(account));
         }
     }
 

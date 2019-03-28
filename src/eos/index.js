@@ -55,7 +55,7 @@ async function DetectWallet(once) {
                     if (!g_wallet && wallet.connected) {
                         g_wallet = wallet;
 
-                        console.log('Detected and connected to ' + selectedProvider.meta.name); 
+                        console.log('Detected and connected to ' + selectedProvider.meta.name);
                         await Login();
                     }
                     else {
@@ -65,6 +65,8 @@ async function DetectWallet(once) {
                 catch (ex) {
                     console.log('Undetected ' + selectedProvider.meta.name);
                 }
+
+                resolve();
             }));
         }
 
@@ -167,11 +169,17 @@ async function ExecuteEOSActions(actions) {
 
 async function SignData(pub, data, reason) {
     if (!g_wallet || !g_wallet.auth.accountName) {
+        console.log('No wallet able to sign data: ' + data);
         return '';
     }
 
-    const sig = await g_wallet.signArbitrary(data, reason);
-    return sig;
+    try {
+        const sig = await g_wallet.signArbitrary(data, reason);
+        return sig;
+    }
+    catch (ex) {
+        console.log('Failed to sign data "' + data + '"');
+    }
 }
 
 export {
