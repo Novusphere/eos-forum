@@ -481,7 +481,8 @@ export default {
 }
 .mobile .dropdown-menu {
   max-height: 50vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   width: 200px;
 }
 .mobile .dropdown-toggle {
