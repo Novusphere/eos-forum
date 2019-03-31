@@ -6,9 +6,47 @@
       <div class="BrandBanner__Banner">
         <object class="BrandBanner__Image" v-if="brand_banner.endsWith('.svg')" :data="brand_banner" type="image/svg+xml"></object>
         <img v-else class="BrandBanner__Image" :src="brand_banner">
-        <button v-if="false && buyableBanner()" class="buy-banner btn btn-primary">
+        <button @click="showBuyBannerModal = true" v-if="buyableBanner()" class="buy-banner btn btn-primary">
           Buy Banner
         </button>
+        <modal @mousedown.native.stop="closeBuyBannerModal()" v-if="showBuyBannerModal">
+          <div class="modal-container">
+            <div @mousedown.stop class="buy-banner-modal">
+              <div>
+                Buy Banner
+              </div>
+              <div>
+                <label> Buy: </label>
+                <input class="form-control" type="text" v-model="modal.buy"/>
+              </div>
+              <div>
+                <label> Resell: </label>
+                <input class="form-control" type="text" v-model="modal.resell" />
+              </div>
+              <div>
+                <label> Property Tax: </label>
+                <span>
+                  {{ (modal.resell * 0.12 / 24).toFixed(2) }}
+                </span>
+              </div>
+              <div>
+                Lorem ips maximus iaculis. Nam finibus scelerisque ligula, non efficitur arcu.
+                Vivamus blandit augue in ex volutpat, in mollis est commodo.
+                Suspendisse iaculis justo tellus, eu eleifend nulla aliquet ac.
+                In quis tincidunt quam, non fermentum lectus. Sed non elit pharetra, posuere lorem vel, egestas purus.
+                Vivamus ut semper magna, in cursus velit. Pellentesque sit amet rhoncus nisi.
+              </div>
+              <div class="footer">
+                <button type="button" @click="closeBuyBannerModal()" class="btn btn-danger">
+                  Cancel
+                </button>
+                <button type="button" @click="closeBuyBannerModal()" class="btn btn-primary">
+                  Buy
+                </button>
+              </div>
+            </div>
+          </div>
+        </modal>
       </div>
     </div>
 
@@ -332,11 +370,12 @@ export default {
       htmlAttrs: {
         lang: "en",
         amp: undefined // "amp" has no value
-      }
+      },
     };
   },
   components: {
-    RecentlyVisited
+    RecentlyVisited,
+    Modal: () => import('@/components/modal/Modal.vue'),
   },
   props: {
     load: {
@@ -440,6 +479,13 @@ export default {
     },
     toggleSubs() {
       this.$root.showSubs = !this.$root.showSubs;
+    },
+    closeBuyBannerModal() {
+      this.showBuyBannerModal = false;
+      this.modal = {
+        buy: 0,
+        resell: 0,
+      }
     }
   },
   data() {
@@ -455,7 +501,12 @@ export default {
       defaultSubs: [
         'all',
         'referendum'
-      ]
+      ],
+      modal: {
+        buy: 0,
+        resell: 0
+      },
+      showBuyBannerModal: false,
     };
   }
 };
@@ -481,7 +532,8 @@ export default {
 }
 .mobile .dropdown-menu {
   max-height: 50vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   width: 200px;
 }
 .mobile .dropdown-toggle {
@@ -539,5 +591,36 @@ export default {
 }
 .navbar-actions {
   display: flex;
+}
+.modal-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buy-banner-modal {
+  background-color: white;
+  width: 500px;
+  padding: 20px;
+  color: black;
+}
+
+.buy-banner-modal > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.buy-banner-modal > div > label {
+  width: 100px;
+  margin: 0;
+}
+.buy-banner-modal .footer {
+  justify-content: flex-end;
+  margin: 0;
+}
+.buy-banner-modal .footer button {
+  margin-left: 10px;
 }
 </style>

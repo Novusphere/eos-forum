@@ -6,7 +6,7 @@
     </template>
 
     <template slot="content">
-        <b-tabs>
+      <b-tabs>
         <b-tab title="comments" active>
           <div class="mt-2 mb-2">
             <div class="float-right">
@@ -50,6 +50,33 @@
           Blogs...
         </b-tab>
       </b-tabs>
+      <modal @mousedown.native.stop="closeSendAtmosModal()" v-if="showSendAtmosModal">
+        <div class="modal-container">
+          <div @mousedown.stop class="send-atmos-modal">
+            <div>
+              Send ATMOS
+            </div>
+            <div>
+              <label> To: </label>
+              <div class="form-control">
+                {{ account }}
+              </div>
+            </div>
+            <div>
+              <label> Amount: </label>
+              <input class="form-control" type="text" v-model="modal.amount" />
+            </div>
+            <div class="footer">
+              <button type="button" @click="closeSendAtmosModal()" class="btn btn-danger">
+                Cancel
+              </button>
+              <button type="button" @click="closeSendAtmosModal()" class="btn btn-primary">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </modal>
     </template>
 
     <template slot="right_sidebar">
@@ -80,6 +107,11 @@
         </div>
         <div class="blocktxt">
           Last Activity: {{ last_activity }}
+        </div>
+        <div class="blocktxt">
+          <button class="btn btn-primary" @click="showSendAtmosModal = true">
+            Send ATMOS
+          </button>
         </div>
       </div>
     </template>
@@ -167,6 +199,13 @@ export default {
 
       await ui.actions.ToggleFollowUser(this.account, this.is_followed);
       this.is_followed = !this.is_followed;
+    },
+
+    closeSendAtmosModal() {
+      this.showSendAtmosModal = false;
+      this.modal = {
+        amount: 0,
+      }
     }
   },
   data() {
@@ -185,8 +224,46 @@ export default {
       user_icons: [],
       current_page: 1,
       pages: 0,
-      selectedPostID: undefined
+      selectedPostID: undefined,
+      showSendAtmosModal: false,
+      modal: {
+        amount: 0,
+      }
     };
   }
 };
 </script>
+
+<style scoped>
+.modal-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-atmos-modal {
+  background-color: white;
+  width: 400px;
+  padding: 20px;
+  color: black;
+}
+
+.send-atmos-modal > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.send-atmos-modal > div > label {
+  width: 100px;
+  margin: 0;
+}
+.send-atmos-modal .footer {
+  justify-content: flex-end;
+  margin: 0;
+}
+.send-atmos-modal .footer button {
+  margin-left: 10px;
+}
+</style>
