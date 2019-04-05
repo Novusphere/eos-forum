@@ -54,16 +54,16 @@ export default async function UserProfile(current_page, account, sorter) {
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.postsByAccount(account, false) },
-            { $lookup: novusphere.query.lookup.postState() },
+            { $sort: sorter }, // [1] -- note: assume sort by time
+            { $skip: novusphere.query.skip.page(current_page, MAX_ITEMS_PER_PAGE) },
+            { $limit: MAX_ITEMS_PER_PAGE },
+            { $lookup: novusphere.query.lookup.postState() }, // [2]
             {
                 $project: novusphere.query.project.post({
                     normalize_up: true,
                     score: true 
                 })
             },
-            { $sort: sorter },
-            { $skip: novusphere.query.skip.page(current_page, MAX_ITEMS_PER_PAGE) },
-            { $limit: MAX_ITEMS_PER_PAGE },
             { $lookup: novusphere.query.lookup.postReplies() },
             { $lookup: novusphere.query.lookup.postMyVote(identity.account) },
             { $lookup: novusphere.query.lookup.postParent() },

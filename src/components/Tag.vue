@@ -22,7 +22,22 @@
           </div>
         </div>
 
-        <post v-for="p in posts" :key="p.o_id" :post="p"></post>
+            <post
+              v-for="p in posts"
+              class="post-parent"
+              :key="p.o_id"
+              :showAsFeed="p.data.reply_to_poster != ''"
+              @openPost="$_openPost"
+              :post="p"
+            />
+            <modal
+              @click.native="$_closePost"
+              v-if="selectedPostID">
+              <thread-modal
+                @click.native.stop
+                :id="selectedPostID"
+              />
+            </modal>
       </div>
       <div class="text-center" v-else>
         <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
@@ -40,6 +55,8 @@ import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
 
 import Layout from "@/components/section/Layout";
+import Modal from "@/components/modal/Modal.vue";
+import ThreadModal from "@/components/ThreadModal.vue";
 
 export default {
   name: "Tag",
@@ -47,7 +64,9 @@ export default {
     Pager,
     Post,
     PostSorter,
-    Layout
+    Layout,
+    Modal,
+    ThreadModal
   },
   watch: {
     "$route.query.page": function() {
@@ -65,7 +84,11 @@ export default {
       this.loading = true;
       this.tag = this.$route.params.tag;
 
-      var tag = await ui.views.Tag(this.$route.query.page, this.tag, this.$refs.sorter.getSorter());
+      var tag = await ui.views.Tag(
+        this.$route.query.page,
+        this.tag,
+        this.$refs.sorter.getSorter()
+      );
 
       // push data to this
       this.posts = tag.posts;
@@ -73,7 +96,7 @@ export default {
       this.current_page = tag.current_page;
       this.tag = tag.tag;
       this.loading = false;
-    },
+    }
   },
   data() {
     return {
@@ -81,7 +104,8 @@ export default {
       current_page: 0,
       pages: 0,
       tag: "",
-      posts: [] // for posts being displayed
+      posts: [], // for posts being displayed
+      selectedPostID: undefined,
     };
   }
 };

@@ -12,7 +12,8 @@ import { initAccessContext } from 'eos-transit';
 import scatter from 'eos-transit-scatter-provider';
 import lynx from 'eos-transit-lynx-provider';
 import tokenpocket from 'eos-transit-tokenpocket-provider';
-import { resolve } from 'url';
+import ledger from 'eos-transit-ledger-provider';
+import meetone from 'eos-transit-meetone-provider';
 
 const network = {
     host: 'eos.greymass.com',
@@ -27,12 +28,15 @@ const accessContext = initAccessContext({
     walletProviders: [
         lynx(),
         tokenpocket(),
+        meetone(),
+        ledger(),
         scatter()
     ]
 });
 
 var g_wallet = null;
 var g_identity = new Identity();
+var g_discoveryData = { keyToAccountMap: [] };
 
 DetectWallet();
 
@@ -52,18 +56,32 @@ async function DetectWallet(once) {
             promises.push(new Promise(async (resolve, reject) => {
                 try {
                     await wallet.connect();
-                    if (!g_wallet && wallet.connected) {
-                        g_wallet = wallet;
+                    const discoveryData = (await wallet.discover({ pathIndexList: [0] }));
 
-                        console.log('Detected and connected to ' + selectedProvider.meta.name);
-                        await Login();
+                    if (g_wallet)
+                        throw new Error('Already have a wallet present');
+                    else if (!wallet.connected)
+                        throw new Error('Failed to connect');
+                    else if (selectedProvider.meta.id == 'ledger' &&
+                        (discoveryData.keyToAccountMap.length == 0 ||
+                            discoveryData.keyToAccountMap.every(k => !k.accounts || k.accounts.length == 0))) {
+
+                        throw new Error('Ledger not actually connected');
                     }
-                    else {
-                        throw new Error('Undetected');
+
+                    g_wallet = wallet;
+                    g_discoveryData = discoveryData;
+
+                    console.log('Detected and connected to ' + selectedProvider.meta.name);
+                    if (g_discoveryData.keyToAccountMap.length > 0) {
+                        console.log(g_discoveryData);
                     }
+
+                    await Login();
                 }
                 catch (ex) {
                     console.log('Undetected ' + selectedProvider.meta.name);
+                    //console.log(ex);
                 }
 
                 resolve();
@@ -80,7 +98,26 @@ async function DetectWallet(once) {
 async function Login() {
     // TO-DO: discovery for ledger
     try {
-        await g_wallet.login();
+        if (g_discoveryData.keyToAccountMap.length > 0) {
+            var permission = null;
+
+            //  TO-DO: discovery, and let use select Ledger permission
+            for (var i = 0; i < g_discoveryData.keyToAccountMap.length; i++) {
+                const keyObj = g_discoveryData.keyToAccountMap[i];
+                if (keyObj.accounts && keyObj.accounts.length > 0) {
+                    permission = keyObj.accounts[0];
+                    break;
+                }
+            }
+
+            await g_wallet.login(
+                permission.account,
+                permission.authorization);
+        }
+        else {
+            await g_wallet.login();
+        }
+
         if (g_wallet.auth.accountName) {
             g_identity.account = g_wallet.auth.accountName;
             g_identity.publicKey = g_wallet.auth.publicKey;

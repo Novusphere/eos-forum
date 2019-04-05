@@ -8,9 +8,14 @@ export default {
             "createdAt": { $gt: last_notification },
             "data.json_metadata.sub": { $exists: true, $ne: "" },
             "data.poster": { $ne: account },
-            $or: [
-                { "data.reply_to_poster": account },
-                { "data.json_metadata.parent_poster": account }
+            "$or": [
+                {
+                    "$or": [
+                        { "data.reply_to_poster": account }, // reply
+                        { "data.json_metadata.parent_poster": account } // thread starter
+                    ]
+                },
+                { "mentions": account } // @name
             ]
         };
     },
@@ -69,7 +74,7 @@ export default {
         return query;
     },
     feed(following) {
-        var two_months_ago = parseInt(new Date().getTime() / 1000) - (60*60*24*31*2);
+        var two_months_ago = parseInt(new Date().getTime() / 1000) - (60 * 60 * 24 * 31 * 2);
 
         return {
             createdAt: { $gte: two_months_ago },
@@ -90,22 +95,30 @@ export default {
         };
     },
     postsByTag(tag) {
-        if (!Array.isArray(tag)) {
-            tag = [tag]; // turn into array
-        }
-
-        for (var i = 0; i < tag.length; i++) {
-            tag[i] = tag[i].toLowerCase();
-        }
-
-        return {
+        var query = {
             "data.json_metadata.edit": false,
-            "tags": { $in: tag },
-            //"data.content": { $regex: ".*#" + tag + ".*", $options: 'i' },
             createdAt: {
                 $gte: 1531434299
             } /* Last eosforumtest contract redeploy */
         }
+
+        if (!Array.isArray(tag)) {
+            tag = [tag];
+        }
+
+        tag = tag.map(t => t.toLowerCase());
+
+        query["$or"] = [
+            { "tags": { $in: tag } },
+            {
+                $and: [
+                    { "data.json_metadata.sub": { $in: tag } },
+                    { "data.reply_to_post_uuid": "" }
+                ]
+            }
+        ]
+
+        return query;
     },
     postEdits(poster, post_uuid) {
         return {

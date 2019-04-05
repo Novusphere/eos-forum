@@ -11,13 +11,13 @@ export default function (makeUser, makeTag) {
             // @username syntax
             {
                 type: 'lang',
-                regex: '\\s([@][\\w\.]+)', //'\\B(\\\\)?@([\\w_-]+)\\b',
+                regex: '(^|\\s)([@][a-z1-5\\.]+)', //'\\B(\\\\)?@([\\w_-]+)\\b',
                 replace: function (match, leadingSlash, username) {
                     // Check if we matched the leading \ and return nothing changed if so
                     if (leadingSlash === '\\') {
                         return match;
                     } else {
-                        return makeUser(match);
+                        return makeUser(username);
                     }
                 }
             },
@@ -25,7 +25,7 @@ export default function (makeUser, makeTag) {
             // #hashtag syntax
             {
                 type: 'lang',
-                regex: '(.)?#([a-zA-Z0-9_]+)\\b',
+                regex: '(^|\\s)#([a-zA-Z0-9_-]+)\\b',
                 replace: function (match, leadingSlash, tag) {
                     // Check if we matched the leading \ and return nothing changed if so
                     if (leadingSlash === '\\' || leadingSlash == '/') {
@@ -34,13 +34,6 @@ export default function (makeUser, makeTag) {
                         return makeTag(tag);
                     }
                 }
-            },
-
-            // Escaped @'s
-            {
-                type: 'lang',
-                regex: '\\\\@',
-                replace: '@'
             }
         ];
     }

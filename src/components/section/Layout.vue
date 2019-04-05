@@ -6,7 +6,7 @@
       <div class="BrandBanner__Banner">
         <object class="BrandBanner__Image" v-if="brand_banner.endsWith('.svg')" :data="brand_banner" type="image/svg+xml"></object>
         <img v-else class="BrandBanner__Image" :src="brand_banner">
-        <button @click="showBuyBannerModal = true" v-if="buyableBanner()" class="buy-banner btn btn-primary">
+        <button @click="showBuyBannerModal = true" v-if="false && buyableBanner()" class="buy-banner btn btn-primary">
           Buy Banner
         </button>
         <modal @mousedown.native.stop="closeBuyBannerModal()" v-if="showBuyBannerModal">
@@ -78,11 +78,11 @@
                 <b-dropdown-item
                   v-for="s in subs()"
                   :key="s.sub"
-                  @click="$router.push({ name: 'Sub', params: { sub: s.sub } })"
+                  @click="$router.push({ name: 'Tag', params: { tag: s.sub } })"
                 >
                   <img v-if="s.logo" :src="s.logo" style="max-width:24px">
                   <div style="flex:1">
-                    e/{{ s.sub }}
+                    #{{ s.sub }}
                   </div>
                   <b-badge variant="dark" v-if="false">
                     0
@@ -221,19 +221,22 @@
               <router-link v-for="s in subs()"
                 :key="s.sub"
                 class="dropdown-item"
-                :to="{ name: 'Sub', params: { sub: s.sub } }">
+                :to="{ name: 'Tag', params: { tag: s.sub } }">
                 <img v-if="s.logo" :src="s.logo" style="max-width:24px">
                 <div>
-                  e/{{ s.sub }}
+                  #{{ s.sub }}
                 </div>
                 <b-badge variant="dark" v-if="false">
                   0
                 </b-badge>
               </router-link>
             </div>
-            <div v-if="$route.params.sub" class="block mobile">
-              <h3>
+            <div v-if="$route.params.sub || $route.params.tag" class="block mobile">
+              <h3 v-if="$route.params.sub">
                 /e/{{ $route.params.sub }}
+              </h3>
+               <h3 v-else-if="$route.params.tag">
+                #{{ $route.params.tag }}
               </h3>
               <!-- <h3>
                 Subscribers: {{ sub_count }}
@@ -263,9 +266,12 @@
             <slot name="content"></slot>
           </div>
           <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
-            <div v-if="$route.params.sub" class="block desktop">
-              <h3>
+            <div v-if="$route.params.sub || $route.params.tag" class="block desktop">
+             <h3 v-if="$route.params.sub">
                 /e/{{ $route.params.sub }}
+              </h3>
+               <h3 v-else-if="$route.params.tag">
+                #{{ $route.params.tag }}
               </h3>
               <!-- <h3>
                 Subscribers: {{ sub_count }}
@@ -423,10 +429,10 @@ export default {
       return this.anon_id.name !== '' && ecc.isValidPrivate(this.anon_id.key);
     },
     is_subscribed() {
-      return this.subscribed_subs.includes(this.$route.params.sub);
+      return this.subscribed_subs.includes(this.$route.params.sub || this.$route.params.tag);
     },
     async subscribe(sub) {
-      await ui.actions.Subscribe(sub, this.$route.params.sub);
+      await ui.actions.Subscribe(sub, this.$route.params.sub || this.$route.params.tag);
       this.$forceUpdate();
     },
     subs() {

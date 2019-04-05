@@ -362,7 +362,7 @@ export default {
       return moment(this.post.createdAt * 1000).fromNow();
     },
     received_tips() {
-      const tips = {};
+      var tips = {};
       this.post.children.forEach(child => {
         if (child.tips) {
           child.tips.filter(t => t.to == this.post.data.poster).forEach(tip => {
@@ -374,6 +374,12 @@ export default {
           });
         }
       });
+
+      // fix precisions
+      for (var sym in tips) {
+        tips[sym] = tips[sym].toFixed(4).replace(/([0-9]+(\.[1-9]+)?)(\.?0+$)/,"$1");
+      }
+
       return tips;
     },
     is_multi_referendum() {
