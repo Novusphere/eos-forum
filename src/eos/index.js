@@ -84,7 +84,10 @@ async function DetectWallet(once) {
                 await TryConnectWallet(provider);
             }
             catch (ex) {
-                window._alert(ex);
+                if (i == 0) {
+                    window._alert(ex);
+                }
+                console.log('Undetected ' + provider.id);
             }
         }
         else {
