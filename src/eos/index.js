@@ -40,55 +40,68 @@ var g_discoveryData = { keyToAccountMap: [] };
 
 DetectWallet();
 
+async function TryConnectWallet(selectedProvider) {
+    const wallet = accessContext.initWallet(selectedProvider);
+
+    await wallet.connect();
+    const discoveryData = (await wallet.discover({ pathIndexList: [0] }));
+
+    if (g_wallet)
+        throw new Error('Already have a wallet present');
+    else if (!wallet.connected)
+        throw new Error('Failed to connect');
+    else if (selectedProvider.id == 'ledger' &&
+        (discoveryData.keyToAccountMap.length == 0 ||
+            discoveryData.keyToAccountMap.every(k => !k.accounts || k.accounts.length == 0))) {
+
+        throw new Error('Ledger not actually connected');
+    }
+
+    g_wallet = wallet;
+    g_discoveryData = discoveryData;
+
+    console.log('Detected and connected to ' + selectedProvider.meta.name);
+    if (g_discoveryData.keyToAccountMap.length > 0) {
+        console.log(g_discoveryData);
+    }
+
+    await Login();
+}
+
 async function DetectWallet(once) {
     if (g_wallet) {
         return;
     }
 
     const providers = accessContext.getWalletProviders();
+
     for (var i = 0; i < 5; i++) {
         console.log('Wallet detection round ' + i);
-        var promises = [];
 
-        for (var j = 0; j < providers.length; j++) {
-            const selectedProvider = providers[j];
-            const wallet = accessContext.initWallet(selectedProvider);
-            promises.push(new Promise(async (resolve, reject) => {
+        if (navigator.userAgent.toLowerCase().includes('meet.one')) {
+            const provider = providers.find(p => p.id == 'meetone_provider');
+            try {
+                await TryConnectWallet(provider);
+            }
+            catch (ex) {
+                window._alert(ex);
+            }
+        }
+        else {
+
+            var promises = providers.map(p => new Promise(async (resolve, reject) => {
                 try {
-                    await wallet.connect();
-                    const discoveryData = (await wallet.discover({ pathIndexList: [0] }));
-
-                    if (g_wallet)
-                        throw new Error('Already have a wallet present');
-                    else if (!wallet.connected)
-                        throw new Error('Failed to connect');
-                    else if (selectedProvider.meta.id == 'ledger' &&
-                        (discoveryData.keyToAccountMap.length == 0 ||
-                            discoveryData.keyToAccountMap.every(k => !k.accounts || k.accounts.length == 0))) {
-
-                        throw new Error('Ledger not actually connected');
-                    }
-
-                    g_wallet = wallet;
-                    g_discoveryData = discoveryData;
-
-                    console.log('Detected and connected to ' + selectedProvider.meta.name);
-                    if (g_discoveryData.keyToAccountMap.length > 0) {
-                        console.log(g_discoveryData);
-                    }
-
-                    await Login();
+                    await TryConnectWallet(p);
                 }
                 catch (ex) {
-                    console.log('Undetected ' + selectedProvider.meta.name);
-                    //console.log(ex);
+                    console.log('Undetected ' + p.id);
                 }
-
                 resolve();
             }));
+
+            await Promise.all(promises);
         }
 
-        await Promise.all(promises);
         if (g_wallet || once) {
             break;
         }
