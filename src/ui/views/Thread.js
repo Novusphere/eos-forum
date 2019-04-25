@@ -7,7 +7,7 @@ import { Post } from "@/types/post";
 export default async function Thread(id, child_id) {
     const novusphere = GetNovusphere();
     const identity = await GetIdentity();
-
+    
     var main_post = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
         maxTimeMS: 1000,
@@ -28,67 +28,75 @@ export default async function Thread(id, child_id) {
     main_post = new Post(main_post);
     await main_post.normalize();
 
+    if (main_post.data.content.length == ((1024 * 10) - 1)) {
+        // look for extension
+        var content_ext = (await novusphere.api({
+            aggregate: novusphere.config.collection_nsdb,
+            maxTimeMS: 1000,
+            cursor: {},
+            pipeline: [
+                {
+                    $match: {
+                        'data.account': main_post.data.poster,
+                        'data.json.method': 'content_ext',
+                        'data.json.data.post_uuid': main_post.data.post_uuid
+                    }
+                }
+            ]
+        })).cursor.firstBatch[0];
+
+        if (content_ext) {
+            // apply extension
+            main_post.data.content += content_ext.data.json.data.content;
+        }
+    }
+
     var mp_np = storage.new_posts[main_post.data.post_uuid];
     main_post.__seen = (mp_np) ? mp_np.seen : ((new Date().getTime()) / 1000);
 
-    var responses = (await novusphere.api({
-        aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
-        cursor: {},
-        pipeline: [
-            { $match: novusphere.query.match.threadReplies(main_post.data.post_uuid) },
-            { $lookup: novusphere.query.lookup.postState() },
-            { $lookup: novusphere.query.lookup.postMyVote(identity.account) },
-            {
-                $project: novusphere.query.project.post({
-                    normalize_up: true,
-                    normalize_my_vote: true
-                })
-            }
-        ]
-    })).cursor.firstBatch;
+    var responses = [];
+    var r_skip = 0;
+
+    for (; ;) {
+        var _responses = (await novusphere.api({
+            aggregate: novusphere.config.collection_forum,
+            maxTimeMS: 1000,
+            cursor: {},
+            pipeline: [
+                { $match: novusphere.query.match.threadReplies(main_post.data.post_uuid) },
+                { $lookup: novusphere.query.lookup.postState() },
+                { $lookup: novusphere.query.lookup.postMyVote(identity.account) },
+                {
+                    $project: novusphere.query.project.post({
+                        normalize_up: true,
+                        normalize_my_vote: true
+                    })
+                },
+                { $skip: r_skip }
+            ]
+        })).cursor.firstBatch;
+
+        r_skip += _responses.length;
+
+        for (var i = 0; i < _responses.length; i++)
+            responses.push(_responses[i]);
+
+        if (!_responses || _responses.length == 0 || _responses.length < 100)
+            break;
+    }
+
+    var new_posts = await Post.threadify(main_post, responses);
 
     responses.splice(0, 0, main_post);
     responses = await Post.fromArray(responses);
 
-    var commentMap = {};
-    var new_posts = 0;
-    for (var i = 0; i < responses.length; i++) {
-        var p = responses[i];
-        commentMap[p.data.post_uuid] = p;
-
-        if (i > 0) {
-            p.parent = main_post;
-
-            var tree;
-            var parent_uuid = p.data.json_metadata.parent_uuid;
-            parent_uuid = parent_uuid ? parent_uuid : main_post.data.post_uuid;
-
-            var parent = commentMap[parent_uuid];
-
-            // if this is is an edit, update parent content
-            // check parent content isn't already newest
-            // check that this post is actually by the person who made original post
-            if (p.data.json_metadata.edit) {
-                if (
-                    p.data.poster == parent.data.poster &&
-                    p.createdAt > parent.createdAt
-                ) {
-                    await parent.applyEdit(p);
-                }
-            } else {
-                new_posts++;
-                parent.addChild(p);
-            }
-        }
-    }
-
-    Post.sortChildren(responses);
-
     // only count non-edits for new_posts length
     storage.new_posts[main_post.data.post_uuid] = {
+        title: main_post.data.json_metadata.title,
+        sub: main_post.data.json_metadata.sub,
+        id: main_post.o_id,
         replies: new_posts,
-        seen: new Date().getTime() / 1000
+        seen: parseInt(new Date().getTime() / 1000)
     };
     SaveStorage();
 
@@ -96,6 +104,7 @@ export default async function Thread(id, child_id) {
 
     // permalink child
     if (child_id) {
+
         var child_post;
         if (child_id.length == 64) {
             child_post = responses.find(p => p.transaction == child_id);
@@ -104,6 +113,7 @@ export default async function Thread(id, child_id) {
             child_post = responses.find(p => p.o_id == child_id);
         }
 
+        child_post.parent = main_post;
         child_post.depth = 0;
         child_post.data.json_metadata.title = main_post.data.json_metadata.title;
 

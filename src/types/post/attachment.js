@@ -1,5 +1,38 @@
 import requests from "@/requests";
-import ui from "@/ui";
+import { GetNovusphere } from "@/novusphere";
+
+function GetHost(href) {
+    if (href.indexOf("magnet:") == 0) {
+        return "magnet link";
+    }
+    var parser = document.createElement("a");
+    parser.href = href;
+    return parser.host.toLowerCase();
+}
+
+async function OEmbed(url) {
+    const novusphere = GetNovusphere();
+
+    var oembed = null; 
+    
+    try { oembed = JSON.parse(await novusphere.cors(url)); }
+    catch (ex) { return null; }
+
+    var src = oembed.html.match(/src=\".+\"/);
+
+    if (src) {
+        src = src[0].substring(5);
+        src = src.substring(0, src.indexOf("\""));
+
+        return {
+            src: src,
+            thumbnail: oembed.thumbnail_url,
+            width: oembed.width,
+            height: oembed.height
+        }
+    }
+    return null;
+}
 
 class PostAttachment {
     constructor(attachment) {
@@ -44,6 +77,8 @@ class PostAttachment {
 
     async normalize() {
         var attachment = this;
+        var oembed = null;
+
         if (attachment && attachment.value) {
             if (attachment.type == 'ipfs') {
                 //
@@ -56,20 +91,14 @@ class PostAttachment {
                 //
                 //  transform youtube --> auto embed
                 //
-                var host = ui.helpers.GetHost(attachment.value);
+                var host = GetHost(attachment.value);
                 if (host == 'youtu.be') {
                     var split = attachment.value.split('/');
-                    attachment.value = 'https://www.youtube.com/?v=' + split[split.length - 1];
+                    attachment.value = 'https://www.youtube.com/watch?v=' + split[split.length - 1];
                     host = 'youtube.com';
                 }
                 if (host == 'youtube.com' || host == 'www.youtube.com') {
-                    var vid = attachment.value.match(/v\=[A-Za-z0-9_\-]+/);
-                    if (vid && vid.length > 0) {
-                        attachment.width = 560;
-                        attachment.height = 315;
-                        attachment.value = 'https://www.youtube.com/embed/' + vid[0].substring(2);
-                        attachment.display = 'iframe';
-                    }
+                    oembed = await OEmbed('https://www.youtube.com/oembed?format=json&url='+attachment.value);
                 }
                 if (host == 'i.imgur.com') {
                     attachment.display = 'img';
@@ -84,29 +113,11 @@ class PostAttachment {
                     attachment.display = 'iframe';
                 }
                 if (host == 'd.tube') {
-                    var vid = attachment.value.indexOf('v/') + 2;
-                    attachment.value = 'https://emb.d.tube/#!/' + attachment.value.substring(vid);
-                    attachment.width = 560;
-                    attachment.height = 400;
-                    attachment.display = 'iframe';
+                    var url = attachment.value.replace('/#!/', '/');
+                    oembed = await OEmbed('https://api.d.tube/oembed?url=' + url);
                 }
                 if (host == 'soundcloud.com') {
-                    try {
-                        var sc_json = await requests.get('https://soundcloud.com/oembed?format=json&url=' + attachment.value);
-                        var sc_src = sc_json.html.match(/src=\".+\"/);
-                        if (sc_src.length > 0) {
-                            var sc_iframe = sc_src[0].substring(5);
-                            sc_iframe = sc_iframe.substring(0, sc_iframe.length - 1);
-
-                            attachment.value = sc_iframe;
-                            attachment.width = 560;
-                            attachment.height = 300;
-                            attachment.display = 'iframe';
-                        }
-                    }
-                    catch (sc_ex) {
-                        // pass
-                    }
+                    oembed = await OEmbed('https://soundcloud.com/oembed?format=json&url=' + attachment.value);
                 }
                 if (host == 'bitchute.com' || host == 'www.bitchute.com') {
                     var vid = attachment.value.match(/video\/[a-zA-Z0-9]+/);
@@ -119,12 +130,39 @@ class PostAttachment {
                 }
             }
 
+            if (attachment.display == 'link') {
+                if (attachment.value.endsWith('.png') ||
+                    attachment.value.endsWith('.jpg') ||
+                    attachment.value.endsWith('.jpeg') || 
+                    attachment.value.endsWith('.gif')) {
+
+                    attachment.display = 'img';
+                }
+            }
+
             if (attachment.display == 'iframe') {
+                if (attachment.value.indexOf('http:') == 0) {
+                    attachment.value = 'https:' + attachment.value.substring(5);
+                }
+
                 if (!(attachment.width) && !(attachment.height)) {
                     attachment.width = 560;
                     attachment.height = 315;
                 }
             }
+        }
+
+        if (oembed)
+        {
+            attachment.thumbnail = oembed.thumbnail;
+            attachment.width = oembed.width;
+            attachment.height = oembed.height;
+            attachment.value = oembed.src;
+            attachment.display = 'iframe';
+        }
+
+        if (attachment.display == 'img' && !attachment.thumbnail) {
+            attachment.thumbnail = attachment.value;
         }
     }
 }

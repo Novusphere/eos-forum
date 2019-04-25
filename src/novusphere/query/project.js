@@ -29,7 +29,7 @@ function score() {
                             2
                         ]
                     },
-                    0.70
+                    1.8
                 ]
             }
         ]
@@ -51,11 +51,14 @@ export default {
 
         var query = {
             id: "$id",
+            name: "$name",
             transaction: "$transaction",
             createdAt: "$createdAt",
             data: "$data",
+            tags: "$tags",
             //state: "$state",
-            replies: "$replies",
+            expired: "$expired",
+            replies: !opts.total_replies ? "$replies" : [],
             up: !opts.normalize_up ? "$up" : { $ifNull: [{ $arrayElemAt: ["$state.up", 0] }, 0] },
             up_atmos: !opts.normalize_up ? "$up_atmos" : { $ifNull: [{ $arrayElemAt: ["$state.up_atmos", 0] }, 0] },
             parent: !opts.normalize_parent ? "$parent" : { $arrayElemAt: ["$parent", 0] },

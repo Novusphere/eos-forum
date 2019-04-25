@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <link rel="stylesheet" type="text/css" :href="theme"> 
-
+  <div> 
     <div class="modal fade" tabindex="-1" role="dialog" id="settings">
         <div class="modal-dialog modal-full" role="document">
           <div class="modal-content">

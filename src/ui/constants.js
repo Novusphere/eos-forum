@@ -1,4 +1,4 @@
-const FORUM_CONTRACT = "eosforumdapp";
+const FORUM_CONTRACT = "eosio.forum";
 const MAX_ITEMS_PER_PAGE = 25;
 const UPVOTE_ATMOS_RATE = 10; // 1 upvote in ATMOS
 var HEADER_TEXTS = [
@@ -13,13 +13,47 @@ if (window.__PRESETS__ && window.__PRESETS__.default_sub) {
     DEFAULT_SUB = window.__PRESETS__.default_sub;
 }
 
+// TO-DO: remove hard coding?
+var BRANDS = {
+    "novusphere": {
+        "title": "A decentralized forum",
+        "logo": "https://cdn.novusphere.io/static/atmos.svg",
+        "icon": "https://cdn.novusphere.io/static/atmos2.png",
+        "banner": "",
+        "token_symbol": "ATMOS",
+        "token_contract": "novusphereio"
+    },
+    "eoscafe": {
+        "title": "A decentralized coffee lover's forum",
+        "logo": "https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png",
+        "icon": "https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png",
+        "banner": "https://cdn.novusphere.io/static/eoscafe.svg",
+        "token_symbol": "EOS",
+        "token_contract": "eosio.token"
+    },
+    "eos": {
+        "title": "EOS Community",
+        "logo": "https://cdn.novusphere.io/static/eos3.svg",
+        "icon": "https://cdn.novusphere.io/static/eos3.png",
+        "banner": "",
+        "token_symbol": "EOS",
+        "token_contract": "eosio.token"
+    }
+}
+
+var FORUM_BRAND =  Object.assign({}, BRANDS["novusphere"]);
+
 if (window.__PRESETS__) {
     var presets = window.__PRESETS__;
+
     if (presets.header_texts)
         HEADER_TEXTS = presets.header_texts;
 
     if (presets.default_sub)
         DEFAULT_SUB = presets.default_sub;
+
+    if (presets.brand)
+        FORUM_BRAND = presets.brand;
 }
 
 export {
@@ -27,5 +61,7 @@ export {
     MAX_ITEMS_PER_PAGE,
     UPVOTE_ATMOS_RATE,
     HEADER_TEXTS,
-    DEFAULT_SUB
+    DEFAULT_SUB,
+    FORUM_BRAND,
+    BRANDS
 }

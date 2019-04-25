@@ -1,0 +1,20 @@
+/*********************************************
+	-	SETTINGS FOR BANNER CONTAINERS	-
+**********************************************/
+
+.BrandBanner__Container {
+	width:100%;
+	position:relative;
+	padding:0;
+
+}
+
+.BrandBanner__Banner {
+	width:100%;
+	position:relative;
+}
+
+.BrandBanner__Image {
+	width: 100%;
+	max-height: 278px;
+}

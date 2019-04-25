@@ -1,63 +1,101 @@
 <template>
-  <div>
-    <SubmitPostModal ref="submit_modal" :sub="sub" :post_content_callback="postContent"></SubmitPostModal>
-    <HeaderSection :load="load">
-      <span class="title mr-3"><router-link :to="'/e/' + sub">{{ sub }}</router-link></span>
-      <button v-if="sub && !is_subscribed" v-on:click="subscribe(true)"  type="button" class="btn btn-sm btn-outline-primary ml-1">subscribe</button>
-      <button v-if="sub && is_subscribed" v-on:click="subscribe(false)" type="button" class="btn btn-sm btn-outline-danger ml-1">unsubscribe</button>
-      <button v-if="sub" type="button" class="btn btn-sm btn-outline-primary" v-on:click="newThread()">new</button>
-      <PostSorter ref="sorter" :change="load"></PostSorter>
-    </HeaderSection>
-    <MainSection>
-      <div>
-        <div v-if="posts.length == 0">
-              <div class="text-center">
-                <h1>There doesn't seem to be any posts here! Why not make one?</h1>
-              </div>
+  <layout ref="layout" :load="load">
+
+    <template slot="topic">
+      <span v-if="sub">e/{{sub}}</span>
+      <span v-else>Home</span>
+    </template>
+
+    <template slot="content">
+      <div class="mt-1 mb-3">
+        <div class="ml-1 float-left">
+          <post-sorter ref="sorter"
+            :default_by="default_sorter"
+            :options="sorter_options"
+            :change="load">
+          </post-sorter>
         </div>
-     
-          <Post 
-            v-for="p in posts" 
-            :key="p.transaction" 
-            :submit_modal="$refs.submit_modal" 
-            :post="p" 
-            :show_content="false">
-          </Post>
-     
-        <div class="row mb-4">
-            <div class="col-12">
-              <div class="float-right">
-                  <router-link v-if="current_page>1" class="btn btn-outline-primary" :to="'/e/' + sub + '?page=' + (current_page-1)">&larr; prev</router-link>
-                  <router-link v-if="current_page<pages" class="btn btn-outline-primary" :to="'/e/' + sub + '?page=' + (current_page+1)">next &rarr;</router-link>
-              </div>
-            </div>
+        <div class="ml-1 float-left" v-if="!loading">
+          <button v-if="sub && !is_subscribed"
+            v-on:click="subscribe(true)"
+            type="button"
+            class="btn btn-outline-primary mr-1">
+            subscribe
+          </button>
+          <button v-if="sub && is_subscribed"
+            v-on:click="subscribe(false)"
+            type="button"
+            class="btn btn-outline-danger mr-1">
+            unsubscribe
+          </button>
         </div>
+        <div class="float-right">
+          <pager :pages="pages"
+            :current_page="current_page">
+          </pager>
+        </div>
+        <div class="clearfix"></div>
       </div>
-    </MainSection>
-  </div>
+
+      <div class="post-container" v-if="!loading">
+        <div v-if="posts.length == 0">
+          <div class="text-center">
+            <h1>There doesn't seem to be any posts here! Why not make one?</h1>
+          </div>
+        </div>
+
+        <post
+          v-for="p in posts"
+          class="post-parent"
+          :key="p.transaction"
+          @openPost="openPost"
+          :post="p"
+        />
+        <modal
+          @click.native="closePost"
+          v-if="selectedPostID">
+          <thread-modal
+            @click.native.stop
+            :id="selectedPostID"
+          />
+        </modal>
+      </div>
+
+      <div class="text-center" v-else>
+        <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+      </div>
+    </template>
+
+  </layout>
 </template>
 
 <script>
-import jQuery from "jquery";
-
 import ui from "@/ui";
+import { GetNovusphere } from "@/novusphere";
 
-import Post from "@/components/core/Post";
+import Pager from "@/components/core/Pager";
 import PostSorter from "@/components/core/PostSorter";
-
-import SubmitPostModal from "@/components/modal/SubmitPostModal";
-
-import HeaderSection from "@/components/section/HeaderSection";
-import MainSection from "@/components/section/MainSection";
+import Post from "@/components/core/Post";
+import { storage } from "@/storage";
+import Layout from "@/components/section/Layout";
+import Modal from "@/components/modal/Modal.vue";
+import ThreadModal from "@/components/ThreadModal.vue";
 
 export default {
-  name: "Home",
+  name: "Home2",
+  metaInfo() {
+    const sub = (this.sub) ? `e/${this.sub}` : 'Home';
+    return {
+      titleTemplate: `%s | ${sub}`,
+    };
+  },
   components: {
-    Post: Post,
-    PostSorter: PostSorter,
-    SubmitPostModal: SubmitPostModal,
-    HeaderSection: HeaderSection,
-    MainSection: MainSection
+    Pager,
+    PostSorter,
+    Post,
+    Layout,
+    Modal,
+    ThreadModal,
   },
   watch: {
     "$route.query.page": function() {
@@ -67,22 +105,46 @@ export default {
       this.load();
     }
   },
+  computed: {
+    default_sorter() {
+      if (this.sub == 'referendum')
+        return 'active';
+      return 'popular';
+    },
+    sorter_options() {
+      if (this.sub == 'referendum')
+        return ['active', 'old'];
+
+      return ['popular', 'time'];
+    },
+    subs() {
+      return storage.subscribed_subs;
+    },
+  },
   async mounted() {
     this.load();
   },
   methods: {
     async load() {
-      var home = await ui.views.Home(this.$route.query.page, this.$route.params.sub, this.$refs.sorter.getSorter());
+      this.loading = true;
+      this.sub = this.$route.params.sub;
+      this.posts = [];
+      this.pages = 0;
+
+      const novusphere = GetNovusphere();
+      var home = await ui.views.Home(this.$route.query.page, this.sub, this.$refs.sorter.getSorter());
       this.is_subscribed = home.is_subscribed;
       this.posts = home.posts;
       this.pages = home.pages;
       this.current_page = home.current_page;
       this.sub = home.sub;
+      this.loading = false;
+
     },
     async newThread() {
       try {
         await ui.actions.CheckCreateThread(this.sub);
-        jQuery("#submitPost").modal();
+        this.$refs.submit_modal.showModal();
       }
       catch (reason) {
         alert(reason);
@@ -93,15 +155,26 @@ export default {
     },
     async subscribe(sub) {
       this.is_subscribed = await ui.actions.Subscribe(sub, this.sub);
+    },
+    openPost (postID, sub){
+      this.selectedPostID = postID;
+      history.pushState({},"","#/e/" + sub + "/" + postID);
+    },
+    closePost () {
+      this.selectedPostID = undefined;
+      history.pushState({},"","#/");
     }
   },
   data() {
     return {
+      loading: false,
       is_subscribed: false,
       current_page: 0,
       pages: 0,
       sub: "",
-      posts: [] // for posts being displayed
+      posts: [], // for posts being displayed
+      selectedPostID: undefined,
+      eos_referendum: storage.eos_referendum,
     };
   }
 };

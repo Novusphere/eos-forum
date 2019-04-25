@@ -2,8 +2,6 @@ export default class LynxWallet {
     static async detect(identity) {
         if (window.lynxMobile) {
             var lynx = window.lynxMobile;
-            //window.lynxMobile = null;
-            console.log('Lynx Mobile loaded');
             return new LynxWallet(lynx, identity);
         }
         return null; // fail
@@ -21,6 +19,7 @@ export default class LynxWallet {
         this.identity.account = identity;
         this.identity.auth = 'active'; // assume
         this.identity.atmos = '0.000';
+        this.identity.token = '0.000';
         this.identity.notifications = 0;
         
         await this.identity.update(true);
@@ -42,7 +41,21 @@ export default class LynxWallet {
             };
         });
 
-        var eostx = await lynx.transact(lynx_actions);
-        return eostx.transaction_id;
+        try { 
+            var eostx = await lynx.transact(lynx_actions);
+            if (eostx == null) {
+                _alert('eostx is null');
+            }
+            else if (!eostx.transaction_id) {
+                _alert('eostx.transaction_id is not set');
+            }
+            return eostx.transaction_id;
+        }
+        catch (err) {
+            _alert('An error occured from transact()');
+            _alert(err);
+
+            throw err;
+        }
     }
 }

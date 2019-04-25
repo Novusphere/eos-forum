@@ -3,13 +3,13 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Error</h5>
+              <h5 class="modal-title">{{ title }}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">
-                <div class="text-alert text-center">
+            <div class="modal-body" style="word-wrap: break-word">
+                <div :class="text_class + ' text-center'">
                     {{ text }}
                 </div>
             </div>
@@ -27,19 +27,24 @@ import jQuery from "jquery";
 export default {
   name: "ErrorModal",
   async mounted() {
-      //
-      // override alert
-      //
-      var _this = this;
-      window.alert = function(message, args) {
-          _this.text = message;
-          jQuery("#errorModal").modal(args);
-      };
+    //
+    // override alert
+    //
+    var _this = this;
+    window._alert = window.alert;
+    window.alert = function(message, args) {
+      _this.text = message;
+      _this.title = (args && args.title) ? args.title : 'Error';
+      _this.text_class = (args && args.text_class) ? args.text_class : 'text-alert';
+      jQuery("#errorModal").modal(args);
+    };
   },
   methods: {},
   data() {
     return {
-        text: ''
+      text_class: "",
+      title: "",
+      text: ""
     };
   }
 };

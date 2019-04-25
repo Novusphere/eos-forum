@@ -15,6 +15,7 @@ export default async function UserNotifications(current_page) {
 
     if (!identity.account) {
         return {
+            current_page: 1,
             pages: 0,
             posts: []
         }
@@ -30,7 +31,7 @@ export default async function UserNotifications(current_page) {
 
     var posts = (await novusphere.api({
         aggregate: novusphere.config.collection_forum,
-        maxTimeMS: 1000,
+        maxTimeMS: 5000,
         cursor: {},
         pipeline: [
             { $match: novusphere.query.match.notifications(identity.account) },

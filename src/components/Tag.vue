@@ -1,60 +1,61 @@
 <template>
-  <div>
-    <PostHistoryModal ref="history_modal"></PostHistoryModal>
-    <HeaderSection :load="load">
-      <span class="title mr-3"><router-link :to="'/tag/' + tag">#{{ tag }}</router-link></span>
-      <PostSorter ref="sorter" :change="load"></PostSorter>
-    </HeaderSection>
-    <MainSection>
-      <div>
+  <layout :load="load">
+    <template slot="topic">
+      <span>#{{ tag }}</span>
+    </template>
+
+    <template slot="content">
+      <div class="mb-1">
+        <div class="float-left">
+          <post-sorter ref="sorter" :change="load"></post-sorter>
+        </div>
+        <div class="float-right">
+          <pager :pages="pages" :current_page="current_page"></pager>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+
+      <div v-if="!loading">
         <div v-if="posts.length == 0">
           <div class="text-center">
             <h1>No posts with #{{ tag }} found!</h1>
           </div>
         </div>
 
-          <Post 
-            v-for="p in posts" 
-            :key="p.o_id" 
-            :history_modal="$refs.history_modal" 
-            :post="p" 
-            :show_content="true">
-          </Post>
-
-        <div class="row mb-4">
-            <div class="col-12">
-              <div class="float-right">
-                  <router-link v-if="current_page>1" class="btn btn-outline-primary" :to="'/tag/' + tag + '?page=' + (current_page-1)">&larr; prev</router-link>
-                  <router-link v-if="current_page<pages" class="btn btn-outline-primary" :to="'/tag/' + tag + '?page=' + (current_page+1)">next &rarr;</router-link>
-              </div>
-            </div>
-        </div>
+        <post v-for="p in posts" :key="p.o_id" :post="p"></post>
       </div>
-    </MainSection>
-  </div>
+      <div class="text-center" v-else>
+        <h1><font-awesome-icon :icon="['fas', 'spinner']" spin></font-awesome-icon></h1>
+      </div>
+    </template>
+
+    <template slot="right_sidebar">
+      <div class="sidebarblock">
+        <recently-visited></recently-visited>
+      </div>
+    </template>
+
+  </layout>
 </template>
 
 <script>
-import jQuery from "jquery";
-
 import ui from "@/ui";
 
+import Pager from "@/components/core/Pager";
 import Post from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
+import RecentlyVisited from "@/components/core/RecentlyVisited";
 
-import PostHistoryModal from "@/components/modal/PostHistoryModal";
-
-import HeaderSection from "@/components/section/HeaderSection";
-import MainSection from "@/components/section/MainSection";
+import Layout from "@/components/section/Layout";
 
 export default {
   name: "Tag",
   components: {
-    Post: Post,
-    PostSorter: PostSorter,
-    PostHistoryModal: PostHistoryModal,
-    HeaderSection: HeaderSection,
-    MainSection: MainSection
+    Pager,
+    Post,
+    PostSorter,
+    RecentlyVisited,
+    Layout
   },
   watch: {
     "$route.query.page": function() {
@@ -69,17 +70,22 @@ export default {
   },
   methods: {
     async load() {
-      var tag = await ui.views.Tag(this.$route.query.page, this.$route.params.tag, this.$refs.sorter.getSorter());
+      this.loading = true;
+      this.tag = this.$route.params.tag;
+
+      var tag = await ui.views.Tag(this.$route.query.page, this.tag, this.$refs.sorter.getSorter());
 
       // push data to this
       this.posts = tag.posts;
       this.pages = tag.pages;
       this.current_page = tag.current_page;
       this.tag = tag.tag;
+      this.loading = false;
     },
   },
   data() {
     return {
+      loading: false,
       current_page: 0,
       pages: 0,
       tag: "",

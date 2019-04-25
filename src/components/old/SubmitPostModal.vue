@@ -33,10 +33,10 @@
                       <textarea rows="10" class="form-control" placeholder="Content" v-model="post.content"></textarea>
                     </div>
                   </div>
-                  <div class="form-group row">
+                  <div class="form-group row" v-if="reply_uuid">
                     <label class="col-sm-2 col-form-label"></label>
                     <div class="col-sm-10">
-                      {{ post.content.length }} / {{ 1024 * 10 }}
+                      {{ post.content.length }} / {{ (1024 * 10)-1 }}
                     </div>
                   </div>
                   <fieldset class="form-group">
@@ -97,8 +97,8 @@
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)">post</button>
-                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true, true)" v-if="is_anon_sub">post anon</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(false)" v-if="identity">post</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="postContent(true, true)">post anon</button>
                 <button type="button" class="btn btn-outline-primary" v-on:click="preview = true">preview</button>
                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">close</button>
               </div>
@@ -112,6 +112,8 @@
 import jQuery from "jquery";
 
 import ui from "@/ui";
+
+import { GetIdentity } from "@/eos";
 
 export default {
   name: "SubmitPostModal",
@@ -151,10 +153,10 @@ export default {
         return;
       }
 
-      if (post.content.length > 1024 * 10) {
+      if (this.reply_uuid && post.content.length > 1024 * 10) {
         this.setStatus(
           "Post is too long, over limit by " +
-            (1024 * 10 - post.content.length) +
+            (post.content.length - (1024 * 10 - 1)) +
             " characters"
         );
         return;
@@ -191,11 +193,15 @@ export default {
         this.set_status(text);
       }
     },
+    async showModal() {
+      this.identity = (await GetIdentity()).account;
+      jQuery("#submitPost").modal();
+    },
     async postContent(anon, warn_anon) {
       this.setStatus("Creating tx and broadcasting to EOS...");
       var eos_post = await this.makePost(anon);
       if (!eos_post) {
-        return false;
+        return null;
       }
 
       var txid = await ui.actions.PushNewPost(
@@ -205,9 +211,9 @@ export default {
         warn_anon,
         this.setStatus
       );
-      
+
       if (!txid) {
-        return false;
+        return null;
       }
 
       this.post.content = "";
@@ -215,11 +221,13 @@ export default {
       this.post.attachment.type = "";
       this.post.attachment.display = "link";
 
+      this.setStatus("");
+
       jQuery("#submitPost").modal("hide");
 
-      this.post_content_callback(txid);
+      this.post_content_callback(txid, eos_post);
 
-      return true;
+      return txid;
     }
   },
   computed: {
@@ -233,6 +241,7 @@ export default {
   },
   data() {
     return {
+      identity: "",
       status: "",
       set_status: null,
       preview: false,

@@ -4,6 +4,12 @@ import { PostAnonId } from "./anonid";
 
 class PostJsonMetadata {
     constructor(json) {
+        
+        if (typeof json == 'string') {
+            try { json = JSON.parse(json); }
+            catch (ex) { }
+        }
+
         json = Object.assign({  
             title: "",
             sub: "",
