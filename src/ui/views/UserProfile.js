@@ -44,6 +44,14 @@ export default async function UserProfile(current_page, account, sorter) {
 
     console.log(`loaded (3) in ${(new Date()).getTime() - benchmark} ms`);
 
+    var n_followers = (await novusphere.api({
+        count: novusphere.config.collection_account,
+        maxTimeMS: 10000,
+        query: novusphere.query.match.followersByAccount(account)
+    })).n;
+
+    console.log(`loaded (4) in ${(new Date()).getTime() - benchmark} ms`);
+
     var pages = Math.ceil((n_comments + n_threads) / MAX_ITEMS_PER_PAGE);
 
     const identity = await GetIdentity();
@@ -78,7 +86,7 @@ export default async function UserProfile(current_page, account, sorter) {
         ]
     })).cursor.firstBatch;
 
-    console.log(`loaded (4) in ${(new Date()).getTime() - benchmark} ms`);
+    console.log(`loaded (5) in ${(new Date()).getTime() - benchmark} ms`);
 
     posts = await Post.fromArray(posts);
 
@@ -88,7 +96,7 @@ export default async function UserProfile(current_page, account, sorter) {
 
     var user_icons = await GetUserIcons(account);
 
-    console.log(`loaded (5) in ${(new Date()).getTime() - benchmark} ms`);
+    console.log(`loaded (6) in ${(new Date()).getTime() - benchmark} ms`);
 
     return {
         current_page: current_page,
@@ -99,6 +107,7 @@ export default async function UserProfile(current_page, account, sorter) {
         balance_atmos: balance_atmos,
         n_comments: n_comments,
         n_threads: n_threads,
+        n_followers: n_followers,
         last_activity: last_activity,
         posts: posts,
         pages: pages

@@ -9,8 +9,8 @@
               </button>
             </div>
             <div class="modal-body" style="word-wrap: break-word">
-                <div :class="text_class + ' text-center'">
-                    {{ text }}
+                <div :class="text_class + ' text-center'" v-html="text">
+                
                 </div>
             </div>
             <div class="modal-footer">
@@ -23,6 +23,7 @@
 
 <script>
 import jQuery from "jquery";
+import { MarkdownParser } from "@/markdown";
 
 export default {
   name: "ErrorModal",
@@ -40,7 +41,9 @@ export default {
     }
 
     window.alert = function(message, args) {
-      _this.text = message;
+      var md = new MarkdownParser(message);
+
+      _this.text = md.html;
       _this.title = (args && args.title) ? args.title : 'Error';
       _this.text_class = (args && args.text_class) ? args.text_class : 'text-alert';
       jQuery("#errorModal").modal(args);

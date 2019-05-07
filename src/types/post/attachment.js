@@ -18,12 +18,15 @@ async function OEmbed(url) {
     try { oembed = JSON.parse(await novusphere.cors(url)); }
     catch (ex) { return null; }
 
-    var src = oembed.html.match(/src=\".+\"/);
+    var src = '';
 
+    src = oembed.html.match(/src=\".+\"/);
     if (src) {
         src = src[0].substring(5);
         src = src.substring(0, src.indexOf("\""));
+    }
 
+    if (src) {
         return {
             src: src,
             thumbnail: oembed.thumbnail_url,
@@ -31,6 +34,7 @@ async function OEmbed(url) {
             height: oembed.height
         }
     }
+
     return null;
 }
 

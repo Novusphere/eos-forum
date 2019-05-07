@@ -97,6 +97,9 @@
         </div>
         <div class="divline"></div>
         <div class="blocktxt">
+          Followers: {{ followers }}
+        </div>
+        <div class="blocktxt">
           Balances: {{ balances.atmos }} ATMOS
         </div>
         <div class="blocktxt">
@@ -179,6 +182,7 @@ export default {
       this.balances.atmos = profile.balance_atmos;
       this.comments = profile.n_comments;
       this.threads = profile.n_threads;
+      this.followers = profile.n_followers;
       this.last_activity = profile.last_activity;
       this.posts = profile.posts;
       this.pages = profile.pages;
@@ -218,6 +222,7 @@ export default {
         atmos: 0
       },
       comments: 0,
+      followers: 0,
       threads: 0,
       last_activity: "",
       posts: [],

@@ -54,8 +54,8 @@
                 </div>
                 <div class="form-group row" v-if="is_referendum">
                   <label class="col-sm-2 col-form-label">Expiry</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" placeholder="mm-dd-yyyy" v-model="referendum_expires">
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" v-model="referendum_expires">
                   </div>
                   <label class="col-sm-2 col-form-label">({{ expiry_delta }} days from now)</label>
                 </div>
@@ -190,7 +190,7 @@ import PostSorter from "@/components/core/PostSorter";
 import Layout from "@/components/section/Layout";
 
 import { Post } from "@/types/post";
-import $ from 'jquery';
+import $ from "jquery";
 
 export default {
   name: "StartThread",
@@ -211,7 +211,7 @@ export default {
         this.referendum_type == "multi-select-v1"
       );
     },
-    expiry_delta: function() {
+    expiry_delta() {
       var expiry = new Date(this.referendum_expires);
       if (isNaN(expiry.getTime())) {
         return "?";
@@ -227,19 +227,19 @@ export default {
       if (event.key.length === 1) {
         this.customSub += event.key;
       }
-      if (event.key === 'Backspace') {
+      if (event.key === "Backspace") {
         this.customSub = this.customSub.substr(0, this.customSub.length - 1);
       }
     },
     addCustom() {
       const custom = {
-        icon: '',
+        icon: "",
         sub: this.customSub,
-        type: 'custom',
-      }
+        type: "custom"
+      };
       this.sub_options.unshift(custom);
       this.sub2 = custom;
-      this.customSub = '';
+      this.customSub = "";
     },
     getDeltaDays(future) {
       var delta = future.getTime() - new Date().getTime();
@@ -315,8 +315,13 @@ export default {
       }
 
       if (this.content.length == 0) {
-        this.setStatus("Post must have at least 1 character of content");
-        return;
+        if (!this.attachment.value) {
+          this.setStatus(
+            "Post must have at least 1 character of content or an attachment"
+          );
+          return;
+        }
+        this.content = " ";
       }
 
       const edit_post = this.edit_post;
@@ -354,7 +359,7 @@ export default {
       this.setStatus("Creating tx and broadcasting to EOS...");
       var eos_post = await this.makePost(anon);
       if (!eos_post) {
-        this.setStatus('Unable to create transaction data!');
+        this.setStatus("Unable to create transaction data!");
         return null;
       }
 
@@ -370,13 +375,17 @@ export default {
           }
         }
 
-        txid = await ui.actions.Referendum.PushNewProposal({
-          expires_at: this.referendum_expires,
-          title: this.title,
-          content: this.content,
-          type: this.referendum_type,
-          options: this.referendum_options
-        });
+        try {
+          txid = await ui.actions.Referendum.PushNewProposal({
+            expires_at: this.referendum_expires,
+            title: this.title,
+            content: this.content,
+            type: this.referendum_type,
+            options: this.referendum_options
+          });
+        } catch (ex) {
+          this.setStatus(ex.message);
+        }
       } else {
         txid = await ui.actions.PushNewPost(
           eos_post,
@@ -442,7 +451,7 @@ export default {
       referendum_expires: "",
       referendum_option: "",
       referendum_options: [],
-      customSub: '',
+      customSub: ""
     };
   }
 };
@@ -452,7 +461,7 @@ export default {
   color: white;
 }
 .v-select .no-options:after {
-  content: 'press enter to create custom sub';
+  content: "press enter to create custom sub";
   width: 100%;
   height: 100%;
   position: absolute;

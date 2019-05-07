@@ -6,7 +6,8 @@ const NovusphereConfig = {
     collection_forum: 'eosforum',
     collection_nsdb: 'ns',
     collection_post_state: 'ns_post_state',
-    collection_post_vote: 'ns_post_vote'
+    collection_post_vote: 'ns_post_vote',
+    collection_account: 'ns_account'
 }
 
 function GetNovusphere() {

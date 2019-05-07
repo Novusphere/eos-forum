@@ -564,6 +564,14 @@ class Post {
                 
                 match: /https:\/\/medium.com\/@[\w]+\/.+/i,
                 handle: (m) => attach(m[0], 'url', 'link')
+            },
+            {
+                match: /https:\/\/www.instagram.com\/p\/[a-zA-Z0-9]+/i,
+                handle: (m) => attach(m[0], 'url', 'link')
+            },
+            {
+                match: /https:\/\/www.instagr.am\/p\/[a-zA-Z0-9]+/i,
+                handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
 

@@ -179,11 +179,11 @@ export default {
     },
     async PushNewProposal(post) {
         if (post.title.length > 1024) {
-            throw ("Title is too long, over limit by " + (1024 - post.title.length) + " characters");
+            throw new Error("Title is too long, over limit by " + (1024 - post.title.length) + " characters");
         }
 
         if (post.content.length > 30000) {
-            throw ("Post is too long, over limit by " + (30000 - post.content.length) + " characters");
+            throw new Error("Post is too long, over limit by " + (30000 - post.content.length) + " characters");
         }
 
         function generateName(identity, content) {
@@ -198,6 +198,7 @@ export default {
           }
 
         const identity = await GetIdentity();
+        console.log(post.expires_at);
 
         var proposal = {
             proposer: identity.account,
@@ -209,7 +210,7 @@ export default {
                 options: post.options
                 //src: "novusphere-forum"
             }),
-            expires_at: new Date(post.expires_at).getTime() / 1000
+            expires_at: new Date(post.expires_at).toISOString().replace(/Z$/, '') //new Date(post.expires_at).getTime() / 1000
         };
 
         var txid;
@@ -221,7 +222,7 @@ export default {
             });
         } catch (ex) {
             console.log(ex);
-            throw ("Error: Failed to submit proposal!");
+            throw new Error("Failed to submit proposal: " + ex.message);
         }
 
         const novusphere = GetNovusphere();

@@ -3,7 +3,7 @@ import { GetEOS, GetIdentity, ExecuteEOSActions } from "@/eos";
 export default async function UpvoteFree(post) {
     const identity = await GetIdentity();
     if (!identity.account) {
-        throw ("You must be logged in to upvote comments!");
+        throw new Error("You must be logged in to upvote comments!");
     }
 
     const action = {

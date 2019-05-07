@@ -203,7 +203,7 @@ export default async function PushNewPost(post, parent_tx, anon, warn_anon, set_
         }
 
     } catch (ex) {
-        set_status("Creating tx and broadcasting to EOS... Failed!");
+        set_status("Error: " + ex.message);
         console.log(ex);
         return false;
     }

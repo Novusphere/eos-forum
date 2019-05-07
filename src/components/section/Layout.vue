@@ -329,6 +329,7 @@
             <ul class="list-inline">
               <li class="list-inline-item"><router-link :to="{ name: 'Sub', params: { sub: 'eoscafe' } }"><img src="https://cdn.discordapp.com/attachments/522320367293825036/522320438161047552/icon-1.png" width="60">EOS Cafe</router-link></li>
               <li class="list-inline-item"><router-link :to="{ name: 'Sub', params: { sub: 'pixeos' } }"><img src="https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/pixeos.png" width="60">pixEOS</router-link></li>
+              <li class="list-inline-item"><router-link :to="{ name: 'Sub', params: { sub: 'whaleshares' } }"><img src="https://i.imgur.com/JHCT9cv.png" width="60">Whaleshares</router-link></li>
             </ul>
           </p>
 
@@ -392,6 +393,9 @@ export default {
   watch: {
     "$route.params.sub": function() {
       this.updateBrand();
+    },
+    "$route.params.tag": function() {
+      this.updateBrand(); 
     }
   },
   computed: {
@@ -453,7 +457,7 @@ export default {
       return storage.following
     },
     updateBrand() {
-      ui.helpers.UpdateBrand(this.$route.params.sub);
+      ui.helpers.UpdateBrand(this.$route.params.sub || this.$route.params.tag);
       this.brand_logo = FORUM_BRAND.logo;
       this.brand_icon = FORUM_BRAND.icon;
       this.brand_symbol = FORUM_BRAND.token_symbol;

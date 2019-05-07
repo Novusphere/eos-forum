@@ -83,6 +83,9 @@ export default {
             "data.poster": { $in: following },
         };
     },
+    followersByAccount(account) {
+        return { "state.following": account };
+    },
     threadsByAccount(account) {
         return {
             "data.json_metadata.edit": false,

@@ -9,6 +9,7 @@
         v-else-if="this.instagramAttachment"
         v-html="this.instagramAttachment"
         class="instagram-container">
+        <!-- html -->
       </div>
       <div v-else-if="telegramID" :id="random_id + '-telegram'">
         <!-- append -->
@@ -89,8 +90,12 @@ export default {
       telegram(window);
     }
 
-    if (this.attachment.value.match(/instagram|instagr.am/)) {
-      this.instagramAttachment = await this.getInstagramAttachmentEmbed(this.attachment.value)
+    if (this.attachment.value.match(/https:\/\/(www.)?instagr(.)?am/)) {
+      // instagram attachments are too complex to handle as iframe or simple embeds
+      // which puts it outside of the limitations of the embed framework in types/post/*
+      // so instead, we handle it here since we want to "trust" the html
+      await this.setInstagramAttachment();
+      setTimeout(() => window.instgrm.Embeds.process(), 1000);
     }
   },
   computed: {
@@ -149,19 +154,20 @@ export default {
     hasAttachment(type) {
       return this.attachment.display == type;
     },
-    async getInstagramAttachmentEmbed(url) {
-      const request = await requests.get(`https://api.instagram.com/oembed/?url=${url}`)
-      if (request && request['html']) {
-        return request['html']
+    async setInstagramAttachment() {
+      const request = await requests.get(
+        `https://api.instagram.com/oembed/?url=${this.attachment.value}`
+      );
+      if (request && request["html"]) {
+        this.instagramAttachment = request["html"];
       }
-      return null
     }
   },
   data() {
     return {
-      random_id: (Math.random() * 0x7FFFFFFF) | 0,
+      random_id: (Math.random() * 0x7fffffff) | 0,
       show_iframe: false,
-      instagramAttachment: '',
+      instagramAttachment: ""
     };
   }
 };

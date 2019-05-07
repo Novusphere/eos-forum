@@ -44,13 +44,15 @@ async function TryConnectWallet(selectedProvider) {
     const wallet = accessContext.initWallet(selectedProvider);
 
     await wallet.connect();
-    const discoveryData = (await wallet.discover({ pathIndexList: [0] }));
 
     if (g_wallet)
         throw new Error('Already have a wallet present');
     else if (!wallet.connected)
         throw new Error('Failed to connect');
-    else if (selectedProvider.id == 'ledger' &&
+    
+    const discoveryData = (await wallet.discover({ pathIndexList: [0] }));
+
+    if (selectedProvider.id == 'ledger' &&
         (discoveryData.keyToAccountMap.length == 0 ||
             discoveryData.keyToAccountMap.every(k => !k.accounts || k.accounts.length == 0))) {
 
@@ -84,9 +86,6 @@ async function DetectWallet(once) {
                 await TryConnectWallet(provider);
             }
             catch (ex) {
-                if (i == 0) {
-                    window._alert(ex);
-                }
                 console.log('Undetected ' + provider.id);
             }
         }

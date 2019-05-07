@@ -8,7 +8,7 @@ export default async function UpvotePaid(post, atmos) {
 
     atmos = parseFloat(atmos);
     if (isNaN(atmos) || atmos <= 0) {
-        throw ("Invalid quantity of atmos");
+        throw new Error("Invalid quantity of atmos");
     }
 
     const identity = await GetIdentity();
@@ -58,7 +58,7 @@ export default async function UpvotePaid(post, atmos) {
 
     } catch (ex) {
         console.log(ex);
-        throw ("Error: upvote transaction failed!");
+        throw new Error("Error: upvote transaction failed!");
     }
 
     var new_upvotes = Math.floor(atmos / UPVOTE_ATMOS_RATE);
