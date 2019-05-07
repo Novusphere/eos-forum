@@ -1,49 +1,47 @@
 <template>
-  <div>
-    <div
-      v-if="this.instagramAttachment"
-      v-html="this.instagramAttachment"
-      class="instagram-container">
-    </div>
-    <div v-if="this.attachment && this.attachment.value"
-         :id="this.id"
-         :class="this.collapse ? 'row collapse' : 'row'">
+  <div v-if="this.attachment && this.attachment.value"
+       :id="this.id"
+       :class="this.collapse ? 'row collapse' : 'row'">
 
-      <div class="col-md-12">
-        <Tweet v-if="twitterID" :id="twitterID" />
-        <div v-else-if="telegramID" :id="random_id + '-telegram'">
-          <!-- append -->
-        </div>
-        <div v-else-if="iframe" class="text-center">
-          <iframe :src="this.show_iframe ? attachment.value : ''"
-                  style="max-width: 100%"
-                  :height="attachment.height"
-                  :width="attachment.width"
-                  frameborder="0"
-                  allow="encrypted-media"
-                  allowfullscreen>
-          </iframe>
-        </div>
-        <div v-else-if="markdown">
-          <p v-html="markdown_html"></p>
-        </div>
-        <div v-else-if="img">
-          <img class="limit-height" :src="attachment.value">
-        </div>
-        <div v-else-if="mp4" class="text-center">
-          <video class="limit-height" controls>
-            <source :src="attachment.value" type="video/mp4">
-          </video>
-        </div>
-        <div v-else-if="mp3">
-          <audio class="limit-height" controls>
-            <source :src="attachment.value" type="audio/mpeg">
-          </audio>
-        </div>
-        <div v-else-if="link">
-          <div>
-            <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
-          </div>
+    <div class="col-md-12">
+      <Tweet v-if="twitterID" :id="twitterID" />
+      <div
+        v-else-if="this.instagramAttachment"
+        v-html="this.instagramAttachment"
+        class="instagram-container">
+      </div>
+      <div v-else-if="telegramID" :id="random_id + '-telegram'">
+        <!-- append -->
+      </div>
+      <div v-else-if="iframe" class="text-center">
+        <iframe :src="this.show_iframe ? attachment.value : ''"
+                style="max-width: 100%"
+                :height="attachment.height"
+                :width="attachment.width"
+                frameborder="0"
+                allow="encrypted-media"
+                allowfullscreen>
+        </iframe>
+      </div>
+      <div v-else-if="markdown">
+        <p v-html="markdown_html"></p>
+      </div>
+      <div v-else-if="img">
+        <img class="limit-height" :src="attachment.value">
+      </div>
+      <div v-else-if="mp4" class="text-center">
+        <video class="limit-height" controls>
+          <source :src="attachment.value" type="video/mp4">
+        </video>
+      </div>
+      <div v-else-if="mp3">
+        <audio class="limit-height" controls>
+          <source :src="attachment.value" type="audio/mpeg">
+        </audio>
+      </div>
+      <div v-else-if="link">
+        <div>
+          <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
         </div>
       </div>
     </div>
