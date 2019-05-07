@@ -11,9 +11,9 @@ import {
 
 import { storage } from "@/storage";
 
-export default async function UserProfile(current_page, account, sorter) {    
+export default async function UserProfile(current_page, account, sorter) {
     var benchmark = (new Date()).getTime();
-    
+
     current_page = parseInt(current_page ? current_page : 1);
     var is_blocked = await moderation.isBlocked(0, null, account);
     var is_followed = storage.following.includes(account);
@@ -21,10 +21,14 @@ export default async function UserProfile(current_page, account, sorter) {
     const eos = GetEOS();
     const novusphere = GetNovusphere();
 
-    var balance_atmos = parseFloat(
-        (await eos.rpc.get_currency_balance("novusphereio", account, "ATMOS"))[0]
-    );
-    balance_atmos = (isNaN(balance_atmos) ? 0 : balance_atmos).toFixed(3);
+    var balance_atmos = 0;
+
+    if (account.length < 14) {
+        balance_atmos = parseFloat(
+            (await eos.rpc.get_currency_balance("novusphereio", account, "ATMOS"))[0]
+        );
+        balance_atmos = (isNaN(balance_atmos) ? 0 : balance_atmos).toFixed(3);
+    }
 
     console.log(`loaded (1) in ${(new Date()).getTime() - benchmark} ms`);
 
@@ -69,7 +73,7 @@ export default async function UserProfile(current_page, account, sorter) {
             {
                 $project: novusphere.query.project.post({
                     normalize_up: true,
-                    score: true 
+                    score: true
                 })
             },
             { $lookup: novusphere.query.lookup.postReplies() },

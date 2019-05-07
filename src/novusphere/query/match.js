@@ -87,7 +87,7 @@ export default {
         return { "state.following": account };
     },
     threadsByAccount(account) {
-        return {
+        var query = {
             "data.json_metadata.edit": false,
             "data.json_metadata.sub": { $exists: true, $ne: "" },
             "data.reply_to_post_uuid": "",
@@ -96,6 +96,13 @@ export default {
                 $gte: 1531434299
             } /* Last eosforumtest contract redeploy */
         };
+
+        if (account.length >= 14) { // public key
+            delete query["data.poster"];
+            query["data.json_metadata.anon_id.pub"] = account;
+        }
+
+        return query;
     },
     postsByTag(tag) {
         var query = {

@@ -22,8 +22,8 @@
           <router-link
             v-else-if="post.transaction"
             @click.native.stop
-            :class="{'disabled': is_anon_alias}"
-            :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+            :class="{'disabled': false}"
+            :to="{ name: 'UserProfile', params: { account: post_poster } }">
 
             <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">     
             <font-awesome-icon v-if="post.user_icons.length == 0" class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
@@ -104,8 +104,8 @@
                   <router-link
                     v-else-if="post.transaction"
                     @click.native.stop
-                    :class="{'disabled': is_anon_alias}"
-                    :to="{ name: 'UserProfile', params: { account: post.data.poster } }">
+                    :class="{'disabled': false}"
+                    :to="{ name: 'UserProfile', params: { account: post_poster } }">
                     
                     <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">
                     <font-awesome-icon v-if="post.user_icons.length == 0"  class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
@@ -358,6 +358,13 @@ export default {
     }
   },
   computed: {
+    post_poster() {
+      var anon_id = this.post.data.json_metadata.anon_id;
+      if (anon_id && anon_id.pub) {
+        return anon_id.pub;
+      }
+      return this.post.poster;
+    },
     created_at() {
       return moment(this.post.createdAt * 1000).fromNow();
     },

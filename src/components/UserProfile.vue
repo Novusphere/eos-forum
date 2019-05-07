@@ -85,8 +85,9 @@
           <div> 
             <img v-if="user_icons.length > 0" v-for="(icon, i) in user_icons" :key="i" width="25" height="25" :src="icon">     
             <font-awesome-icon v-else class="fas" :icon="['fas', 'user-circle']" />
-
-            {{ account }} 
+            <span style="overflow-wrap: break-word">
+              {{ account }} 
+            </span>
           </div>
           <button class="btn btn-primary mt-3" v-on:click="toggleFollow()">
             {{ is_followed ? 'Unfollow' : 'Follow' }}
