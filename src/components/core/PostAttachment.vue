@@ -112,6 +112,7 @@ export default {
         facebookScript.setAttribute('src', facebookSDKScriptPath);
         child.appendChild(facebookScript);
       }
+      setTimeout(() => window.FB.XFBML.parse(), 1000);
     }
   },
   computed: {
