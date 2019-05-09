@@ -79,10 +79,14 @@ export default {
       required: true
     }
   },
+  async updated() {
+    if (this.instagramAttachment) {
+      window.instgrm.Embeds.process();
+    }
+  },
   async mounted() {
     this.show_iframe = !this.collapse;
 
-    // unfortunately, there's no vue component for this :(
     if (this.telegramID) {
       var child = document.getElementById(this.random_id + "-telegram");
       var script = document.createElement("script");
@@ -93,17 +97,16 @@ export default {
 
       telegram(window);
     }
-
-    if (this.attachment.value.match(/https:\/\/(www.)?instagr(.)?am/)) {
+    else if (this.hasFacebookAsAttachment) {
+      console.log('fb');
+      window.FB.XFBML.parse();
+    }
+    else if (this.attachment.value.match(/https:\/\/(www.)?instagr(.)?am/)) {
       // instagram attachments are too complex to handle as iframe or simple embeds
       // which puts it outside of the limitations of the embed framework in types/post/*
       // so instead, we handle it here since we want to "trust" the html
       await this.setInstagramAttachment();
-      setTimeout(() => window.instgrm.Embeds.process(), 1000);
-    }
-
-    if (this.hasFacebookAsAttachment) {
-      setTimeout(() => window.FB.XFBML.parse(), 1000);
+      // --> updated()
     }
   },
   computed: {
