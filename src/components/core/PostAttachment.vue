@@ -11,6 +11,10 @@
         class="instagram-container">
         <!-- html -->
       </div>
+      <div v-else-if="this.hasFacebookAsAttachment" :id="random_id + '-facebook'">
+        <div id="fb-root"></div>
+        <div class="fb-post" data-width="300" :data-href="this.attachment.value"></div>
+      </div>
       <div v-else-if="telegramID" :id="random_id + '-telegram'">
         <!-- append -->
       </div>
@@ -97,8 +101,25 @@ export default {
       await this.setInstagramAttachment();
       setTimeout(() => window.instgrm.Embeds.process(), 1000);
     }
+
+    if (this.hasFacebookAsAttachment) {
+      const scripts = document.getElementsByTagName('script');
+      // make sure to load the script only once
+      const facebookSDKScriptPath = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2';
+      if (!Array.from(scripts).find(script => script.src ===  facebookSDKScriptPath)) {
+        const child = document.getElementById(this.random_id + "-facebook");
+        const facebookScript = document.createElement('script');
+        facebookScript.setAttribute('src', facebookSDKScriptPath);
+        child.appendChild(facebookScript);
+      }
+      setTimeout(() => window.FB.XFBML.parse(), 1000);
+    }
   },
   computed: {
+    hasFacebookAsAttachment() {
+      const facebookMatch = this.attachment.value.match(/facebook.com|fb.me/);
+      return facebookMatch && facebookMatch.length > 0
+    },
     twitterID() {
       if (this.attachment.value.includes("twitframe.com/show")) {
         const s = this.attachment.value.match(/status\/[0-9]+/);
@@ -135,7 +156,7 @@ export default {
       return this.hasAttachment("mp3");
     },
     link() {
-      return this.hasAttachment("link");
+      return this.hasAttachment("link") && !this.hasFacebookAsAttachment;
     },
     markdown() {
       return this.hasAttachment("markdown");
