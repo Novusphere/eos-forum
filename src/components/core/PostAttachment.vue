@@ -103,15 +103,6 @@ export default {
     }
 
     if (this.hasFacebookAsAttachment) {
-      const scripts = document.getElementsByTagName('script');
-      // make sure to load the script only once
-      const facebookSDKScriptPath = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2';
-      if (!Array.from(scripts).find(script => script.src ===  facebookSDKScriptPath)) {
-        const child = document.getElementById(this.random_id + "-facebook");
-        const facebookScript = document.createElement('script');
-        facebookScript.setAttribute('src', facebookSDKScriptPath);
-        child.appendChild(facebookScript);
-      }
       setTimeout(() => window.FB.XFBML.parse(), 1000);
     }
   },
