@@ -10,6 +10,10 @@ async function SaveAccountState() {
     const eos = GetEOS();
 
     const account_state = {
+        moderation: {
+            accounts: storage.moderation.accounts,
+            transactions: storage.moderation.transactions
+        },
         subscribed_subs: storage.subscribed_subs,
         unsubscribed_subs: storage.unsubscribed_subs,
         last_notification: storage.last_notification,
@@ -140,6 +144,11 @@ async function ApplyLoadedState(ns_account) {
 
         if (state.following) {
             importArray(state.following.filter(f => f), storage.following);
+        }
+
+        if (state.moderation) {
+            importArray(state.moderation.accounts, storage.moderation.accounts);
+            importArray(state.moderation.transactions, storage.moderation.transactions);
         }
 
         if (state.last_notification && !isNaN(state.last_notification)) {

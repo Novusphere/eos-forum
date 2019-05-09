@@ -263,6 +263,12 @@
                 <font-awesome-icon :icon="['fas', 'link']" />
               </a>
             </li>
+            <li class="list-inline-item">
+              <a @click="toggleSpam()" href="javascript:void(0)">
+                <font-awesome-icon :icon="['fas', 'exclamation-triangle']" />
+                mark as spam
+              </a>
+            </li>
             <li class="list-inline-item" v-if="post.depth >= 5">
               <a
                 @click="
@@ -271,7 +277,7 @@
                 "
                 class="hover black follow-discussion"
               >
-                follow the discussion
+                show more
               </a>
             </li>
           </ul>
@@ -318,7 +324,8 @@
 import { BRANDS, FORUM_BRAND } from "@/ui/constants";
 import ui from "@/ui";
 import requests from "@/requests";
-import { storage } from "@/storage";
+import { storage, SaveStorage } from "@/storage";
+import { SaveAccountState } from "@/accountstate";
 import { GetIdentity, GetTokensInfo } from "@/eos";
 import { MarkdownParser } from "@/markdown";
 import { moderation } from "@/moderation";
@@ -529,6 +536,23 @@ export default {
         )));
   },
   methods: {
+    toggleSpam() {
+      if (!this.is_spam) {
+        if (!storage.moderation.transactions.includes(this.post.o_transaction)) {
+          storage.moderation.transactions.push(this.post.o_transaction);
+        }
+        this.is_spam =true;
+      }
+      else {
+        var i = storage.moderation.transactions.indexOf(this.post.o_transaction)
+        if (i > -1) {
+          storage.moderation.transactions.splice(i, 1);
+        }
+        this.is_spam = false;
+      }
+      SaveStorage();
+      SaveAccountState();
+    },
     post_content_html() {
       let content = this.post.getContent();
       let token;

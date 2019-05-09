@@ -566,11 +566,11 @@ class Post {
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             {
-                match: /https:\/\/www.instagram.com\/p\/[a-zA-Z0-9]+/i,
+                match: /https:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i,
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             {
-                match: /https:\/\/www.instagr.am\/p\/[a-zA-Z0-9]+/i,
+                match: /https:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i,
                 handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
