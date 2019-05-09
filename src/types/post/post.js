@@ -561,7 +561,6 @@ class Post {
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             {
-                
                 match: /https:\/\/medium.com\/@[\w]+\/.+/i,
                 handle: (m) => attach(m[0], 'url', 'link')
             },
@@ -572,6 +571,22 @@ class Post {
             {
                 match: /https:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i,
                 handle: (m) => attach(m[0], 'url', 'link')
+            },
+          /**
+           * There are many different combinations of facebook URLs:
+           * facebook.com/video.php?###
+           * facebook.com/stories.php?###
+           * facebook.com/photo.php?###
+           * facebook.com/######/videos/###
+           * facebook.com/######/posts/###
+           *
+           * All of the above are also in combination with fb.me.
+           * Perhaps it is best to generalize to just the host(s).
+           * Old regex: ^(https?:\/\/)?(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos)\/[a-zA-Z0-9(.?)]+)
+           */
+          {
+              match: /^(https?:\/\/)?(www\.)?(facebook|fb).(com|me)/i,
+              handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
 
