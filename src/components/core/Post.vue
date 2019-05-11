@@ -780,7 +780,7 @@ export default {
       window.open(`http://twitter.com/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}&hashtags=eos`, '_blank')
     },
     shareToTelegram() {
-      window.open(`https://telegram.me/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}&hashtags=eos`, '_blank')
+      window.open(`https://telegram.me/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}`, '_blank')
     }
   },
   data() {
