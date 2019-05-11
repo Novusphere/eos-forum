@@ -523,6 +523,9 @@ export default {
           ? BRANDS[this.sub].logo
           : BRANDS["novusphere"].logo;
       return t;
+    },
+    shareHref() {
+      return `https://eos.discussions.app/${this.$router.resolve(this.perma_link).href}`;
     }
   },
   async mounted() {
@@ -768,19 +771,16 @@ export default {
       this.show_share_sheet = !this.show_share_sheet;
     },
     shareToFacebook() {
-      const href = `https://eos.discussions.app/${this.$router.resolve(this.perma_link).href}`;
       FB.ui({
         method: 'share',
-        href: href
+        href: this.shareHref
       })
     },
     shareToTwitter() {
-      const href = `https://eos.discussions.app/${this.$router.resolve(this.perma_link).href}`;
-      window.open(`http://twitter.com/share?text=Check this out&url=${encodeURIComponent(href)}&hashtags=eos`, '_blank')
+      window.open(`http://twitter.com/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}&hashtags=eos`, '_blank')
     },
     shareToTelegram() {
-      const href = `https://eos.discussions.app/${this.$router.resolve(this.perma_link).href}`;
-      window.open(`https://telegram.me/share?text=Check this out&url=${encodeURIComponent(href)}&hashtags=eos`, '_blank')
+      window.open(`https://telegram.me/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}&hashtags=eos`, '_blank')
     }
   },
   data() {
