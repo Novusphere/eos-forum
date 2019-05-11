@@ -146,7 +146,7 @@
               ref="post_attachment"
               :attachment="post.data.json_metadata.attachment"
               :id="'content-' + post.data.post_uuid"
-              :collapse="this.show_iframe">
+              :collapse="false">
             </post-attachment>
           </div>
           <div v-if="post.referendum && post.referendum.details">
@@ -761,7 +761,6 @@ export default {
       ],
       status: "",
       identity: {},
-      show_iframe: false,
       show_quick_reply: false,
       show_quick_edit: false,
       quick_reply: "",
