@@ -557,6 +557,11 @@ export default {
           this.post.createdAt,
           this.post.o_transaction
         )));
+
+    // show quick reply open by default for OP
+    if (this.post.depth == 0 && this.showChildren) {
+      this.show_quick_reply = true;
+    }
   },
   methods: {
     toggleSpam() {
