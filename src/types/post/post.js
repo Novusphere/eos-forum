@@ -543,6 +543,10 @@ class Post {
             attachment.display = d;
         }
 
+        const whiteList = [
+          /https:\/\/devhints.io\/[a-zA-Z0-9-_]+/,
+        ];
+
         const filters = [
             { // youtube
                 match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/i,
@@ -575,6 +579,10 @@ class Post {
             {
               match: /https?:\/\/(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos)\/[a-zA-Z0-9(.?)]+)/i,
               handle: (m) => attach(m[0], 'url', 'link')
+            },
+            {
+              match: new RegExp(whiteList.map(link => link.source).join('|'), 'i'),
+              handle: (m) => attach(m[0], 'link', 'iframe')
             }
         ];
 

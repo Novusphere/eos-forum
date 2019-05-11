@@ -19,7 +19,7 @@
         <!-- append -->
       </div>
       <div v-else-if="iframe" class="text-center">
-        <iframe :src="this.show_iframe ? attachment.value : ''"
+        <iframe :src="this.a ? attachment.value : ''"
                 style="max-width: 100%"
                 :height="attachment.height"
                 :width="attachment.width"

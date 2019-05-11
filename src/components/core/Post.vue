@@ -141,6 +141,7 @@
             'op-posttext': is_op
           }"
         >
+          <pre>{{ post.data.json_metadata.attachment }}</pre>
           <div>
             <post-attachment
               ref="post_attachment"
