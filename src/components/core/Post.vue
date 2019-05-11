@@ -25,7 +25,7 @@
             :class="{'disabled': false}"
             :to="{ name: 'UserProfile', params: { account: post_poster } }">
 
-            <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">     
+            <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">
             <font-awesome-icon v-if="post.user_icons.length == 0" class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
 
             {{ poster_name }}
@@ -106,7 +106,7 @@
                     @click.native.stop
                     :class="{'disabled': false}"
                     :to="{ name: 'UserProfile', params: { account: post_poster } }">
-                    
+
                     <img v-if="post.user_icons.length > 0" v-for="(icon, i) in post.user_icons" :key="i" width="25" height="25" :src="icon">
                     <font-awesome-icon v-if="post.user_icons.length == 0"  class="fas" :icon="['fas', is_anon_alias ? 'user-secret' : 'user-circle']" />
 
@@ -167,7 +167,7 @@
               <a class="btn btn-sm btn-outline-secondary" @click.stop="referendumClean()" v-if="post.data.poster == identity.account">clean</a>
             </div>
           </div>
-          
+
           <p v-if="post_content_html()" v-html="post_content_html()" />
         </div>
         <div class="clearfix"></div>

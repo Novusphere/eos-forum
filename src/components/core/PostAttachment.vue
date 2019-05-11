@@ -45,8 +45,23 @@
         </audio>
       </div>
       <div v-else-if="link">
-        <div>
-          <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
+        <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
+      </div>
+      <div v-else-if="untrustedIframe">
+        <iframe
+          v-if="show_iframe"
+          :src="attachment.value"
+          style="max-width: 100%"
+          :height="attachment.height"
+          :width="attachment.width"
+          frameborder="0"
+          allow="encrypted-media"
+          allowfullscreen
+        >
+        </iframe>
+        <div class="show_iframe" @click="toggleIframe()">
+          <span v-if="!show_iframe">Click here to show embedded link</span>
+          <span v-if="show_iframe">Click here to hide embedded link</span>
         </div>
       </div>
     </div>
@@ -85,7 +100,9 @@ export default {
     }
   },
   async mounted() {
-    this.show_iframe = !this.collapse;
+    if (!this.untrustedIframe) {
+      this.show_iframe = !this.collapse;
+    }
 
     if (this.telegramID) {
       var child = document.getElementById(this.random_id + "-telegram");
@@ -140,6 +157,9 @@ export default {
         !this.attachment.value.includes("twitframe.com/show")
       );
     },
+    untrustedIframe() {
+      return this.hasAttachment("untrustedIframe")
+    },
     img() {
       return this.hasAttachment("img");
     },
@@ -176,6 +196,10 @@ export default {
       if (request && request["html"]) {
         this.instagramAttachment = request["html"];
       }
+    },
+    toggleIframe() {
+      this.show_iframe = !this.show_iframe;
+      this.$forceUpdate();
     }
   },
   data() {
@@ -195,5 +219,11 @@ export default {
 }
 .instagram-container {
   padding: 1em 0;
+}
+.show_iframe {
+  cursor: pointer;
+  padding: 0 0.5em;
+  border: 1px solid #ecf0f1;
+  background: #fff;
 }
 </style>

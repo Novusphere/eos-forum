@@ -543,6 +543,10 @@ class Post {
             attachment.display = d;
         }
 
+        const whiteList = [
+          /https:\/\/devhints.io\/[a-zA-Z0-9-_]+/,
+        ];
+
         const filters = [
             { // youtube
                 match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/i,
@@ -575,6 +579,10 @@ class Post {
             {
               match: /https?:\/\/(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos)\/[a-zA-Z0-9(.?)]+)/i,
               handle: (m) => attach(m[0], 'url', 'link')
+            },
+            {
+              match: new RegExp(whiteList.map(link => link.source).join('|'), 'i'),
+              handle: (m) => attach(m[0], 'link', 'iframe')
             }
         ];
 
@@ -586,6 +594,18 @@ class Post {
                 break;
             }
         }
+
+      // detect any other links
+      const matches = this.data.content.match(/\bhttps?:\/\/\S+/gi);
+      if (matches && matches.length > 0) {
+        for (var m = 0; m < matches.length; m++) {
+          if (!attachment.value && !attachment.display && !attachment.type) {
+            attach(matches[m], 'url', 'untrustedIframe');
+            attachment.width = 560;
+            attachment.height = 400;
+          }
+        }
+      }
     }
 
     async applyEdit(edit) {
