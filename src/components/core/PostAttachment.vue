@@ -46,9 +46,6 @@
       </div>
       <div v-else-if="link">
         <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
-        <div class="show_iframe" @click="show_iframe">
-          Click here to show embedded link
-        </div>
       </div>
       <div v-else-if="untrustedIframe">
         <iframe
