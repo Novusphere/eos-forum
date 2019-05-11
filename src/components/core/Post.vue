@@ -799,7 +799,7 @@ export default {
       ],
       status: "",
       identity: {},
-      show_quick_reply: true,
+      show_quick_reply: false,
       show_quick_edit: false,
       show_share_sheet: false,
       quick_reply: "",

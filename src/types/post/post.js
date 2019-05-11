@@ -403,7 +403,7 @@ class Post {
     }
 
     async detect() {
-        
+
     }
 
     async detectContent() {
@@ -465,17 +465,17 @@ class Post {
 
         if (attachment_val.startsWith('https://whaleshares.io')) {
             try {
-                const ws_args = attachment_val.substring(attachment_val.indexOf('.io')+3).split('/');
+                const ws_args = attachment_val.substring(attachment_val.indexOf('.io') + 3).split('/');
                 const ws_name = (ws_args[1] || '').substring(1);
                 const ws_post_id = ws_args[2];
 
                 const ws_api = await requests.get(`https://api.whaleshares.io/rest2jsonrpc/database_api/get_content?params=["${ws_name}","${ws_post_id}"]`);
                 //console.log(ws_api);
-                
+
                 var ws_html = ws_api.result.body;
                 ws_html = ws_html.replace(/!\[\]\(https:\/\/whaleshares\.io.+[a-zA-Z0-9]+\)/g, (old) => {
                     var old_trim = old.trim();
-                    old_trim = old_trim.substring(4, old_trim.length-1);
+                    old_trim = old_trim.substring(4, old_trim.length - 1);
                     return `<img src="${old_trim}">`;
                 });
 
@@ -494,16 +494,16 @@ class Post {
                 var cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + attachment_val);
                 var cors_jq = jQuery(cors_html);
 
-                
-                    var canonical = cors_html.indexOf('link rel="canonical"');
-                    if (canonical > -1) {
-                        canonical = cors_html.substring(canonical + 27, cors_html.indexOf('"', canonical + 27)).toLowerCase();
 
-                        if (canonical.indexOf('steemit.com') > -1 && canonical != attachment_val.toLowerCase()) {
-                            cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + canonical);
-                            cors_jq = jQuery(cors_html);
-                        }
+                var canonical = cors_html.indexOf('link rel="canonical"');
+                if (canonical > -1) {
+                    canonical = cors_html.substring(canonical + 27, cors_html.indexOf('"', canonical + 27)).toLowerCase();
+
+                    if (canonical.indexOf('steemit.com') > -1 && canonical != attachment_val.toLowerCase()) {
+                        cors_html = await requests.get('https://db.novusphere.io/service/cors/?' + canonical);
+                        cors_jq = jQuery(cors_html);
                     }
+                }
 
                 cors_jq = cors_jq.find('div[class*="MarkdownViewer"]');
 
@@ -543,10 +543,6 @@ class Post {
             attachment.display = d;
         }
 
-        const whiteList = [
-          /https:\/\/devhints.io\/[a-zA-Z0-9-_]+/,
-        ];
-
         const filters = [
             { // youtube
                 match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/i,
@@ -577,35 +573,35 @@ class Post {
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             {
-              match: /https?:\/\/(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos)\/[a-zA-Z0-9(.?)]+)/i,
-              handle: (m) => attach(m[0], 'url', 'link')
+                match: /https?:\/\/(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos)\/[a-zA-Z0-9(.?)]+)/i,
+                handle: (m) => attach(m[0], 'url', 'link')
             },
-            {
-              match: new RegExp(whiteList.map(link => link.source).join('|'), 'i'),
-              handle: (m) => attach(m[0], 'link', 'iframe')
-            }
+            //{
+            //  match: new RegExp(whiteList.map(link => link.source).join('|'), 'i'),
+            //  handle: (m) => attach(m[0], 'link', 'iframe')
+            //}
         ];
 
-        for (var i = 0; i < filters.length; i++) {
-            const f = filters[i];
-            const match = this.data.content.match(f.match);
-            if (match && match.length > 0) {
-                f.handle(match);
-                break;
-            }
-        }
+        //for (var i = 0; i < filters.length; i++) {
+        //    const f = filters[i];
+        //    const match = this.data.content.match(f.match);
+        //    if (match && match.length > 0) {
+        //        f.handle(match);
+        //        break;
+        //    }
+        // }
 
-      // detect any other links
-      const matches = this.data.content.match(/\bhttps?:\/\/\S+/gi);
-      if (matches && matches.length > 0) {
-        for (var m = 0; m < matches.length; m++) {
-          if (!attachment.value && !attachment.display && !attachment.type) {
-            attach(matches[m], 'url', 'untrustedIframe');
-            attachment.width = 560;
-            attachment.height = 400;
-          }
-        }
-      }
+        // detect any other links
+        //const matches = this.data.content.match(/\bhttps?:\/\/\S+/gi);
+        //if (matches && matches.length > 0) {
+        //  for (var m = 0; m < matches.length; m++) {
+        //    if (!attachment.value && !attachment.display && !attachment.type) {
+        //      attach(matches[m], 'url', 'untrustedIframe');
+        //      attachment.width = 560;
+        //      attachment.height = 400;
+        //    }
+        // }
+        //}
     }
 
     async applyEdit(edit) {

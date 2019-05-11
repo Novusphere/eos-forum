@@ -19,7 +19,8 @@
         <!-- append -->
       </div>
       <div v-else-if="iframe" class="text-center">
-        <iframe :src="this.show_iframe ? attachment.value : ''"
+        <iframe v-if="show_iframe"
+                :src="attachment.value"
                 style="max-width: 100%"
                 :height="attachment.height"
                 :width="attachment.width"
@@ -27,6 +28,10 @@
                 allow="encrypted-media"
                 allowfullscreen>
         </iframe>
+        <button class="btn btn-primary" v-if="untrustedIframe" @click="toggleIframe()">
+          <span v-if="!show_iframe">Show embedded content</span>
+          <span v-if="show_iframe">Hide embedded content</span>
+        </button>
       </div>
       <div v-else-if="markdown">
         <p v-html="markdown_html"></p>
@@ -47,23 +52,6 @@
       <div v-else-if="link">
         <a target="_blank" :href="attachment.value">{{attachment.value}}</a>
       </div>
-      <div v-else-if="untrustedIframe">
-        <iframe
-          v-if="show_iframe"
-          :src="attachment.value"
-          style="max-width: 100%"
-          :height="attachment.height"
-          :width="attachment.width"
-          frameborder="0"
-          allow="encrypted-media"
-          allowfullscreen
-        >
-        </iframe>
-        <div class="show_iframe" @click="toggleIframe()">
-          <span v-if="!show_iframe">Click here to show embedded link</span>
-          <span v-if="show_iframe">Click here to hide embedded link</span>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -73,6 +61,12 @@ import { Tweet } from "vue-tweet-embed";
 import { MarkdownParser } from "@/markdown";
 import telegram from "@/telegram";
 import requests from "@/requests";
+
+const IFRAME_WHITELIST = [
+  /https:\/\/twitframe.com\/+/i,
+  /https:\/\/youtube.com\/+/i,
+  /https:\/\/calendar.google.com\/+/i,
+];
 
 export default {
   name: "PostAttachment",
@@ -115,7 +109,6 @@ export default {
       telegram(window);
     }
     else if (this.hasFacebookAsAttachment) {
-      console.log('fb');
       window.FB.XFBML.parse();
     }
     else if (this.attachment.value.match(/https:\/\/(www.)?instagr(.)?am/)) {
@@ -158,7 +151,8 @@ export default {
       );
     },
     untrustedIframe() {
-      return this.hasAttachment("untrustedIframe")
+      if (!this.hasAttachment("iframe")) return false;
+      return !IFRAME_WHITELIST.some(rx => this.attachment.value.match(rx));
     },
     img() {
       return this.hasAttachment("img");
