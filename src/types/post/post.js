@@ -573,7 +573,7 @@ class Post {
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             {
-                match: /https?:\/\/(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos)\/[a-zA-Z0-9(.?)]+)/i,
+                match: /https?:\/\/(www\.)?(facebook|fb).(com|me)\/.+/i,
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             //{
@@ -582,14 +582,14 @@ class Post {
             //}
         ];
 
-        //for (var i = 0; i < filters.length; i++) {
-        //    const f = filters[i];
-        //    const match = this.data.content.match(f.match);
-        //    if (match && match.length > 0) {
-        //        f.handle(match);
-        //        break;
-        //    }
-        // }
+        for (var i = 0; i < filters.length; i++) {
+            const f = filters[i];
+            const match = this.data.content.match(f.match);
+            if (match && match.length > 0) {
+                f.handle(match);
+                break;
+            }
+        }
 
         // detect any other links
         //const matches = this.data.content.match(/\bhttps?:\/\/\S+/gi);
