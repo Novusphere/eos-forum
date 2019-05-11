@@ -594,6 +594,18 @@ class Post {
                 break;
             }
         }
+
+      // detect any other links
+      const matches = this.data.content.match(/\bhttps?:\/\/\S+/gi);
+      if (matches && matches.length > 0) {
+        for (var m = 0; m < matches.length; m++) {
+          if (!attachment.value && !attachment.display && !attachment.type) {
+            attach(matches[m], 'url', 'untrustedIframe');
+            attachment.width = 560;
+            attachment.height = 400;
+          }
+        }
+      }
     }
 
     async applyEdit(edit) {
