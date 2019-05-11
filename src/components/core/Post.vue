@@ -264,6 +264,26 @@
               </a>
             </li>
             <li class="list-inline-item">
+              <div class="text-center my-3">
+                <a @click="popShareSheet()" class="share-sheet-icon" :id="'share-sheet' + post.data.post_uuid">
+                  <font-awesome-icon :icon="['fas', 'share']" />
+                </a>
+                <b-popover :target="'share-sheet' + post.data.post_uuid" :show.sync="show_share_sheet" triggers="">
+                  <div class="share-sheet-container">
+                    <div class="share-sheet-header">
+                      <span class="title">Share With Friends</span>
+                      <a class="close" @click="popShareSheet()">Close</a>
+                    </div>
+                    <ul>
+                      <li @click="shareToFacebook()">Facebook</li>
+                      <li @click="shareToTwitter()">Twitter</li>
+                      <li @click="shareToTelegram()">Telegram</li>
+                    </ul>
+                  </div>
+                </b-popover>
+              </div>
+            </li>
+            <li class="list-inline-item">
               <a @click="toggleSpam()" href="javascript:void(0)">
                 <font-awesome-icon :icon="['fas', 'exclamation-triangle']" />
                 mark as spam
@@ -503,6 +523,9 @@ export default {
           ? BRANDS[this.sub].logo
           : BRANDS["novusphere"].logo;
       return t;
+    },
+    shareHref() {
+      return `https://eos.discussions.app/${this.$router.resolve(this.perma_link).href}`;
     }
   },
   async mounted() {
@@ -743,6 +766,21 @@ export default {
       } else {
         this.$router.push(this.thread_link);
       }
+    },
+    popShareSheet() {
+      this.show_share_sheet = !this.show_share_sheet;
+    },
+    shareToFacebook() {
+      FB.ui({
+        method: 'share',
+        href: this.shareHref
+      })
+    },
+    shareToTwitter() {
+      window.open(`http://twitter.com/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}&hashtags=eos`, '_blank')
+    },
+    shareToTelegram() {
+      window.open(`https://telegram.me/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}`, '_blank')
     }
   },
   data() {
@@ -763,6 +801,7 @@ export default {
       identity: {},
       show_quick_reply: true,
       show_quick_edit: false,
+      show_share_sheet: false,
       quick_reply: "",
       is_nsfw: false,
       is_spam: false,
@@ -869,5 +908,37 @@ export default {
 }
 .up {
   color: black!important;
+}
+.share-sheet-icon {
+  cursor: pointer;
+}
+.share-sheet-container {
+  display: flex;
+  flex-direction: column;
+}
+.share-sheet-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.share-sheet-header .title {
+  font-size: 14px;
+  color: #000000;
+}
+.share-sheet-header .close {
+  cursor: pointer;
+  font-size: 13px;
+  padding-left: 1em;
+  color: #5c5c5c;
+}
+.share-sheet-container ul {
+  padding: 1em 0 0 0;
+  margin: 0;
+  list-style-type: none;
+}
+.share-sheet-container ul li {
+  cursor: pointer;
+  padding: 0.15em 0;
 }
 </style>
