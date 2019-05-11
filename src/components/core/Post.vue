@@ -761,7 +761,7 @@ export default {
       ],
       status: "",
       identity: {},
-      show_quick_reply: false,
+      show_quick_reply: true,
       show_quick_edit: false,
       quick_reply: "",
       is_nsfw: false,
