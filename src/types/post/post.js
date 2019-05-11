@@ -573,7 +573,7 @@ class Post {
                 handle: (m) => attach(m[0], 'url', 'link')
             },
             {
-              match: /https?:\/\/(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos)\/[a-zA-Z0-9(.?)]+)/i,
+              match: /https?:\/\/(www\.)?(facebook|fb).(com|me)(\/[a-zA-Z0-9(.?)]+\/(posts|videos|photos)\/[a-zA-Z0-9(.?)]+)/i,
               handle: (m) => attach(m[0], 'url', 'link')
             }
         ];
