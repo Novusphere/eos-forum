@@ -525,7 +525,7 @@ export default {
       return t;
     },
     shareHref() {
-      return `https://eos.discussions.app/${this.$router.resolve(this.perma_link).href}`;
+      return `https://eos.discussions.app${this.$router.resolve(this.perma_link).href}`;
     }
   },
   async mounted() {
@@ -782,10 +782,12 @@ export default {
       })
     },
     shareToTwitter() {
-      window.open(`http://twitter.com/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}&hashtags=eos`, '_blank')
+      window.open(`http://twitter.com/share?text=${this.post.data.json_metadata.title}&url=${encodeURIComponent(this.shareHref)}&hashtags=${this.post.data.json_metadata.sub}`, '_blank'
+      )
     },
     shareToTelegram() {
-      window.open(`https://telegram.me/share?text=Check this out&url=${encodeURIComponent(this.shareHref)}`, '_blank')
+      window.open(`https://telegram.me/share?text=${this.post.data.json_metadata.title}&url=${encodeURIComponent(this.shareHref)}`, '_blank'
+      )
     }
   },
   data() {
