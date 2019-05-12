@@ -27,6 +27,7 @@
               class="post-parent"
               :key="p.o_id"
               :showAsFeed="p.data.reply_to_poster != ''"
+              :showChildren="false"
               @openPost="$_openPost"
               :post="p"
             />

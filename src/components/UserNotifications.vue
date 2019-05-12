@@ -25,6 +25,7 @@
           v-for="p in posts"
           :key="p.transaction"
           :showAsFeed="true"
+          :showChildren="false"
           @openPost="$_openPost"
           :post="p"
         />

@@ -27,6 +27,7 @@
               class="post-parent"
               :key="p.o_id"
               :showAsFeed="true"
+              :showChildren="false"
               @openPost="$_openPost"
               :post="p"
             />

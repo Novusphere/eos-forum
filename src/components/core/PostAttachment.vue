@@ -63,9 +63,10 @@ import telegram from "@/telegram";
 import requests from "@/requests";
 
 const IFRAME_WHITELIST = [
-  /https:\/\/twitframe.com\/+/i,
-  /https:\/\/youtube.com\/+/i,
-  /https:\/\/calendar.google.com\/+/i,
+  /^https:\/\/twitframe.com\/.+/i,
+  /^https:\/\/(www.)?youtube.com\/.+/i,
+  /^https:\/\/calendar.google.com\/.+/i,
+  /^https:\/\/emb.d.tube\/.+/i
 ];
 
 export default {
