@@ -263,7 +263,7 @@
                 <font-awesome-icon :icon="['fas', 'link']" />
               </a>
             </li>
-            <li class="list-inline-item">
+            <li class="list-inline-item" v-if="thread && post.transaction && !showAsFeed && post.depth === 0">
               <div class="text-center my-3">
                 <a @click="popShareSheet()" class="share-sheet-icon" :id="'share-sheet' + post.data.post_uuid">
                   <font-awesome-icon :icon="['fas', 'share']" />
