@@ -406,7 +406,7 @@ td.chbox {
 }
 
 .post-parent {
-    max-height: 400px;
+    max-height: 485px;
     overflow: hidden;
     position: relative;
     padding-bottom: 25px;
@@ -464,6 +464,7 @@ td.chbox {
 
 .post.post-parent {
     padding-bottom: 20px;
+    min-height: 290px;
 }
 .post {
     padding: 20px 20px 0px 15px;
