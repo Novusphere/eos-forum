@@ -122,10 +122,14 @@ export default {
   },
   computed: {
     hasFacebookAsAttachment() {
+      if (this.attachment.type != "url") return false;
+
       const facebookMatch = this.attachment.value.match(/facebook.com|fb.me/);
       return facebookMatch && facebookMatch.length > 0
     },
     twitterID() {
+      if (this.attachment.type != "url") return false;
+
       if (this.attachment.value.includes("twitframe.com/show")) {
         const s = this.attachment.value.match(/status\/[0-9]+/);
         if (s && s.length > 0) {
@@ -135,15 +139,15 @@ export default {
       return "";
     },
     telegramID() {
-      if (this.attachment.type == "url") {
+      if (this.attachment.type != "url") return false;
+
         const t_me = "://t.me/";
         const t_me_i = this.attachment.value.indexOf(t_me);
         if (t_me_i > -1) {
           const s = this.attachment.value.substring(t_me_i + t_me.length);
           return s;
         }
-      }
-      return "";
+      return '';
     },
     iframe() {
       return (
