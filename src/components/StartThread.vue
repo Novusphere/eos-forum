@@ -62,7 +62,7 @@
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Content</label>
                     <div class="col-sm-10">
-                      <RichTextEditor v-model="editor_content" />
+                      <RichTextEditor v-model="content" />
                     </div>
                 </div>
                 <div class="form-group row" v-if="is_referendum && is_referendum_multi">
@@ -316,14 +316,14 @@ export default {
         return;
       }
 
-      if (this.editor_content.length == 0) {
+      if (this.content.length == 0) {
         if (!this.attachment.value) {
           this.setStatus(
             "Post must have at least 1 character of content or an attachment"
           );
           return;
         }
-        this.editor.clearContent(true);
+        this.content = "";
       }
 
       const edit_post = this.edit_post;
@@ -337,7 +337,7 @@ export default {
           ? edit_post.data.reply_to_post_uuid || edit_post.data.post_uuid
           : "",
         certify: false,
-        content: this.editor_content,
+        content: this.content,
         post_uuid: ui.helpers.GeneratePostUuid(),
         json_metadata: JSON.stringify({
           title: this.title,
@@ -351,7 +351,7 @@ export default {
             type: this.attachment.type,
             display: this.attachment.value ? this.attachment.display : ""
           },
-          anon_id: anon ? await ui.helpers.GenerateAnonData(this.editor_content) : null
+          anon_id: anon ? await ui.helpers.GenerateAnonData(this.content) : null
         })
       };
 
@@ -381,7 +381,7 @@ export default {
           txid = await ui.actions.Referendum.PushNewProposal({
             expires_at: this.referendum_expires,
             title: this.title,
-            content: this.editor_content,
+            content: this.content,
             type: this.referendum_type,
             options: this.referendum_options
           });
@@ -443,6 +443,7 @@ export default {
       sub: "",
       sub2: {},
       title: "",
+      content: "",
       attachment: {
         value: "",
         type: "",
@@ -453,7 +454,6 @@ export default {
       referendum_option: "",
       referendum_options: [],
       customSub: "",
-      editor_content: '',
     };
   }
 };
