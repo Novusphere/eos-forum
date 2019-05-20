@@ -6,9 +6,9 @@
           v-for="editorOption in editorOptions"
           :key="editorOption.name"
           :class="{
-                                      'is-active': isActive[editorOption.name](),
-                                      'editor-button': true,
-                            }"
+            'is-active': isActive[editorOption.name](),
+            'editor-button': true,
+          }"
           @click.prevent="toggleEditorOption(editorOption.name)"
         >
           <font-awesome-icon
@@ -41,6 +41,7 @@
     Strike,
     Underline,
     History,
+    HorizontalRule,
   } from 'tiptap-extensions'
 
   export default {
@@ -49,7 +50,7 @@
       EditorContent,
       EditorMenuBar
     },
-    props: [ 'value' ],
+    props: ['value'],
     watch: {
       value(val) {
         if (val !== this.editor.getHTML()) {
@@ -80,6 +81,7 @@
             new Strike(),
             new Underline(),
             new History(),
+            new HorizontalRule(),
           ],
           onUpdate: ({getHTML}) => {
             this.$emit('input', getHTML())
@@ -93,6 +95,7 @@
           {name: 'strike', icon: 'strikethrough'},
           {name: 'link', icon: 'link'},
           {name: 'heading', icon: 'heading'},
+          {name: 'horizontal_rule', icon: 'minus'},
         ],
       }
     },
@@ -111,11 +114,24 @@
           case 'heading':
             this.editor.commands.heading({level: 1});
             break;
+          case 'link':
+            this.showLinkMenu();
+            break;
           default:
             this.editor.commands[name]();
             break;
         }
-      }
+      },
+      showLinkMenu() {
+        const link = prompt('Enter the URL:');
+        if (link) {
+          this.setLinkUrl(link);
+        }
+      },
+      setLinkUrl(url) {
+        this.editor.commands.link({href: url});
+        this.editor.focus()
+      },
     }
   }
 </script>
@@ -126,11 +142,19 @@
     box-shadow: none;
     border: none;
     background-color: #f1f1f1;
-    padding: 20px;
     font-size: 14px;
-    color: #989c9e;
+    color: black;
     font-family: 'Open Sans Light', sans-serif;
     margin-bottom: 20px;
+  }
+
+  .newtopicinput > div {
+    padding: 20px;
+  }
+
+  .newtopicinput a {
+    cursor: pointer;
+    color: #007bff;
   }
 
   .editor-button-container {

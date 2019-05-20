@@ -63,7 +63,6 @@
                     <label class="col-sm-2 col-form-label">Content</label>
                     <div class="col-sm-10">
                       <RichTextEditor v-model="editor_content" />
-                      <pre>{{ editor_content }}</pre>
                     </div>
                 </div>
                 <div class="form-group row" v-if="is_referendum && is_referendum_multi">

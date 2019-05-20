@@ -306,7 +306,7 @@
         <div :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
           :id="'qreply-' + post.data.post_uuid">
           <div class="col-sm-12">
-            <textarea @click.stop rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
+            <RichTextEditor v-model="quick_reply" />
           </div>
           <div class="col-sm-12 text-center" v-if="status">
             <span>{{ status }}</span>
@@ -352,10 +352,12 @@ import { moderation } from "@/moderation";
 import PostAttachment from "@/components/core/PostAttachment.vue";
 import moment from 'moment';
 import { Post } from "@/types/post";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default {
   name: "Post",
   components: {
+    RichTextEditor,
     PostAttachment
   },
   props: {
