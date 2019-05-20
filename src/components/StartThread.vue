@@ -62,7 +62,26 @@
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Content</label>
                     <div class="col-sm-10">
-                      <textarea rows="10" class="form-control" placeholder="Content" v-model="content"></textarea>
+                      <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
+                        <div class="editor-button-container">
+                          <button
+                            v-for="editorOption in editorOptions"
+                            :key="editorOption.name"
+                            :class="{
+                                      'is-active': isActive[editorOption.name](),
+                                      'editor-button': true,
+                            }"
+                            @click.prevent="toggleEditorOption(editorOption.name)"
+                          >
+                            <font-awesome-icon
+                              class="fas"
+                              :icon="['fas', editorOption.icon]"
+                            />
+                          </button>
+                        </div>
+                      </editor-menu-bar>
+                      <editor-content :editor="editor" class="newtopicinput" />
+                      <!--<textarea rows="10" class="form-control" placeholder="Content" v-model="content"></textarea>-->
                     </div>
                 </div>
                 <div class="form-group row" v-if="is_referendum && is_referendum_multi">
@@ -191,6 +210,25 @@ import Layout from "@/components/section/Layout";
 
 import { Post } from "@/types/post";
 import $ from "jquery";
+import { Editor, EditorContent, EditorMenuBar } from 'tiptap'
+import {
+  Blockquote,
+  CodeBlock,
+  HardBreak,
+  Heading,
+  OrderedList,
+  BulletList,
+  ListItem,
+  TodoItem,
+  TodoList,
+  Bold,
+  Code,
+  Italic,
+  Link,
+  Strike,
+  Underline,
+  History,
+} from 'tiptap-extensions'
 
 export default {
   name: "StartThread",
@@ -198,7 +236,9 @@ export default {
     Pager,
     Post: PostComponent,
     PostSorter,
-    Layout
+    Layout,
+    EditorContent,
+    EditorMenuBar
   },
   watch: {},
   computed: {
@@ -217,10 +257,16 @@ export default {
         return "?";
       }
       return this.getDeltaDays(expiry);
+    },
+    editor_content() {
+      return this.editor.getHTML()
     }
   },
   async mounted() {
     this.load();
+  },
+  beforeDestroy() {
+    this.editor.destroy()
   },
   methods: {
     updateTemp(event) {
@@ -275,7 +321,6 @@ export default {
         this.edit_post = main_post;
         this.sub = main_post.data.json_metadata.sub;
         this.title = main_post.data.json_metadata.title;
-        this.content = main_post.data.content;
 
         const attachment = main_post.data.json_metadata.attachment;
         this.attachment.value = attachment.value;
@@ -314,14 +359,14 @@ export default {
         return;
       }
 
-      if (this.content.length == 0) {
+      if (this.editor_content.length == 0) {
         if (!this.attachment.value) {
           this.setStatus(
             "Post must have at least 1 character of content or an attachment"
           );
           return;
         }
-        this.content = " ";
+        this.editor.clearContent(true);
       }
 
       const edit_post = this.edit_post;
@@ -335,7 +380,7 @@ export default {
           ? edit_post.data.reply_to_post_uuid || edit_post.data.post_uuid
           : "",
         certify: false,
-        content: this.content,
+        content: this.editor_content,
         post_uuid: ui.helpers.GeneratePostUuid(),
         json_metadata: JSON.stringify({
           title: this.title,
@@ -349,7 +394,7 @@ export default {
             type: this.attachment.type,
             display: this.attachment.value ? this.attachment.display : ""
           },
-          anon_id: anon ? await ui.helpers.GenerateAnonData(this.content) : null
+          anon_id: anon ? await ui.helpers.GenerateAnonData(this.editor_content) : null
         })
       };
 
@@ -379,7 +424,7 @@ export default {
           txid = await ui.actions.Referendum.PushNewProposal({
             expires_at: this.referendum_expires,
             title: this.title,
-            content: this.content,
+            content: this.editor_content,
             type: this.referendum_type,
             options: this.referendum_options
           });
@@ -429,6 +474,9 @@ export default {
       await preview.normalize();
 
       this.preview = preview;
+    },
+    toggleEditorOption(name) {
+      this.editor.commands[name]()
     }
   },
   data() {
@@ -441,7 +489,6 @@ export default {
       sub: "",
       sub2: {},
       title: "",
-      content: "",
       attachment: {
         value: "",
         type: "",
@@ -451,7 +498,39 @@ export default {
       referendum_expires: "",
       referendum_option: "",
       referendum_options: [],
-      customSub: ""
+      customSub: "",
+      editorOptions: [
+        { name: 'bold', icon: 'bold' },
+        { name: 'italic', icon: 'italic' },
+        { name: 'underline', icon: 'underline' },
+        { name: 'strike', icon: 'strikethrough' },
+        { name: 'link', icon: 'link' },
+        { name: 'heading', icon: 'heading' },
+      ],
+      editor: new Editor({
+        extensions: [
+          new Blockquote(),
+          new CodeBlock(),
+          new HardBreak(),
+          new Heading({ levels: [1, 2, 3] }),
+          new BulletList(),
+          new OrderedList(),
+          new ListItem(),
+          new TodoItem(),
+          new TodoList(),
+          new Bold(),
+          new Code(),
+          new Italic(),
+          new Link(),
+          new Strike(),
+          new Underline(),
+          new History(),
+        ],
+        content: `
+          <h1>Yay Headlines!</h1>
+          <p>All these <strong>cool tags</strong> are working now.</p>
+        `,
+      }),
     };
   }
 };
@@ -476,5 +555,26 @@ export default {
 <style scoped>
 .col-form-label {
   white-space: nowrap !important;
+}
+.newtopicinput {
+  border-radius: 2px;
+  box-shadow: none;
+  border: none;
+  background-color: #f1f1f1;
+  padding: 20px;
+  font-size: 14px;
+  color: #989c9e;
+  font-family: 'Open Sans Light', sans-serif;
+  margin-bottom: 20px;
+}
+.editor-button-container {
+  margin: 0 0 1em 0;
+}
+.editor-button {
+  background: none;
+  border: 1px solid #d8d8d8;
+  margin-right: 0.5em;
+  width: 40px;
+  border-radius: 4px;
 }
 </style>
