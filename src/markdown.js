@@ -9,7 +9,7 @@ const WHITE_LIST = [
     'H3', 'H4', 'I', 'IMG', 'KBD',
     'LI', 'OL', 'P', 'PRE', 'S',
     'SUP', 'SUB', 'STRONG', 'STRIKE', 'UL',
-    'BR', 'HR', '#text',
+    'BR', 'HR', '#text', 'U',
     // non-standard
     'DIV', 'FIGURE', 'CENTER'
 ];
@@ -21,7 +21,7 @@ const RX_DATA = new RegExp('data', 'i');
 class MarkdownParser {
     constructor(text, createdAt) {
         this.text = (text ? text : '').replace(/&#x200B;/g, "");
-        this.html = '';
+      this.html = '';
         this.attachments = [];
 
         if (createdAt == undefined || createdAt >= 1538136731) {

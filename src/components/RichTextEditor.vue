@@ -6,8 +6,8 @@
           v-for="editorOption in editorOptions"
           :key="editorOption.name"
           :class="{
-            'is-active': isActive[editorOption.name](),
             'editor-button': true,
+            'is-active': isActive[editorOption.name](),
           }"
           @click.prevent="toggleEditorOption(editorOption.name)"
         >
@@ -149,7 +149,7 @@
   }
 
   .newtopicinput > div {
-    padding: 20px;
+    padding: 10px;
   }
 
   .newtopicinput a {
@@ -167,5 +167,9 @@
     margin-right: 0.5em;
     width: 40px;
     border-radius: 4px;
+  }
+
+  .is-active {
+    border: 1px solid #000;
   }
 </style>
