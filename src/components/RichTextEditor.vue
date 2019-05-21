@@ -123,8 +123,12 @@
         }
       },
       showLinkMenu() {
-        const link = prompt('Enter the URL:');
+        let link = prompt('Enter the URL:');
         if (link) {
+          if (!/^(f|ht)tps?:\/\//i.test(link)) {
+            link = "https://" + link;
+          }
+
           this.setLinkUrl(link);
         }
       },
