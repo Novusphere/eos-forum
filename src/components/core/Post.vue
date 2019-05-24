@@ -930,6 +930,7 @@ export default {
   color: black!important;
 }
 .share-sheet-icon {
+  cursor: pointer;
   color: #363838 !important;
 }
 .share-sheet-icon:hover {
