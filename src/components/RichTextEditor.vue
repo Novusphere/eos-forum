@@ -43,6 +43,7 @@
     History,
     HorizontalRule,
   } from 'tiptap-extensions'
+  import {findPositionOfNodeBefore} from "prosemirror-utils";
 
   export default {
     name: "RichTextEditor",
@@ -115,7 +116,32 @@
             this.editor.commands.heading({level: 1});
             break;
           case 'link':
-            this.showLinkMenu();
+            const { empty } = this.editor.state.tr.selection
+            if (empty) {
+              // show popup to enter text and link
+              const text = prompt('Enter text to link:')
+              if (text) {
+                const link = this.showLinkMenu()
+                const doc = this.editor.getJSON()
+                const lastParagraph = doc.content[doc.content.length -1]
+                if (!lastParagraph.content) {
+                  Object.assign(lastParagraph, { content: [] })
+                }
+                lastParagraph.content.push({
+                  type: 'text',
+                  text,
+                  marks: [{
+                    type: 'link',
+                    attrs: {
+                      href: link,
+                    }
+                  }]
+                })
+                this.editor.setContent(doc)
+              }
+            } else {
+              this.showLinkMenu()
+            }
             break;
           default:
             this.editor.commands[name]();
@@ -130,6 +156,7 @@
           }
 
           this.setLinkUrl(link);
+          return link;
         }
       },
       setLinkUrl(url) {
