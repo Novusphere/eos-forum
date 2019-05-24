@@ -264,25 +264,23 @@
               <font-awesome-icon :icon="['fas', 'link']" />
             </a>
           </li>
-          <li class="list-inline-item" v-if="thread && post.transaction && !showAsFeed && post.depth === 0">
-            <div class="text-center my-3">
-              <a @click="popShareSheet()" class="share-sheet-icon" :id="'share-sheet' + post.data.post_uuid">
-                <font-awesome-icon :icon="['fas', 'share']" />
-              </a>
-              <b-popover :target="'share-sheet' + post.data.post_uuid" :show.sync="show_share_sheet" triggers="">
-                <div class="share-sheet-container">
-                  <div class="share-sheet-header">
-                    <span class="title">Share With Friends</span>
-                    <a class="close" @click="popShareSheet()">Close</a>
-                  </div>
-                  <ul>
-                    <li @click="shareToFacebook()">Facebook</li>
-                    <li @click="shareToTwitter()">Twitter</li>
-                    <li @click="shareToTelegram()">Telegram</li>
-                  </ul>
+          <li class="list-inline-item" v-if="post.transaction && post.depth === 0">
+            <a @click.stop="popShareSheet()" class="share-sheet-icon" :id="share_sheet_id">
+              <font-awesome-icon :icon="['fas', 'share']" />
+            </a>
+            <b-popover :target="share_sheet_id" :show.sync="show_share_sheet" triggers="">
+              <div class="share-sheet-container">
+                <div class="share-sheet-header">
+                  <span class="title">Share With Friends</span>
+                  <a class="close" @click.stop="popShareSheet()">Close</a>
                 </div>
-              </b-popover>
-            </div>
+                <ul>
+                  <li @click="shareToFacebook()">Facebook</li>
+                  <li @click="shareToTwitter()">Twitter</li>
+                  <li @click="shareToTelegram()">Telegram</li>
+                </ul>
+              </div>
+            </b-popover>
           </li>
           <li class="list-inline-item">
             <a @click="toggleSpam()" href="javascript:void(0)">
@@ -394,6 +392,12 @@ export default {
     }
   },
   computed: {
+    share_sheet_id() {
+      if (!this.thread) {
+        return `share-sheet-${this.post.data.post_uuid}-feed`
+      }
+      return `share-sheet-${this.post.data.post_uuid}-thread`
+    },
     post_poster() {
       var anon_id = this.post.data.json_metadata.anon_id;
       if (anon_id && anon_id.pub) {
@@ -926,7 +930,11 @@ export default {
   color: black!important;
 }
 .share-sheet-icon {
-  cursor: pointer;
+  color: #363838 !important;
+}
+.share-sheet-icon:hover {
+  color: #0056b3!important;
+  text-decoration: underline!important;
 }
 .share-sheet-container {
   display: flex;
