@@ -62,7 +62,7 @@
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Content</label>
                     <div class="col-sm-10">
-                      <textarea rows="10" class="form-control" placeholder="Content" v-model="content"></textarea>
+                      <RichTextEditor v-model="content" />
                     </div>
                 </div>
                 <div class="form-group row" v-if="is_referendum && is_referendum_multi">
@@ -188,9 +188,11 @@ import PostComponent from "@/components/core/Post";
 import PostSorter from "@/components/core/PostSorter";
 
 import Layout from "@/components/section/Layout";
+import RichTextEditor from '@/components/RichTextEditor';
 
 import { Post } from "@/types/post";
 import $ from "jquery";
+
 
 export default {
   name: "StartThread",
@@ -198,7 +200,8 @@ export default {
     Pager,
     Post: PostComponent,
     PostSorter,
-    Layout
+    Layout,
+    RichTextEditor,
   },
   watch: {},
   computed: {
@@ -275,7 +278,6 @@ export default {
         this.edit_post = main_post;
         this.sub = main_post.data.json_metadata.sub;
         this.title = main_post.data.json_metadata.title;
-        this.content = main_post.data.content;
 
         const attachment = main_post.data.json_metadata.attachment;
         this.attachment.value = attachment.value;
@@ -321,7 +323,7 @@ export default {
           );
           return;
         }
-        this.content = " ";
+        this.content = "";
       }
 
       const edit_post = this.edit_post;
@@ -451,7 +453,7 @@ export default {
       referendum_expires: "",
       referendum_option: "",
       referendum_options: [],
-      customSub: ""
+      customSub: "",
     };
   }
 };
