@@ -172,43 +172,44 @@
         </div>
         <div class="clearfix"></div>
       </div>
-      <div class="postinfobot">
-        <div class="posted">
-          <ul class="list-inline">
-            <li class="list-inline-item">
-              <a
-                v-if="!is_op"
-                class="up"
-                style="margin-right: 10px;display: inline"
-                @click.stop="upvote()">
-                <font-awesome-icon :icon="['fas', 'caret-up']" />
-                {{ post.up }}
-              </a>
-              <a
-                v-if="!thread && post.transaction && !showAsFeed"
-                class="link"
-                @click.stop.prevent="$router.push(thread_link)"
-              >
-                <font-awesome-icon :icon="['fas', 'reply']" />
-                <span v-if="!post.parent ">{{ post.total_replies }} comments</span>
-              </a>
-              <a class="reply" v-else-if="showAsFeed">
-                <font-awesome-icon :icon="['fas', 'reply']" />
-                reply
-              </a>
-              <a class="reply" v-else @click.stop="showQuickReply()">
-                <font-awesome-icon :icon="['fas', 'reply']" />
-                reply
-              </a>
-            </li>
-            <li v-if="post.referendum && post.referendum.details && (post.referendum.details.total != undefined)" class="list-inline-item">
-              <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
-              {{ post.referendum.details.total.toFixed(4) }}
-            </li>
-            <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
-              <div
-                class="hover"
-                @click.stop="is_op ?
+    </div>
+    <div class="postinfobot" :class="{'hidden': hide === true && post.depth !== 0}">
+      <div class="posted">
+        <ul class="list-inline">
+          <li class="list-inline-item">
+            <a
+              v-if="!is_op"
+              class="up"
+              style="margin-right: 10px;display: inline"
+              @click.stop="upvote()">
+              <font-awesome-icon :icon="['fas', 'caret-up']" />
+              {{ post.up }}
+            </a>
+            <a
+              v-if="!thread && post.transaction && !showAsFeed"
+              class="link"
+              @click.stop.prevent="$router.push(thread_link)"
+            >
+              <font-awesome-icon :icon="['fas', 'reply']" />
+              <span v-if="!post.parent ">{{ post.total_replies }} comments</span>
+            </a>
+            <a class="reply" v-else-if="showAsFeed">
+              <font-awesome-icon :icon="['fas', 'reply']" />
+              reply
+            </a>
+            <a class="reply" v-else @click.stop="showQuickReply()">
+              <font-awesome-icon :icon="['fas', 'reply']" />
+              reply
+            </a>
+          </li>
+          <li v-if="post.referendum && post.referendum.details && (post.referendum.details.total != undefined)" class="list-inline-item">
+            <img src="https://cdn.novusphere.io/static/eos3.svg" style="display: inline-block; height: 2em">
+            {{ post.referendum.details.total.toFixed(4) }}
+          </li>
+          <li v-if="is_mine && thread && !post.referendum" class="list-inline-item">
+            <div
+              class="hover"
+              @click.stop="is_op ?
                 $router.push({
                   name: 'EditThread',
                   params: {
@@ -217,93 +218,95 @@
                   }
                 }) :
                 showQuickEdit()">
-                <font-awesome-icon :icon="['fas', 'edit']" />
-                edit
-              </div>
-            </li>
-            <li class="list-inline-item" v-if="is_op">
-              <template v-if="!post.referendum">
-                <font-awesome-icon :icon="['fas', 'clock']" />
-                {{ created_at }}
-              </template>
-            </li>
-            <li class="list-inline-item">
-              <router-link
-                @click.native.stop
-                v-if="post.id && is_edit"
-                :to="{ name: 'History', params: { id: post.o_transaction } }">
-                <font-awesome-icon :icon="['fas', 'history']" />
-              </router-link>
-            </li>
-            <li v-if="post.referendum" class="list-inline-item">
-              <span v-if="post.referendum.expired" class="text-danger">expired</span>
-              <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
-            </li>
-            <li v-if="!is_op"
+              <font-awesome-icon :icon="['fas', 'edit']" />
+              edit
+            </div>
+          </li>
+          <li class="list-inline-item" v-if="is_op">
+            <template v-if="!post.referendum">
+              <font-awesome-icon :icon="['fas', 'clock']" />
+              {{ created_at }}
+            </template>
+          </li>
+          <li class="list-inline-item">
+            <router-link
+              @click.native.stop
+              v-if="post.id && is_edit"
+              :to="{ name: 'History', params: { id: post.o_transaction } }">
+              <font-awesome-icon :icon="['fas', 'history']" />
+            </router-link>
+          </li>
+          <li v-if="post.referendum" class="list-inline-item">
+            <span v-if="post.referendum.expired" class="text-danger">expired</span>
+            <span v-else>expires on {{ new Date(post.referendum.expires_at * 1000).toLocaleString() }}</span>
+          </li>
+          <li v-if="!is_op"
               class="list-inline-item">
-              <a
-                @click.stop
-                v-if="reddit.author"
-                target="_blank"
-                :href="'https://reddit.com' + reddit.permalink">
-                <font-awesome-icon :icon="['fab', 'reddit']" />
-                permalink
+            <a
+              @click.stop
+              v-if="reddit.author"
+              target="_blank"
+              :href="'https://reddit.com' + reddit.permalink">
+              <font-awesome-icon :icon="['fab', 'reddit']" />
+              permalink
+            </a>
+            <router-link
+              @click.native.stop
+              v-else-if="post.transaction"
+              :to="perma_link">
+              permalink
+            </router-link>
+          </li>
+          <li class="list-inline-item">
+            <a @click.stop
+               :href="`https://eosq.app/tx/${post.transaction}`"
+               target="_blank">
+              <font-awesome-icon :icon="['fas', 'link']" />
+            </a>
+          </li>
+          <li class="list-inline-item" v-if="thread && post.transaction && !showAsFeed && post.depth === 0">
+            <div class="text-center my-3">
+              <a @click="popShareSheet()" class="share-sheet-icon" :id="'share-sheet' + post.data.post_uuid">
+                <font-awesome-icon :icon="['fas', 'share']" />
               </a>
-              <router-link
-                @click.native.stop
-                v-else-if="post.transaction"
-                :to="perma_link">
-                permalink
-              </router-link>
-            </li>
-            <li class="list-inline-item">
-              <a @click.stop
-                :href="`https://eosq.app/tx/${post.transaction}`"
-                target="_blank">
-                <font-awesome-icon :icon="['fas', 'link']" />
-              </a>
-            </li>
-            <li class="list-inline-item" v-if="thread && post.transaction && !showAsFeed && post.depth === 0">
-              <div class="text-center my-3">
-                <a @click="popShareSheet()" class="share-sheet-icon" :id="'share-sheet' + post.data.post_uuid">
-                  <font-awesome-icon :icon="['fas', 'share']" />
-                </a>
-                <b-popover :target="'share-sheet' + post.data.post_uuid" :show.sync="show_share_sheet" triggers="">
-                  <div class="share-sheet-container">
-                    <div class="share-sheet-header">
-                      <span class="title">Share With Friends</span>
-                      <a class="close" @click="popShareSheet()">Close</a>
-                    </div>
-                    <ul>
-                      <li @click="shareToFacebook()">Facebook</li>
-                      <li @click="shareToTwitter()">Twitter</li>
-                      <li @click="shareToTelegram()">Telegram</li>
-                    </ul>
+              <b-popover :target="'share-sheet' + post.data.post_uuid" :show.sync="show_share_sheet" triggers="">
+                <div class="share-sheet-container">
+                  <div class="share-sheet-header">
+                    <span class="title">Share With Friends</span>
+                    <a class="close" @click="popShareSheet()">Close</a>
                   </div>
-                </b-popover>
-              </div>
-            </li>
-            <li class="list-inline-item">
-              <a @click="toggleSpam()" href="javascript:void(0)">
-                <font-awesome-icon :icon="['fas', 'exclamation-triangle']" />
-                mark as spam
-              </a>
-            </li>
-            <li class="list-inline-item" v-if="post.depth >= 5">
-              <a
-                @click="
+                  <ul>
+                    <li @click="shareToFacebook()">Facebook</li>
+                    <li @click="shareToTwitter()">Twitter</li>
+                    <li @click="shareToTelegram()">Telegram</li>
+                  </ul>
+                </div>
+              </b-popover>
+            </div>
+          </li>
+          <li class="list-inline-item">
+            <a @click="toggleSpam()" href="javascript:void(0)">
+              <font-awesome-icon :icon="['fas', 'exclamation-triangle']" />
+              mark as spam
+            </a>
+          </li>
+          <li class="list-inline-item" v-if="post.depth >= 5">
+            <a
+              @click="
                   $root.mode = 'zen',
                   $router.push(zen_mode)
                 "
-                class="hover black follow-discussion"
-              >
-                show more
-              </a>
-            </li>
-          </ul>
-        </div>
+              class="hover black follow-discussion"
+            >
+              show more
+            </a>
+          </li>
+        </ul>
+      </div>
 
-        <div :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
+        <div
+          v-if="!hideReplyBox"
+          :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
           :id="'qreply-' + post.data.post_uuid">
           <div class="col-sm-12">
             <RichTextEditor v-model="quick_reply" />
@@ -318,8 +321,7 @@
           </div>
         </div>
 
-        <div class="clearfix"></div>
-      </div>
+      <div class="clearfix"></div>
     </div>
     <template v-if="showChildren && post.depth < 5">
       <div
@@ -361,6 +363,11 @@ export default {
     PostAttachment
   },
   props: {
+    hideReplyBox: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     preview: {
       type: Boolean,
       required: false,
@@ -784,11 +791,11 @@ export default {
       })
     },
     shareToTwitter() {
-      window.open(`http://twitter.com/share?text=${this.post.data.json_metadata.title}&url=${encodeURIComponent(this.shareHref)}&hashtags=${this.post.data.json_metadata.sub}`, '_blank'
+      window.open(`http://twitter.com/share?text=${encodeURIComponent(this.post.data.json_metadata.title)}&url=${encodeURIComponent(this.shareHref)}&hashtags=${this.post.data.json_metadata.sub}`, '_blank'
       )
     },
     shareToTelegram() {
-      window.open(`https://telegram.me/share?text=${this.post.data.json_metadata.title}&url=${encodeURIComponent(this.shareHref)}`, '_blank'
+      window.open(`https://telegram.me/share?text=${encodeURIComponent(this.post.data.json_metadata.title)}&url=${encodeURIComponent(this.shareHref)}`, '_blank'
       )
     }
   },

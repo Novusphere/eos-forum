@@ -161,7 +161,7 @@
                 </div>
                 <div class="row" v-if="preview">
                   <div class="col-md-12">
-                    <post :post="preview"></post>
+                    <post :post="preview" :hideReplyBox="true"></post>
                   </div>
                 </div>
               </div>
