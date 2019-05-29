@@ -187,26 +187,27 @@
                 class="dropdown-item sidebar-nav-item"
                 :to="{name: 'Index' }"
                 :exact="true">
-                <font-awesome-icon :icon="['fas', 'home']" />
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'home']" />
                 home
               </router-link>
               <router-link
                 class="dropdown-item sidebar-nav-item"
                 :to="{name: 'Feed' }"
                  :exact="true">
-                <font-awesome-icon :icon="['fas', 'newspaper']" />
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'newspaper']" />
                 feed
               </router-link>
               <router-link
                 class="dropdown-item sidebar-nav-item"
                 :to="{name: 'Sub', params: { sub: 'all' } }"
                  :exact="true">
-                <font-awesome-icon :icon="['fas', 'globe']" />
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'globe']" />
                 all
               </router-link>
               <router-link v-if="eos_referendum"
-                class="dropdown-item"
+                class="dropdown-item sidebar-nav-item"
                 :to="{name: 'Sub', params: { sub: 'referendum' } }">
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'poll']" />
                   referendum
               </router-link>
               <div class="divline" />
@@ -215,7 +216,7 @@
                   :key="`userSub-${i}`"
                   class="dropdown-item"
                   :to="{ name: 'UserProfile', params: { account: user } }">
-                  <font-awesome-icon class="fas follow-user-icon" :icon="['fas', 'user-circle']" />
+                  <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'user-circle']" />
                   <div>
                     {{ user }}
                   </div>
@@ -566,7 +567,7 @@ export default {
 }
 </style>
 <style scoped>
-.follow-user-icon {
+.sidebar-nav-icon {
   width: 20px;
   height: 20px;
   margin-right: 5px;
