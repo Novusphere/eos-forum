@@ -62,6 +62,7 @@
     History,
     HorizontalRule,
     Mention,
+    Image,
   } from 'tiptap-extensions'
 
   export default {
@@ -94,6 +95,7 @@
             new ListItem(),
             new TodoItem(),
             new TodoList(),
+            new Image(),
             new Bold(),
             new Code(),
             new Italic(),
@@ -186,6 +188,7 @@
           {name: 'underline', icon: 'underline'},
           {name: 'strike', icon: 'strikethrough'},
           {name: 'link', icon: 'link'},
+          {name: 'image', icon: 'image'},
           {name: 'heading', icon: 'heading'},
           {name: 'horizontal_rule', icon: 'minus'},
         ],
@@ -218,6 +221,9 @@
           // override the heading
           case 'heading':
             this.editor.commands.heading({level: 1});
+            break;
+          case 'image':
+            this.showImagePrompt();
             break;
           case 'link':
             const {empty} = this.editor.state.tr.selection;
@@ -266,11 +272,16 @@
           return link;
         }
       },
+      showImagePrompt() {
+        const src = prompt('Enter the url of your image here')
+        if (src !== null) {
+          this.editor.commands.image({ src })
+        }
+      },
       setLinkUrl(url) {
         this.editor.commands.link({href: url});
         this.editor.focus()
       },
-
       // navigate to the previous item
       // if it's the first item, navigate to the last one
       upHandler() {
