@@ -9,7 +9,7 @@ const WHITE_LIST = [
     'H3', 'H4', 'I', 'IMG', 'KBD',
     'LI', 'OL', 'P', 'PRE', 'S',
     'SUP', 'SUB', 'STRONG', 'STRIKE', 'UL',
-    'BR', 'HR', '#text',
+    'BR', 'HR', '#text', 'U',
     // non-standard
     'DIV', 'FIGURE', 'CENTER'
 ];
@@ -21,7 +21,7 @@ const RX_DATA = new RegExp('data', 'i');
 class MarkdownParser {
     constructor(text, createdAt) {
         this.text = (text ? text : '').replace(/&#x200B;/g, "");
-        this.html = '';
+      this.html = '';
         this.attachments = [];
 
         if (createdAt == undefined || createdAt >= 1538136731) {
@@ -31,6 +31,9 @@ class MarkdownParser {
         this._generateHtml();
         this._postProcess();
     }
+    get _getPre() {
+      return window.__ROUTER_MODE__ == "hash" ? "\\#" : "";
+    }
     _generateHtml() {
         var extensions = [];
 
@@ -39,13 +42,12 @@ class MarkdownParser {
             // idk why I need to use \\ for the link instead of /, it just breaks if I don't
             // but hey, at least it works
             //
-            const pre = window.__ROUTER_MODE__ == "hash" ? "\\#" : "";
 
             extensions.push(twitter(
                 (username) => {
-                    return ` <a href="${pre}/u/${username.trim().substring(1)}">${username}</a>`;
+                    return ` <a href="${this._getPre}/u/${username.trim().substring(1)}">${username}</a>`;
                 },
-                (tag) => ` <a href="${pre}/tag/${tag}">#${tag}</a>`
+                (tag) => ` <a href="${this._getPre}/tag/${tag}">#${tag}</a>`
             ));
         }
 
@@ -87,6 +89,16 @@ class MarkdownParser {
 
         if (el.nodeName == 'SCRIPT') {
             el.innerHTML = '';
+        }
+        // process tiptap mention into a link
+        if (el.nodeName == 'SPAN') {
+          const [classItem] = el.classList;
+          if (classItem === 'mention') {
+            var username = this._safeAttribute(el.getAttribute('data-mention-id'));
+            if (username) {
+              el.outerHTML = `<a href="${this._getPre}/u/${username}">@${username}</a>`
+            }
+          }
         }
         else if (WHITE_LIST.indexOf(el.nodeName) == -1) {
             if (el.nodeName == 'IFRAME') {

@@ -264,25 +264,23 @@
               <font-awesome-icon :icon="['fas', 'link']" />
             </a>
           </li>
-          <li class="list-inline-item" v-if="thread && post.transaction && !showAsFeed && post.depth === 0">
-            <div class="text-center my-3">
-              <a @click="popShareSheet()" class="share-sheet-icon" :id="'share-sheet' + post.data.post_uuid">
-                <font-awesome-icon :icon="['fas', 'share']" />
-              </a>
-              <b-popover :target="'share-sheet' + post.data.post_uuid" :show.sync="show_share_sheet" triggers="">
-                <div class="share-sheet-container">
-                  <div class="share-sheet-header">
-                    <span class="title">Share With Friends</span>
-                    <a class="close" @click="popShareSheet()">Close</a>
-                  </div>
-                  <ul>
-                    <li @click="shareToFacebook()">Facebook</li>
-                    <li @click="shareToTwitter()">Twitter</li>
-                    <li @click="shareToTelegram()">Telegram</li>
-                  </ul>
+          <li class="list-inline-item" v-if="post.transaction && post.depth === 0">
+            <a @click.stop="popShareSheet()" class="share-sheet-icon" :id="share_sheet_id">
+              <font-awesome-icon :icon="['fas', 'share']" />
+            </a>
+            <b-popover :target="share_sheet_id" :show.sync="show_share_sheet" triggers="">
+              <div class="share-sheet-container">
+                <div class="share-sheet-header">
+                  <span class="title">Share With Friends</span>
+                  <a class="close" @click.stop="popShareSheet()">Close</a>
                 </div>
-              </b-popover>
-            </div>
+                <ul>
+                  <li @click="shareToFacebook()">Facebook</li>
+                  <li @click="shareToTwitter()">Twitter</li>
+                  <li @click="shareToTelegram()">Telegram</li>
+                </ul>
+              </div>
+            </b-popover>
           </li>
           <li class="list-inline-item">
             <a @click="toggleSpam()" href="javascript:void(0)">
@@ -304,22 +302,22 @@
         </ul>
       </div>
 
-      <div
-        v-if="!hideReplyBox"
-        :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
-        :id="'qreply-' + post.data.post_uuid">
-        <div class="col-sm-12">
-          <textarea @click.stop rows="2" class="form-control" placeholder="Content" v-model="quick_reply"></textarea>
+        <div
+          v-if="!hideReplyBox"
+          :class="'quick-reply ' + ((show_quick_reply || show_quick_edit) ? '': 'collapse')"
+          :id="'qreply-' + post.data.post_uuid">
+          <div class="col-sm-12">
+            <RichTextEditor v-model="quick_reply" />
+          </div>
+          <div class="col-sm-12 text-center" v-if="status">
+            <span>{{ status }}</span>
+          </div>
+          <div class="col-sm-12 mt-1 mb-2">
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="quickReply(false)">{{ show_quick_edit ? 'Edit' : 'Post' }}</button>
+            <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-primary" @click="quickReply(true)">Post ID</button>
+            <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="addTip()">Tip</button>
+          </div>
         </div>
-        <div class="col-sm-12 text-center" v-if="status">
-          <span>{{ status }}</span>
-        </div>
-        <div class="col-sm-12 mt-1 mb-2">
-          <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="quickReply(false)">{{ show_quick_edit ? 'Edit' : 'Post' }}</button>
-          <button v-if="show_quick_reply" type="button" class="btn btn-sm btn-primary" @click="quickReply(true)">Post ID</button>
-          <button v-if="identity.account" type="button" class="btn btn-sm btn-primary" @click="addTip()">Tip</button>
-        </div>
-      </div>
 
       <div class="clearfix"></div>
     </div>
@@ -354,10 +352,12 @@ import { moderation } from "@/moderation";
 import PostAttachment from "@/components/core/PostAttachment.vue";
 import moment from 'moment';
 import { Post } from "@/types/post";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default {
   name: "Post",
   components: {
+    RichTextEditor,
     PostAttachment
   },
   props: {
@@ -392,6 +392,12 @@ export default {
     }
   },
   computed: {
+    share_sheet_id() {
+      if (!this.thread) {
+        return `share-sheet-${this.post.data.post_uuid}-feed`
+      }
+      return `share-sheet-${this.post.data.post_uuid}-thread`
+    },
     post_poster() {
       var anon_id = this.post.data.json_metadata.anon_id;
       if (anon_id && anon_id.pub) {
@@ -925,6 +931,11 @@ export default {
 }
 .share-sheet-icon {
   cursor: pointer;
+  color: #363838 !important;
+}
+.share-sheet-icon:hover {
+  color: #0056b3!important;
+  text-decoration: underline!important;
 }
 .share-sheet-container {
   display: flex;
