@@ -56,9 +56,9 @@
         <div class="navbar">
           <div class="brand">
             <div>
-              <router-link :to="{ name: 'Index' }">
+              <span class="pointer" @click="$router.push({name: 'Index'})">
                 <img :src="brand_logo" style="height: 38px;">
-              </router-link>
+              </span>
             </div>
 
             <div class="flex">
@@ -183,21 +183,31 @@
         <div class="row">
           <div v-if="$root.mode === 'normal'" class="col-0 col-lg-3 col-xl-3 sidebarblock">
             <div class="desktop block">
-              <router-link class="dropdown-item"
-                :to="{name: 'Index' }">
+              <router-link
+                class="dropdown-item sidebar-nav-item"
+                :to="{name: 'Index' }"
+                :exact="true">
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'home']" />
                 home
               </router-link>
-              <router-link class="dropdown-item"
-                :to="{name: 'Feed' }">
+              <router-link
+                class="dropdown-item sidebar-nav-item"
+                :to="{name: 'Feed' }"
+                 :exact="true">
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'newspaper']" />
                 feed
               </router-link>
-              <router-link class="dropdown-item"
-                :to="{name: 'Sub', params: { sub: 'all' } }">
+              <router-link
+                class="dropdown-item sidebar-nav-item"
+                :to="{name: 'Sub', params: { sub: 'all' } }"
+                 :exact="true">
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'globe']" />
                 all
               </router-link>
               <router-link v-if="eos_referendum"
-                class="dropdown-item"
+                class="dropdown-item sidebar-nav-item"
                 :to="{name: 'Sub', params: { sub: 'referendum' } }">
+                <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'poll']" />
                   referendum
               </router-link>
               <div class="divline" />
@@ -206,7 +216,7 @@
                   :key="`userSub-${i}`"
                   class="dropdown-item"
                   :to="{ name: 'UserProfile', params: { account: user } }">
-                  <font-awesome-icon class="fas follow-user-icon" :icon="['fas', 'user-circle']" />
+                  <font-awesome-icon class="fas sidebar-nav-icon" :icon="['fas', 'user-circle']" />
                   <div>
                     {{ user }}
                   </div>
@@ -557,7 +567,7 @@ export default {
 }
 </style>
 <style scoped>
-.follow-user-icon {
+.sidebar-nav-icon {
   width: 20px;
   height: 20px;
   margin-right: 5px;
@@ -632,5 +642,19 @@ export default {
 }
 .buy-banner-modal .footer button {
   margin-left: 10px;
+}
+.pointer {
+  cursor: pointer;
+}
+.router-link-active {
+  background: #e0e1e2;
+}
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.sidebar-nav-item svg {
+  margin-right: 5px;
 }
 </style>
