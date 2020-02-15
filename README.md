@@ -1,4 +1,8 @@
-# novusphere-eos
+# DEPRECATED
+
+Please See https://github.com/Novusphere/discussions-app instead
+
+# eos-forum
 
 > A simple reddit-like interface built on EOS using novusphere-db
 
