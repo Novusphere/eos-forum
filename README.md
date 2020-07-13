@@ -1,6 +1,6 @@
 # DEPRECATED
 
-Please See https://github.com/Novusphere/discussions-app instead
+Please See https://github.com/Novusphere/discussions-vue instead
 
 # eos-forum
 
